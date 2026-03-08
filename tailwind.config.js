@@ -14,6 +14,7 @@ export default {
         "background-dark": "#2c2826",
         "warm-beige": "#f2ece1",
         "warm-grey": "#5e5452",
+        "warm-muted": "#8c8479",
       },
       fontFamily: {
         display: ["Space Grotesk", "sans-serif"],

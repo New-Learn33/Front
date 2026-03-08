@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
 const showcaseItems = [
@@ -45,8 +46,8 @@ export default function HomePage() {
             <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" href="#">쇼케이스</a>
           </nav>
           <div className="flex items-center gap-4">
-            <button className="hidden sm:block text-sm font-medium text-slate-600">로그인</button>
-            <button className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</button>
+            <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-600">로그인</Link>
+            <Link to="/signup" className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
           </div>
         </div>
       </header>
@@ -148,9 +149,9 @@ export default function HomePage() {
             </h2>
             <p className="text-[#5e5452] mb-12 font-medium">내가 입력하신 내용을 고려한 고퀄리티의 시각적인 결과를 얻으세요.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white font-bold px-10 py-4 rounded-xl transition-all shadow-lg shadow-[#c46e4d]/20 text-sm">
+              <Link to="/signup" className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white font-bold px-10 py-4 rounded-xl transition-all shadow-lg shadow-[#c46e4d]/20 text-sm">
                 무료로 시작하기
-              </button>
+              </Link>
               <button className="bg-white border border-[#d9cdba] text-[#5e5452] px-10 py-4 rounded-xl text-sm font-bold transition-all hover:bg-slate-50">
                 요금제 보기
               </button>
