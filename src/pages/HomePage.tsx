@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks/useScrollReveal'
+import { useAuth } from '../hooks/useAuth'
 
 const showcaseItems = [
   {
@@ -21,6 +22,7 @@ const showcaseItems = [
 ]
 
 export default function HomePage() {
+  const { user, isLoggedIn, logout } = useAuth()
   const heroRef = useScrollReveal<HTMLDivElement>({ threshold: 0.1 })
   const featuresHeadingRef = useScrollReveal<HTMLDivElement>()
   const featuresGridRef = useScrollReveal<HTMLDivElement>()
@@ -48,8 +50,27 @@ export default function HomePage() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-600">로그인</Link>
-            <Link to="/signup" className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
+            {isLoggedIn ? (
+              <>
+                <Link to="/studio" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">스튜디오</Link>
+                <div className="flex items-center gap-3">
+                  {user?.profile_image_url ? (
+                    <img src={user.profile_image_url} alt="프로필" className="size-8 rounded-full object-cover" />
+                  ) : (
+                    <div className="size-8 rounded-full bg-[#c46e4d] flex items-center justify-center text-white text-xs font-bold">
+                      {user?.name?.charAt(0) || '?'}
+                    </div>
+                  )}
+                  <span className="hidden sm:block text-sm font-medium text-slate-700">{user?.nickname || user?.name}</span>
+                  <button onClick={logout} className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">로그아웃</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-600">로그인</Link>
+                <Link to="/signup" className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -151,9 +172,15 @@ export default function HomePage() {
             </h2>
             <p className="text-[#5e5452] mb-12 font-medium">내가 입력하신 내용을 고려한 고퀄리티의 시각적인 결과를 얻으세요.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/signup" className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white font-bold px-10 py-4 rounded-xl transition-all shadow-lg shadow-[#c46e4d]/20 text-sm">
-                무료로 시작하기
-              </Link>
+              {isLoggedIn ? (
+                <Link to="/studio/create" className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white font-bold px-10 py-4 rounded-xl transition-all shadow-lg shadow-[#c46e4d]/20 text-sm">
+                  영상 만들러 가기
+                </Link>
+              ) : (
+                <Link to="/signup" className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white font-bold px-10 py-4 rounded-xl transition-all shadow-lg shadow-[#c46e4d]/20 text-sm">
+                  무료로 시작하기
+                </Link>
+              )}
               <button className="bg-white border border-[#d9cdba] text-[#5e5452] px-10 py-4 rounded-xl text-sm font-bold transition-all hover:bg-slate-50">
                 요금제 보기
               </button>

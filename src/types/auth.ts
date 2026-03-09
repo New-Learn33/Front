@@ -2,14 +2,22 @@ export interface User {
   id: number
   name: string
   email: string
-  plan: 'free' | 'pro' | 'enterprise'
+  nickname?: string
+  profile_image_url?: string
+  provider?: string
+  provider_id?: string
+  plan?: 'free' | 'pro' | 'enterprise'
   avatar_url?: string
-  created_at: string
+  created_at?: string
 }
 
 export interface LoginRequest {
   email: string
   password: string
+}
+
+export interface GoogleLoginRequest {
+  id_token: string
 }
 
 export interface SignupRequest {
