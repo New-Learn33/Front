@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
 
 const stats = [
-  { icon: 'play_circle', label: '생성된 영상', value: '24', change: '+3 이번 주' },
-  { icon: 'folder_open', label: '활성 프로젝트', value: '8', change: '+1 이번 주' },
-  { icon: 'image', label: '저장된 에셋', value: '156', change: '+12 이번 주' },
-  { icon: 'schedule', label: '이용 시간', value: '18h', change: '이번 달' },
+  { icon: 'play_circle', label: '생성된 영상', value: 24, change: '+3 이번 주' },
+  { icon: 'folder_open', label: '활성 프로젝트', value: 8, change: '+1 이번 주' },
+  { icon: 'image', label: '저장된 에셋', value: 156, change: '+12 이번 주' },
+  { icon: 'schedule', label: '이용 시간', value: 18, suffix: 'h', change: '이번 달' },
 ]
 
 const recentProjects = [
@@ -14,36 +15,61 @@ const recentProjects = [
   { title: '테크 프로모션', style: '사이버펑크', date: '2024.12.12', status: '완료', thumb: 'computer' },
 ]
 
+function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
+  const [count, setCount] = useState(0)
+  const ref = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    const duration = 1200
+    const steps = 40
+    let step = 0
+    const timer = setInterval(() => {
+      step++
+      const progress = 1 - Math.pow(1 - step / steps, 3)
+      setCount(Math.round(target * progress))
+      if (step >= steps) {
+        setCount(target)
+        clearInterval(timer)
+      }
+    }, duration / steps)
+    return () => clearInterval(timer)
+  }, [target])
+
+  return <span ref={ref}>{count}{suffix}</span>
+}
+
 export default function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* Welcome */}
-      <div>
+      <div className="animate-enter">
         <h1 className="text-2xl font-bold text-[#2d2926]">안녕하세요, 사용자님 👋</h1>
         <p className="text-warm-muted mt-1">오늘도 멋진 영상을 만들어 보세요.</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
         {stats.map((s) => (
-          <div key={s.label} className="bg-white rounded-2xl p-5 border border-[#e5ddd3]">
+          <div key={s.label} className="bg-white rounded-2xl p-5 border border-[#e5ddd3] card-hover">
             <div className="flex items-center justify-between mb-3">
               <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary">{s.icon}</span>
               </div>
               <span className="text-[11px] text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">{s.change}</span>
             </div>
-            <p className="text-2xl font-bold text-[#2d2926]">{s.value}</p>
+            <p className="text-2xl font-bold text-[#2d2926]">
+              <CountUp target={s.value} suffix={s.suffix} />
+            </p>
             <p className="text-xs text-warm-muted mt-1">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 stagger-children" style={{ animationDelay: '200ms' }}>
         <Link
           to="/studio/create"
-          className="bg-primary text-white rounded-2xl p-6 flex items-center gap-4 hover:opacity-90 transition-all"
+          className="bg-primary text-white rounded-2xl p-6 flex items-center gap-4 card-hover btn-press"
         >
           <div className="size-12 bg-white/20 rounded-xl flex items-center justify-center">
             <span className="material-symbols-outlined text-2xl">auto_awesome</span>
@@ -55,7 +81,7 @@ export default function DashboardPage() {
         </Link>
         <Link
           to="/studio/projects"
-          className="bg-white border border-[#e5ddd3] rounded-2xl p-6 flex items-center gap-4 hover:bg-[#f9f6f0] transition-all"
+          className="bg-white border border-[#e5ddd3] rounded-2xl p-6 flex items-center gap-4 card-hover btn-press"
         >
           <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-2xl">folder_open</span>
@@ -67,7 +93,7 @@ export default function DashboardPage() {
         </Link>
         <Link
           to="/studio/assets"
-          className="bg-white border border-[#e5ddd3] rounded-2xl p-6 flex items-center gap-4 hover:bg-[#f9f6f0] transition-all"
+          className="bg-white border border-[#e5ddd3] rounded-2xl p-6 flex items-center gap-4 card-hover btn-press"
         >
           <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-2xl">perm_media</span>
@@ -80,14 +106,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Projects */}
-      <div>
+      <div className="animate-enter" style={{ animationDelay: '350ms' }}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-[#2d2926]">최근 프로젝트</h2>
-          <Link to="/studio/projects" className="text-xs text-primary font-bold flex items-center gap-1">
+          <Link to="/studio/projects" className="text-xs text-primary font-bold flex items-center gap-1 btn-press">
             전체 보기 <span className="material-symbols-outlined text-sm">arrow_forward</span>
           </Link>
         </div>
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden">
+        <div className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden card-hover">
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#e5ddd3] text-xs text-warm-muted">
@@ -99,7 +125,7 @@ export default function DashboardPage() {
             </thead>
             <tbody>
               {recentProjects.map((p) => (
-                <tr key={p.title} className="border-b border-[#e5ddd3] last:border-0 hover:bg-[#f9f6f0] transition-colors">
+                <tr key={p.title} className="border-b border-[#e5ddd3] last:border-0 hover:bg-[#f9f6f0] transition-colors cursor-pointer">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">

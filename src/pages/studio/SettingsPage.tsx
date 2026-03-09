@@ -8,7 +8,7 @@ export default function SettingsPage() {
   const [language, setLanguage] = useState('ko')
 
   return (
-    <div className="max-w-3xl space-y-8">
+    <div className="max-w-3xl space-y-8 stagger-children">
       <div>
         <h1 className="text-2xl font-bold text-[#2d2926]">환경설정</h1>
         <p className="text-warm-muted text-sm mt-1">계정 및 앱 설정을 관리합니다.</p>
@@ -132,7 +132,7 @@ export default function SettingsPage() {
             <p className="text-sm font-semibold text-[#2d2926]">무료 플랜</p>
             <p className="text-xs text-warm-muted">월 10개 영상 생성 · 5GB 저장공간</p>
           </div>
-          <button className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-xl transition-all">
+          <button className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-xl transition-all btn-press">
             업그레이드
           </button>
         </div>
@@ -149,7 +149,7 @@ export default function SettingsPage() {
 
       {/* Save */}
       <div className="flex justify-end">
-        <button className="bg-primary hover:bg-[#b05d3f] text-white font-bold px-8 py-3 rounded-xl transition-all">
+        <button className="bg-primary hover:bg-[#b05d3f] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press">
           변경사항 저장
         </button>
       </div>

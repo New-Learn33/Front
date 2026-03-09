@@ -27,19 +27,19 @@ export default function AssetLibraryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-enter">
         <div>
           <h1 className="text-2xl font-bold text-[#2d2926]">에셋 라이브러리</h1>
           <p className="text-warm-muted text-sm mt-1">총 {assets.length}개의 에셋 · 115.3 MB 사용 중</p>
         </div>
-        <button className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all">
+        <button className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all btn-press">
           <span className="material-symbols-outlined text-lg">upload</span>
           업로드
         </button>
       </div>
 
       {/* Filter & View */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-enter" style={{ animationDelay: '100ms' }}>
         <div className="flex items-center gap-2">
           {categories.map((c) => (
             <button
@@ -73,11 +73,11 @@ export default function AssetLibraryPage() {
 
       {/* Content */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 stagger-children">
           {filtered.map((a) => (
             <div
               key={a.id}
-              className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden hover:shadow-md transition-all cursor-pointer group"
+              className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden cursor-pointer group card-hover"
             >
               <div className="aspect-square bg-[#f9f6f0] flex items-center justify-center relative">
                 <span className="material-symbols-outlined text-4xl text-primary/30">{a.icon}</span>
@@ -91,7 +91,7 @@ export default function AssetLibraryPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden">
+        <div className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden animate-enter-scale" style={{ animationDelay: '150ms' }}>
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#e5ddd3] text-xs text-warm-muted">

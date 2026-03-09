@@ -22,12 +22,12 @@ export default function VisualCreationPage() {
       {/* Left Panel - Prompt & Style */}
       <div className="flex-1 space-y-6">
         {/* Prompt Input */}
-        <div className="space-y-3">
+        <div className="space-y-3 animate-enter">
           <h1 className="text-2xl font-bold text-[#2d2926]">비주얼 생성</h1>
           <p className="text-warm-muted text-sm">원하는 장면을 설명해 주세요. AI가 영상을 만들어 드립니다.</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-3">
+        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-3 animate-enter-scale" style={{ animationDelay: '80ms' }}>
           <label className="text-sm font-semibold text-[#2d2926]">프롬프트</label>
           <textarea
             className="w-full h-32 bg-[#f9f6f0] rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 border border-[#e5ddd3] resize-none placeholder:text-warm-muted/50"
@@ -42,17 +42,17 @@ export default function VisualCreationPage() {
         </div>
 
         {/* Style Selection */}
-        <div className="space-y-3">
+        <div className="space-y-3 animate-enter" style={{ animationDelay: '160ms' }}>
           <h2 className="text-lg font-bold text-[#2d2926]">스타일 선택</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 stagger-children">
             {styles.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setSelectedStyle(s.id)}
-                className={`p-4 rounded-2xl border-2 text-left transition-all ${
+                className={`p-4 rounded-2xl border-2 text-left transition-all btn-press ${
                   selectedStyle === s.id
                     ? 'border-primary bg-primary/5'
-                    : 'border-[#e5ddd3] bg-white hover:border-primary/30'
+                    : 'border-[#e5ddd3] bg-white hover:border-primary/30 card-hover'
                 }`}
               >
                 <div className={`size-10 rounded-xl flex items-center justify-center mb-3 ${
@@ -68,7 +68,7 @@ export default function VisualCreationPage() {
         </div>
 
         {/* Preview Placeholder */}
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-8 flex flex-col items-center justify-center min-h-[240px]">
+        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-8 flex flex-col items-center justify-center min-h-[240px] animate-enter-scale" style={{ animationDelay: '300ms' }}>
           <div className="size-16 rounded-2xl bg-[#f9f6f0] flex items-center justify-center mb-4">
             <span className="material-symbols-outlined text-3xl text-primary/40">smart_display</span>
           </div>
@@ -78,7 +78,7 @@ export default function VisualCreationPage() {
       </div>
 
       {/* Right Panel - Settings */}
-      <div className="w-80 shrink-0 space-y-5">
+      <div className="w-80 shrink-0 space-y-5 animate-enter" style={{ animationDelay: '200ms' }}>
         <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-6">
           <h3 className="text-base font-bold text-[#2d2926]">세부 설정</h3>
 
@@ -178,7 +178,7 @@ export default function VisualCreationPage() {
         </div>
 
         {/* Generate Button */}
-        <button className="w-full bg-primary hover:bg-[#b05d3f] text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+        <button className="w-full bg-primary hover:bg-[#b05d3f] text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 btn-press">
           <span className="material-symbols-outlined">auto_awesome</span>
           영상 생성하기
         </button>
