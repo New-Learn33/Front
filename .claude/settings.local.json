@@ -5,7 +5,9 @@
       "Bash(npx create-vite@latest . --template react-ts)",
       "Bash(npm install)",
       "Bash(npm run build)",
-      "Bash(npm install react-router-dom)"
+      "Bash(npm install react-router-dom)",
+      "Bash(npm install axios)",
+      "Bash(npm install -D @types/node)"
     ]
   }
 }
