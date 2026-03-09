@@ -16,6 +16,11 @@ export default function LoginPage() {
       return
     }
 
+    // id_token 콘솔에 출력 (디버깅용)
+    console.log('=== Google id_token ===')
+    console.log(idToken)
+    console.log('======================')
+
     try {
       setIsLoading(true)
       // 백엔드에 id_token 전송 → 검증 후 JWT 반환
@@ -120,27 +125,23 @@ export default function LoginPage() {
           </div>
 
           {/* Social Logins */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* 구글 로그인 버튼 */}
-            <div className="flex items-center justify-center h-12 rounded-xl border border-[#e5ddd3] bg-white/40 hover:bg-white/70 transition-colors overflow-hidden">
-              {isLoading ? (
+          <div className="w-full flex justify-center">
+            {isLoading ? (
+              <div className="w-full flex items-center justify-center h-11 rounded-xl border border-[#e5ddd3] bg-white/40">
                 <span className="text-sm text-warm-muted">로그인 중...</span>
-              ) : (
-                <GoogleLogin
-                  onSuccess={handleGoogleLoginSuccess}
-                  onError={() => alert('구글 로그인에 실패했습니다.')}
-                  size="large"
-                  width="200"
-                  text="signin_with"
-                  shape="rectangular"
-                  theme="outline"
-                />
-              )}
-            </div>
-            <button className="flex items-center justify-center gap-2 h-12 rounded-xl border border-[#e5ddd3] bg-white/40 hover:bg-white/70 transition-colors">
-              <span className="material-symbols-outlined text-xl">account_circle</span>
-              <span className="text-sm font-medium">Apple</span>
-            </button>
+              </div>
+            ) : (
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={() => alert('구글 로그인에 실패했습니다.')}
+                size="large"
+                width="400"
+                theme="outline"
+                shape="rectangular"
+                text="signin_with"
+                logo_alignment="left"
+              />
+            )}
           </div>
 
           {/* Footer */}
