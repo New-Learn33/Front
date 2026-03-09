@@ -30,21 +30,23 @@ export default function HomePage() {
   const footerRef = useScrollReveal<HTMLElement>()
 
   return (
-    <div className="bg-[#f2ece1] font-display text-slate-900 antialiased overflow-x-hidden">
+    <div className="bg-[#f2ece1] font-display text-slate-900 antialiased">
       {/* Top Navigation */}
       <header className="fixed top-0 w-full z-50 bg-[#f2ece1]/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="size-8 bg-blue-600 rounded-md flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-xl">movie_filter</span>
-            </div>
-            <h2 className="text-lg font-bold tracking-tight text-[#1a1a1a]">AI 비디오</h2>
+          <div className="flex items-center gap-8">
+            <Link to="/" className="flex items-center gap-3">
+              <div className="size-8 bg-primary rounded-md flex items-center justify-center text-white">
+                <span className="material-symbols-outlined text-xl">movie_filter</span>
+              </div>
+              <h2 className="text-lg font-bold tracking-tight text-[#1a1a1a]">AI 비디오</h2>
+            </Link>
+            <nav className="hidden md:flex items-center gap-6">
+              <Link className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" to="/">홈</Link>
+              <Link className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" to="/showcase">쇼케이스</Link>
+              <Link className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" to="#">요금제</Link>
+            </nav>
           </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" href="#">기능</a>
-            <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" href="#">요금제</a>
-            <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" href="#">쇼케이스</a>
-          </nav>
           <div className="flex items-center gap-4">
             <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-600">로그인</Link>
             <Link to="/signup" className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
@@ -60,8 +62,8 @@ export default function HomePage() {
               <span>★ NEXT-GEN AI GENERATION</span>
             </div>
             <h1 className="text-6xl md:text-[80px] font-bold leading-[1.05] tracking-tight text-[#2d2926]">
-              아이디어를 단 몇 초 만에{' '}
-              <span className="text-[#c46e4d]">숏<br/>폼 영상</span>으로
+              아이디어를 단 몇 초만에<br/>
+              <span className="text-[#c46e4d]">숏폼 영상</span>으로
             </h1>
             <p className="text-lg text-[#5e5452] max-w-2xl mx-auto font-medium">
               이미 나를 시용하여 창의적인 아이디어를 소유할 수 있을 정도로 즉시 변환<br/>하세요.
@@ -76,9 +78,9 @@ export default function HomePage() {
                     type="text"
                   />
                 </div>
-                <button className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition-all text-sm">
+                <Link to="/studio/create" className="bg-[#c46e4d] hover:bg-[#b05d3f] text-white font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition-all text-sm">
                   영상 생성하기 <span className="material-symbols-outlined text-sm">bolt</span>
-                </button>
+                </Link>
               </div>
               <p className="mt-4 text-xs text-slate-400">최근 "공상과학적 사운드 효과 및 시각적인 효과"를 입력해보세요.</p>
             </div>
