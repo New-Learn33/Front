@@ -26,8 +26,17 @@ export interface SignupRequest {
   password: string
 }
 
-export interface LoginResponse {
+export interface ApiResponse<T> {
+  success: boolean
+  message: string
+  data: T
+}
+
+export interface LoginResponseData {
   access_token: string
   token_type: string
   user: User
 }
+
+export type LoginResponse = ApiResponse<LoginResponseData>
+export type MeResponse = ApiResponse<User>

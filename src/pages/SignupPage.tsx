@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import aiVidLogo from '@/assets/AI_vid_logo.png'
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -10,9 +11,7 @@ export default function SignupPage() {
       {/* Top Navigation Bar */}
       <header className="flex items-center justify-between px-6 py-6 lg:px-20 border-b border-[#e5ddd3]/50">
         <Link to="/" className="flex items-center gap-3">
-          <div className="bg-primary p-1.5 rounded-lg flex items-center justify-center text-white">
-            <span className="material-symbols-outlined text-2xl">movie_filter</span>
-          </div>
+          <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-11 rounded-lg bg-primary p-1.5 object-contain" />
           <h2 className="text-xl font-bold tracking-tight">AI Video Studio</h2>
         </Link>
         <div className="hidden md:flex gap-6 items-center">
@@ -157,3 +156,4 @@ export default function SignupPage() {
     </div>
   )
 }
+

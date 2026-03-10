@@ -1,5 +1,5 @@
 import api from './client'
-import type { LoginRequest, GoogleLoginRequest, LoginResponse, SignupRequest, User } from '@/types/auth'
+import type { LoginRequest, GoogleLoginRequest, LoginResponse, MeResponse, SignupRequest } from '@/types/auth'
 
 export const authApi = {
   login: (data: LoginRequest) =>
@@ -12,7 +12,7 @@ export const authApi = {
     api.post<LoginResponse>('/auth/signup', data),
 
   me: () =>
-    api.get<User>('/auth/me'),
+    api.get<MeResponse>('/auth/me'),
 
   logout: () =>
     api.post('/auth/logout'),

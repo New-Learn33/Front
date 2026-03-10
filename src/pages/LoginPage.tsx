@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { authApi } from '@/api/auth'
+import aiVidLogo from '@/assets/AI_vid_logo.png'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -25,7 +26,7 @@ export default function LoginPage() {
       setIsLoading(true)
       // 백엔드에 id_token 전송 → 검증 후 JWT 반환
       const res = await authApi.googleLogin({ id_token: idToken })
-      const { access_token, user } = res.data
+      const { access_token, user } = res.data.data
 
       // 토큰 & 유저 정보 저장
       localStorage.setItem('access_token', access_token)
@@ -46,8 +47,8 @@ export default function LoginPage() {
         <div className="w-full max-w-[440px] space-y-8">
           {/* Logo */}
           <div className="flex flex-col items-center gap-3">
-            <Link to="/" className="bg-primary p-1.5 rounded-lg flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-2xl">movie_filter</span>
+            <Link to="/" className="flex items-center justify-center">
+              <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-11 rounded-lg bg-primary p-1.5 object-contain" />
             </Link>
             <Link to="/" className="text-xl font-bold tracking-tight">AI Video Studio</Link>
           </div>
@@ -153,3 +154,5 @@ export default function LoginPage() {
     </div>
   )
 }
+
+

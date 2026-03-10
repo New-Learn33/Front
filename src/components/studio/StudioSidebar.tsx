@@ -1,4 +1,5 @@
 import { NavLink, Link } from 'react-router-dom'
+import aiVidLogo from '@/assets/AI_vid_logo.png'
 
 const navItems = [
   { to: '/studio', icon: 'dashboard', label: '대시보드', end: true },
@@ -14,9 +15,7 @@ export default function StudioSidebar() {
       {/* Logo */}
       <div className="px-6 h-16 flex items-center gap-3 border-b border-white/10">
         <Link to="/" className="flex items-center gap-3">
-          <div className="size-8 bg-primary rounded-md flex items-center justify-center">
-            <span className="material-symbols-outlined text-lg">movie_filter</span>
-          </div>
+          <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-8 rounded-md bg-primary p-1 object-contain" />
           <span className="text-base font-bold tracking-tight">AI Video Studio</span>
         </Link>
       </div>
@@ -66,3 +65,4 @@ export default function StudioSidebar() {
     </aside>
   )
 }
+
