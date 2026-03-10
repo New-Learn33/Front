@@ -3,17 +3,17 @@ import type { LoginRequest, GoogleLoginRequest, LoginResponse, MeResponse, Signu
 
 export const authApi = {
   login: (data: LoginRequest) =>
-    api.post<LoginResponse>('/auth/login', data),
+    api.post<LoginResponse>('/api/v1/auth/login', data),
 
   googleLogin: (data: GoogleLoginRequest) =>
-    api.post<LoginResponse>('/auth/google/login', data),
+    api.post<LoginResponse>('/api/v1/auth/google/login', data),
 
   signup: (data: SignupRequest) =>
-    api.post<LoginResponse>('/auth/signup', data),
+    api.post<LoginResponse>('/api/v1/auth/signup', data),
 
   me: () =>
-    api.get<MeResponse>('/auth/me'),
+    api.get<User>('/api/v1/auth/me'),
 
   logout: () =>
-    api.post('/auth/logout'),
+    api.post('/api/v1/auth/logout'),
 }
