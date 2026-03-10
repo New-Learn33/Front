@@ -128,7 +128,7 @@ export default function HomePage() {
                     index === 0 ? 'bg-amber-400 text-amber-900' :
                     index === 1 ? 'bg-slate-300 text-slate-700' :
                     index === 2 ? 'bg-amber-600 text-amber-100' :
-                    'bg-white/90 text-[#2d2926]'
+                    'bg-white/90 text-[#2d2926] rank-badge-light'
                   }`}>
                     {index + 1}
                   </div>
