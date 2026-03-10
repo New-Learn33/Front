@@ -5,9 +5,37 @@ import { authApi } from '@/api/auth'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
 
 export default function LoginPage() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
+
+  // 이메일 로그인 핸들러
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!email.trim() || !password) {
+      alert('이메일과 비밀번호를 입력해주세요.')
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      const res = await authApi.login({ email, password })
+      const { access_token, user } = res.data.data
+
+      localStorage.setItem('access_token', access_token)
+      localStorage.setItem('user', JSON.stringify(user))
+      navigate('/studio')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      const msg = error.response?.data?.message || '로그인 중 오류가 발생했습니다.'
+      alert(msg)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   // 구글 로그인 성공 핸들러
   const handleGoogleLoginSuccess = async (credentialResponse: { credential?: string }) => {
@@ -17,22 +45,13 @@ export default function LoginPage() {
       return
     }
 
-    // id_token 콘솔에 출력 (디버깅용)
-    console.log('=== Google id_token ===')
-    console.log(idToken)
-    console.log('======================')
-
     try {
       setIsLoading(true)
-      // 백엔드에 id_token 전송 → 검증 후 JWT 반환
       const res = await authApi.googleLogin({ id_token: idToken })
       const { access_token, user } = res.data.data
 
-      // 토큰 & 유저 정보 저장
       localStorage.setItem('access_token', access_token)
       localStorage.setItem('user', JSON.stringify(user))
-
-      // 스튜디오 대시보드로 이동
       navigate('/studio')
     } catch {
       alert('구글 로그인 중 오류가 발생했습니다.')
@@ -60,7 +79,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-5" onSubmit={handleLogin}>
             {/* Email */}
             <div className="space-y-2">
               <label className="text-sm font-semibold block px-1">이메일</label>
@@ -68,6 +87,8 @@ export default function LoginPage() {
                 className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                 placeholder="이메일을 입력하세요"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -79,6 +100,8 @@ export default function LoginPage() {
                   className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                   placeholder="비밀번호를 입력하세요"
                   type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
@@ -110,8 +133,11 @@ export default function LoginPage() {
             </div>
 
             {/* Submit */}
-            <button className="w-full h-14 bg-primary hover:opacity-90 text-white font-bold rounded-xl text-lg transition-all shadow-md">
-              로그인
+            <button
+              disabled={isLoading}
+              className="w-full h-14 bg-primary hover:opacity-90 text-white font-bold rounded-xl text-lg transition-all shadow-md disabled:opacity-50"
+            >
+              {isLoading ? '로그인 중...' : '로그인'}
             </button>
           </form>
 
@@ -154,5 +180,3 @@ export default function LoginPage() {
     </div>
   )
 }
-
-

@@ -12,6 +12,9 @@ const sortFilters = [
 
 const PAGE_SIZE = 8
 
+// 좋아요 기준 TOP 5 랭킹
+const topVideos = [...allVideos].sort((a, b) => b.likes - a.likes).slice(0, 5)
+
 export default function HomePage() {
   const { user, isLoggedIn, logout } = useAuth()
   const [activeSort, setActiveSort] = useState(0)
@@ -98,6 +101,57 @@ export default function HomePage() {
               새 영상 만들기
             </Link>
           )}
+        </div>
+
+        {/* Ranking */}
+        <div className="mb-14">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="material-symbols-outlined text-2xl text-amber-500">emoji_events</span>
+            <h3 className="text-2xl font-black text-[#2d2926] tracking-tight">인기 랭킹 TOP 5</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {topVideos.map((video, index) => (
+              <Link
+                key={video.id}
+                to={`/video/${video.id}`}
+                className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#eee6d8]"
+              >
+                {/* 썸네일 */}
+                <div className="relative aspect-[3/4] w-full overflow-hidden">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                    style={{ backgroundImage: `url("${video.image}")` }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  {/* 순위 뱃지 */}
+                  <div className={`absolute top-3 left-3 size-9 rounded-full flex items-center justify-center font-black text-sm shadow-lg ${
+                    index === 0 ? 'bg-amber-400 text-amber-900' :
+                    index === 1 ? 'bg-slate-300 text-slate-700' :
+                    index === 2 ? 'bg-amber-600 text-amber-100' :
+                    'bg-white/90 text-[#2d2926]'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  {/* 하단 정보 */}
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <h4 className="font-bold text-sm truncate mb-1">{video.title}</h4>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <div className="size-5 rounded-full overflow-hidden">
+                          <img className="w-full h-full object-cover" src={video.avatar} alt={video.creator} />
+                        </div>
+                        <span className="text-xs text-white/80">{video.creator}</span>
+                      </div>
+                      <span className="flex items-center gap-1 text-xs text-white/80">
+                        <span className="material-symbols-outlined text-xs text-red-400">favorite</span>
+                        {formatCount(video.likes)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Filters + Search */}

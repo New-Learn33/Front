@@ -12,7 +12,7 @@ export const authApi = {
     api.post<LoginResponse>('/api/v1/auth/signup', data),
 
   me: () =>
-    api.get<User>('/api/v1/auth/me'),
+    api.get<MeResponse>('/api/v1/auth/me'),
 
   logout: () =>
     api.post('/api/v1/auth/logout'),

@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useAuth } from '../../hooks/useAuth'
 
 export default function SettingsPage() {
+  const { user, isLoading } = useAuth()
   const [notifications, setNotifications] = useState(true)
   const [emailUpdates, setEmailUpdates] = useState(false)
   const [autoSave, setAutoSave] = useState(true)
@@ -17,33 +19,65 @@ export default function SettingsPage() {
       {/* Profile */}
       <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6 space-y-5">
         <h2 className="text-base font-bold text-[#2d2926]">프로필</h2>
-        <div className="flex items-center gap-5">
-          <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary text-3xl">person</span>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <span className="text-sm text-warm-muted">불러오는 중...</span>
           </div>
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-[#2d2926]">사용자</p>
-            <p className="text-xs text-warm-muted">user@example.com</p>
-          </div>
-          <button className="ml-auto text-sm text-primary font-bold hover:underline">프로필 수정</button>
-        </div>
-        <div className="grid grid-cols-2 gap-4 pt-2">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#2d2926]">이름</label>
-            <input
-              className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              defaultValue="사용자"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#2d2926]">이메일</label>
-            <input
-              className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              defaultValue="user@example.com"
-              type="email"
-            />
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-5">
+              {user?.profile_image_url ? (
+                <img src={user.profile_image_url} alt="프로필" className="size-16 rounded-full object-cover" />
+              ) : (
+                <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-primary text-2xl font-bold">{user?.name?.charAt(0) || '?'}</span>
+                </div>
+              )}
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-[#2d2926]">{user?.name || '사용자'}</p>
+                <p className="text-xs text-warm-muted">{user?.email || '-'}</p>
+                <span className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                  {user?.provider === 'google' ? 'Google 계정' : '이메일 계정'}
+                </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#2d2926]">이름</label>
+                <input
+                  className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  value={user?.name || ''}
+                  readOnly
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#2d2926]">이메일</label>
+                <input
+                  className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  value={user?.email || ''}
+                  type="email"
+                  readOnly
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#2d2926]">닉네임</label>
+                <input
+                  className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  value={user?.nickname || ''}
+                  readOnly
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#2d2926]">로그인 방식</label>
+                <input
+                  className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none"
+                  value={user?.provider === 'google' ? 'Google' : '이메일'}
+                  readOnly
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Preferences */}

@@ -1,10 +1,77 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { GoogleLogin } from '@react-oauth/google'
+import { authApi } from '@/api/auth'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
 
 export default function SignupPage() {
+  const navigate = useNavigate()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  // 이메일 회원가입 핸들러
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!name.trim() || !email.trim() || !password) {
+      alert('모든 필드를 입력해주세요.')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      alert('비밀번호가 일치하지 않습니다.')
+      return
+    }
+
+    if (password.length < 6) {
+      alert('비밀번호는 6자 이상이어야 합니다.')
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      const res = await authApi.signup({ name, email, password })
+      const { access_token, user } = res.data.data
+
+      localStorage.setItem('access_token', access_token)
+      localStorage.setItem('user', JSON.stringify(user))
+      navigate('/studio')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      const msg = error.response?.data?.message || '회원가입 중 오류가 발생했습니다.'
+      alert(msg)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 구글 로그인 성공 핸들러
+  const handleGoogleLoginSuccess = async (credentialResponse: { credential?: string }) => {
+    const idToken = credentialResponse.credential
+    if (!idToken) {
+      alert('구글 인증 정보를 받지 못했습니다.')
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      const res = await authApi.googleLogin({ id_token: idToken })
+      const { access_token, user } = res.data.data
+
+      localStorage.setItem('access_token', access_token)
+      localStorage.setItem('user', JSON.stringify(user))
+      navigate('/studio')
+    } catch {
+      alert('구글 로그인 중 오류가 발생했습니다.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="bg-[#f2ece1] min-h-screen flex flex-col font-display text-slate-900">
@@ -31,7 +98,7 @@ export default function SignupPage() {
           </div>
 
           {/* Form */}
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-5" onSubmit={handleSignup}>
             {/* Name */}
             <div className="space-y-2">
               <label className="text-sm font-semibold block px-1">이름</label>
@@ -39,6 +106,8 @@ export default function SignupPage() {
                 className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                 placeholder="성함을 입력하세요"
                 type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 
@@ -49,6 +118,8 @@ export default function SignupPage() {
                 className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                 placeholder="example@email.com"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -60,6 +131,8 @@ export default function SignupPage() {
                   className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                   placeholder="비밀번호를 입력하세요"
                   type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
@@ -81,6 +154,8 @@ export default function SignupPage() {
                   className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                   placeholder="비밀번호를 다시 입력하세요"
                   type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <button
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
@@ -108,9 +183,12 @@ export default function SignupPage() {
             </div>
 
             {/* Submit */}
-            <button className="w-full h-14 bg-primary hover:opacity-90 text-white font-bold rounded-xl text-lg transition-all shadow-md flex items-center justify-center gap-2">
-              가입하기
-              <span className="material-symbols-outlined">arrow_forward</span>
+            <button
+              disabled={isLoading}
+              className="w-full h-14 bg-primary hover:opacity-90 text-white font-bold rounded-xl text-lg transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isLoading ? '가입 중...' : '가입하기'}
+              {!isLoading && <span className="material-symbols-outlined">arrow_forward</span>}
             </button>
           </form>
 
@@ -124,21 +202,24 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Social Buttons */}
-          <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-2 h-12 rounded-xl border border-[#e5ddd3] bg-white/40 hover:bg-white/70 transition-colors">
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              <span className="text-sm font-medium">Google</span>
-            </button>
-            <button className="flex items-center justify-center gap-2 h-12 rounded-xl border border-[#e5ddd3] bg-white/40 hover:bg-white/70 transition-colors">
-              <span className="material-symbols-outlined text-xl">account_circle</span>
-              <span className="text-sm font-medium">Apple</span>
-            </button>
+          {/* Google Login */}
+          <div className="w-full flex justify-center">
+            {isLoading ? (
+              <div className="w-full flex items-center justify-center h-11 rounded-xl border border-[#e5ddd3] bg-white/40">
+                <span className="text-sm text-warm-muted">로그인 중...</span>
+              </div>
+            ) : (
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={() => alert('구글 로그인에 실패했습니다.')}
+                size="large"
+                width="440"
+                theme="outline"
+                shape="rectangular"
+                text="signup_with"
+                logo_alignment="left"
+              />
+            )}
           </div>
 
           <p className="text-warm-muted text-base text-center">
@@ -156,4 +237,3 @@ export default function SignupPage() {
     </div>
   )
 }
-
