@@ -58,7 +58,7 @@ export default function HomePage() {
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link className="text-sm font-semibold text-primary" to="/">홈</Link>
-              <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" to="#">요금제</Link>
+              <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" to="/pricing">요금제</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
@@ -258,9 +258,9 @@ export default function HomePage() {
             <span className="font-bold text-[#2d2926]">AI 비디오</span>
           </div>
           <div className="flex gap-8 text-sm text-[#5e5452]">
-            <a className="hover:text-primary transition-colors" href="#">이용약관</a>
-            <a className="hover:text-primary transition-colors" href="#">개인정보처리방침</a>
-            <a className="hover:text-primary transition-colors" href="#">고객센터</a>
+            <Link className="hover:text-primary transition-colors" to="/terms">이용약관</Link>
+            <Link className="hover:text-primary transition-colors" to="/privacy">개인정보처리방침</Link>
+            <Link className="hover:text-primary transition-colors" to="/support">고객센터</Link>
           </div>
           <p className="text-sm text-slate-400">© 2024 AI Video Studio. All rights reserved.</p>
         </div>

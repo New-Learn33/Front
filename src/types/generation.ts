@@ -34,3 +34,43 @@ export interface GenerationResponse {
   message: string
   data: GenerationData
 }
+
+// 자막 합성
+export interface SubtitleRenderRequest {
+  job_id: number
+  images: ImageItem[]
+  scenes: SceneItem[]
+}
+
+export interface SubtitleImageItem {
+  scene_order: number
+  image_url: string
+}
+
+export interface SubtitleRenderResponse {
+  success: boolean
+  message: string
+  data: {
+    job_id: number
+    subtitle_images: SubtitleImageItem[]
+  }
+}
+
+// 영상 렌더링
+export interface VideoRenderRequest {
+  job_id: number
+  subtitle_images: {
+    scene_order: number
+    image_url: string
+    duration: number
+  }[]
+}
+
+export interface VideoRenderResponse {
+  success: boolean
+  message: string
+  data: {
+    job_id: number
+    video_url: string
+  }
+}

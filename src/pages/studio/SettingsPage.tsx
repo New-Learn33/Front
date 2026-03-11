@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useAuth } from '../../hooks/useAuth'
+import { useTheme } from '../../hooks/useTheme'
 
 export default function SettingsPage() {
-  const { user, isLoading } = useAuth()
+  const { isDark, toggleTheme } = useTheme()
   const [notifications, setNotifications] = useState(true)
   const [emailUpdates, setEmailUpdates] = useState(false)
   const [autoSave, setAutoSave] = useState(true)
@@ -13,79 +13,28 @@ export default function SettingsPage() {
     <div className="max-w-3xl space-y-8 stagger-children">
       <div>
         <h1 className="text-2xl font-bold text-[#2d2926]">환경설정</h1>
-        <p className="text-warm-muted text-sm mt-1">계정 및 앱 설정을 관리합니다.</p>
-      </div>
-
-      {/* Profile */}
-      <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6 space-y-5">
-        <h2 className="text-base font-bold text-[#2d2926]">프로필</h2>
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <span className="text-sm text-warm-muted">불러오는 중...</span>
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center gap-5">
-              {user?.profile_image_url ? (
-                <img src={user.profile_image_url} alt="프로필" className="size-16 rounded-full object-cover" />
-              ) : (
-                <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-primary text-2xl font-bold">{user?.name?.charAt(0) || '?'}</span>
-                </div>
-              )}
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-[#2d2926]">{user?.name || '사용자'}</p>
-                <p className="text-xs text-warm-muted">{user?.email || '-'}</p>
-                <span className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                  {user?.provider === 'google' ? 'Google 계정' : '이메일 계정'}
-                </span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#2d2926]">이름</label>
-                <input
-                  className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  value={user?.name || ''}
-                  readOnly
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#2d2926]">이메일</label>
-                <input
-                  className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  value={user?.email || ''}
-                  type="email"
-                  readOnly
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#2d2926]">닉네임</label>
-                <input
-                  className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  value={user?.nickname || ''}
-                  readOnly
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#2d2926]">로그인 방식</label>
-                <input
-                  className="w-full h-11 px-4 rounded-xl border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none"
-                  value={user?.provider === 'google' ? 'Google' : '이메일'}
-                  readOnly
-                />
-              </div>
-            </div>
-          </>
-        )}
+        <p className="text-warm-muted text-sm mt-1">앱 설정을 관리합니다.</p>
       </div>
 
       {/* Preferences */}
       <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6 space-y-5">
-        <h2 className="text-base font-bold text-[#2d2926]">환경 설정</h2>
+        <h2 className="text-base font-bold text-[#2d2926]">일반 설정</h2>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="text-sm font-medium text-[#2d2926]">다크 모드</p>
+              <p className="text-xs text-warm-muted">어두운 테마로 전환합니다</p>
+            </div>
+            <button
+              onClick={toggleTheme}
+              className={`w-11 h-6 rounded-full transition-all ${isDark ? 'bg-primary' : 'bg-[#e5ddd3]'}`}
+            >
+              <div className={`size-5 bg-white rounded-full shadow transition-transform ${isDark ? 'translate-x-[22px]' : 'translate-x-[2px]'}`} />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between py-2 border-t border-[#e5ddd3]">
             <div>
               <p className="text-sm font-medium text-[#2d2926]">알림</p>
               <p className="text-xs text-warm-muted">앱 내 알림을 받습니다</p>

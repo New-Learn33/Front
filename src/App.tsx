@@ -10,6 +10,11 @@ import ProjectsPage from './pages/studio/ProjectsPage'
 import VisualCreationPage from './pages/studio/VisualCreationPage'
 import AssetLibraryPage from './pages/studio/AssetLibraryPage'
 import SettingsPage from './pages/studio/SettingsPage'
+import MyPage from './pages/studio/MyPage'
+import PricingPage from './pages/PricingPage'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
+import SupportPage from './pages/SupportPage'
 import ThemeToggle from './components/ThemeToggle'
 import { ThemeProvider } from './hooks/useTheme'
 
@@ -25,11 +30,16 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/video/:id" element={<VideoDetailPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/support" element={<SupportPage />} />
             <Route path="/studio" element={<StudioLayout />}>
               <Route index element={<DashboardPage />} />
               <Route path="projects" element={<ProjectsPage />} />
               <Route path="create" element={<VisualCreationPage />} />
               <Route path="assets" element={<AssetLibraryPage />} />
+              <Route path="mypage" element={<MyPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
           </Routes>

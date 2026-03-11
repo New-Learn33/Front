@@ -1,19 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
-
-const stats = [
-  { icon: 'play_circle', label: '생성된 영상', value: 24, change: '+3 이번 주' },
-  { icon: 'folder_open', label: '활성 프로젝트', value: 8, change: '+1 이번 주' },
-  { icon: 'image', label: '저장된 에셋', value: 156, change: '+12 이번 주' },
-  { icon: 'schedule', label: '이용 시간', value: 18, suffix: 'h', change: '이번 달' },
-]
-
-const recentProjects = [
-  { title: '브랜드 홍보 영상', style: '시네마틱', date: '2024.12.15', status: '완료', thumb: 'movie' },
-  { title: '제품 소개 릴스', style: '애니메이션', date: '2024.12.14', status: '완료', thumb: 'animation' },
-  { title: '자연 다큐멘터리', style: '수채화', date: '2024.12.13', status: '진행중', thumb: 'landscape' },
-  { title: '테크 프로모션', style: '사이버펑크', date: '2024.12.12', status: '완료', thumb: 'computer' },
-]
+import { useAuth } from '../../hooks/useAuth'
+import { userApi } from '../../api/user'
+import type { UserVideo } from '../../api/user'
 
 function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0)
@@ -39,11 +28,45 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
 }
 
 export default function DashboardPage() {
+  const { user } = useAuth()
+  const [myVideos, setMyVideos] = useState<UserVideo[]>([])
+  const [commentCount, setCommentCount] = useState(0)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [videosRes, commentsRes] = await Promise.allSettled([
+          userApi.getMyVideos(),
+          userApi.getMyComments(),
+        ])
+        if (videosRes.status === 'fulfilled' && videosRes.value.data.success) {
+          setMyVideos(videosRes.value.data.data.videos)
+        }
+        if (commentsRes.status === 'fulfilled' && commentsRes.value.data.success) {
+          setCommentCount(commentsRes.value.data.data.comments.length)
+        }
+      } catch (err) {
+        console.error('대시보드 데이터 로드 실패:', err)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const totalViews = myVideos.reduce((sum, v) => sum + (v.view_count || 0), 0)
+  const totalLikes = myVideos.reduce((sum, v) => sum + (v.like_count || 0), 0)
+
+  const stats = [
+    { icon: 'play_circle', label: '생성된 영상', value: myVideos.length, change: '' },
+    { icon: 'visibility', label: '총 조회수', value: totalViews, change: '' },
+    { icon: 'favorite', label: '총 좋아요', value: totalLikes, change: '' },
+    { icon: 'chat_bubble', label: '작성한 댓글', value: commentCount, change: '' },
+  ]
+
   return (
     <div className="space-y-8">
       {/* Welcome */}
       <div className="animate-enter">
-        <h1 className="text-2xl font-bold text-[#2d2926]">안녕하세요, 사용자님 👋</h1>
+        <h1 className="text-2xl font-bold text-[#2d2926]">안녕하세요, {user?.nickname || user?.name || '사용자'}님 👋</h1>
         <p className="text-warm-muted mt-1">오늘도 멋진 영상을 만들어 보세요.</p>
       </div>
 
@@ -55,10 +78,9 @@ export default function DashboardPage() {
               <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary">{s.icon}</span>
               </div>
-              <span className="text-[11px] text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">{s.change}</span>
             </div>
             <p className="text-2xl font-bold text-[#2d2926]">
-              <CountUp target={s.value} suffix={s.suffix} />
+              <CountUp target={s.value} />
             </p>
             <p className="text-xs text-warm-muted mt-1">{s.label}</p>
           </div>
@@ -80,76 +102,75 @@ export default function DashboardPage() {
           </div>
         </Link>
         <Link
-          to="/studio/projects"
+          to="/studio/mypage"
           className="bg-white border border-[#e5ddd3] rounded-2xl p-6 flex items-center gap-4 card-hover btn-press"
         >
           <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary text-2xl">folder_open</span>
+            <span className="material-symbols-outlined text-primary text-2xl">person</span>
           </div>
           <div>
-            <p className="font-bold text-[#2d2926]">프로젝트 보기</p>
-            <p className="text-sm text-warm-muted">진행 중인 프로젝트</p>
+            <p className="font-bold text-[#2d2926]">마이페이지</p>
+            <p className="text-sm text-warm-muted">내 프로필 및 활동</p>
           </div>
         </Link>
         <Link
-          to="/studio/assets"
+          to="/studio/settings"
           className="bg-white border border-[#e5ddd3] rounded-2xl p-6 flex items-center gap-4 card-hover btn-press"
         >
           <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary text-2xl">perm_media</span>
+            <span className="material-symbols-outlined text-primary text-2xl">settings</span>
           </div>
           <div>
-            <p className="font-bold text-[#2d2926]">에셋 라이브러리</p>
-            <p className="text-sm text-warm-muted">저장된 미디어 관리</p>
+            <p className="font-bold text-[#2d2926]">환경설정</p>
+            <p className="text-sm text-warm-muted">앱 설정 관리</p>
           </div>
         </Link>
       </div>
 
-      {/* Recent Projects */}
+      {/* Recent Videos */}
       <div className="animate-enter" style={{ animationDelay: '350ms' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-[#2d2926]">최근 프로젝트</h2>
-          <Link to="/studio/projects" className="text-xs text-primary font-bold flex items-center gap-1 btn-press">
+          <h2 className="text-lg font-bold text-[#2d2926]">내 최근 영상</h2>
+          <Link to="/studio/mypage" className="text-xs text-primary font-bold flex items-center gap-1 btn-press">
             전체 보기 <span className="material-symbols-outlined text-sm">arrow_forward</span>
           </Link>
         </div>
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden card-hover">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-[#e5ddd3] text-xs text-warm-muted">
-                <th className="text-left px-6 py-3 font-medium">프로젝트</th>
-                <th className="text-left px-6 py-3 font-medium">스타일</th>
-                <th className="text-left px-6 py-3 font-medium">날짜</th>
-                <th className="text-left px-6 py-3 font-medium">상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentProjects.map((p) => (
-                <tr key={p.title} className="border-b border-[#e5ddd3] last:border-0 hover:bg-[#f9f6f0] transition-colors cursor-pointer">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-primary text-lg">{p.thumb}</span>
-                      </div>
-                      <span className="text-sm font-semibold text-[#2d2926]">{p.title}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-warm-muted">{p.style}</td>
-                  <td className="px-6 py-4 text-sm text-warm-muted">{p.date}</td>
-                  <td className="px-6 py-4">
-                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                      p.status === '완료'
-                        ? 'bg-green-50 text-green-600'
-                        : 'bg-amber-50 text-amber-600'
-                    }`}>
-                      {p.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {myVideos.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-[#e5ddd3] p-12 flex flex-col items-center text-warm-muted">
+            <span className="material-symbols-outlined text-4xl mb-2">movie</span>
+            <p className="text-sm">아직 생성한 영상이 없습니다</p>
+            <Link to="/studio/create" className="mt-3 text-sm text-primary font-medium hover:underline">
+              첫 영상 만들기 →
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {myVideos.slice(0, 4).map((video) => (
+              <Link
+                key={video.id}
+                to={`/video/${video.id}`}
+                className="group bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden hover:shadow-lg transition-all"
+              >
+                <div className="aspect-video bg-[#f0ebe3] flex items-center justify-center relative overflow-hidden">
+                  {video.thumbnail_url ? (
+                    <img src={`http://localhost:8000${video.thumbnail_url}`} alt={video.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="material-symbols-outlined text-3xl text-[#c5beb4]">movie</span>
+                  )}
+                </div>
+                <div className="p-3">
+                  <h3 className="text-xs font-bold text-[#2d2926] truncate group-hover:text-primary transition-colors">
+                    {video.title}
+                  </h3>
+                  <div className="flex items-center gap-2 text-[10px] text-warm-muted mt-1">
+                    <span>조회 {video.view_count || 0}</span>
+                    <span>좋아요 {video.like_count || 0}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

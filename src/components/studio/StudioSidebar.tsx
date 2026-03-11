@@ -6,6 +6,7 @@ const navItems = [
   { to: '/studio/projects', icon: 'folder_open', label: '프로젝트' },
   { to: '/studio/create', icon: 'auto_awesome', label: '비주얼 생성' },
   { to: '/studio/assets', icon: 'perm_media', label: '에셋 라이브러리' },
+  { to: '/studio/mypage', icon: 'person', label: '마이페이지' },
   { to: '/studio/settings', icon: 'settings', label: '환경설정' },
 ]
 

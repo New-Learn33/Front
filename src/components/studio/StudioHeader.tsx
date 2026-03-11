@@ -10,7 +10,7 @@ const routeLabels: Record<string, string> = {
 
 export default function StudioHeader() {
   const { pathname } = useLocation()
-  const label = routeLabels[pathname] || '스튜디오'
+  const label = routeLabels[pathname] || '마이페이지'
 
   return (
     <header className="h-16 bg-[#f2ece1] border-b border-[#e5ddd3] flex items-center justify-between px-8">

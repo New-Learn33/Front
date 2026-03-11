@@ -16,6 +16,13 @@ export default function VisualCreationPage() {
   const [error, setError] = useState('')
   const [result, setResult] = useState<GenerationData | null>(null)
 
+  // 영상 생성 상태
+  const [videoLoading, setVideoLoading] = useState(false)
+  const [videoStep, setVideoStep] = useState<'idle' | 'subtitles' | 'video' | 'done'>('idle')
+  const [videoUrl, setVideoUrl] = useState<string | null>(null)
+  const [videoError, setVideoError] = useState('')
+
+  // 1단계: 3컷 이미지 + 대사 생성
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       setError('프롬프트를 입력해주세요.')
@@ -25,6 +32,9 @@ export default function VisualCreationPage() {
     setLoading(true)
     setError('')
     setResult(null)
+    setVideoUrl(null)
+    setVideoStep('idle')
+    setVideoError('')
 
     try {
       const res = await generationApi.create({
@@ -47,6 +57,63 @@ export default function VisualCreationPage() {
     }
   }
 
+  // 2단계 + 3단계: 자막 합성 → 영상 생성 (한 플로우)
+  const handleRenderVideo = async () => {
+    if (!result) return
+
+    setVideoLoading(true)
+    setVideoError('')
+    setVideoUrl(null)
+
+    try {
+      // 2단계: 자막 합성
+      setVideoStep('subtitles')
+      const subtitleRes = await generationApi.renderSubtitles({
+        job_id: result.job_id,
+        images: result.images,
+        scenes: result.scenes,
+      })
+
+      if (!subtitleRes.data.success) {
+        setVideoError(subtitleRes.data.message || '자막 합성에 실패했습니다.')
+        return
+      }
+
+      // 3단계: 영상 생성
+      setVideoStep('video')
+      const videoRes = await generationApi.renderVideo({
+        job_id: result.job_id,
+        subtitle_images: subtitleRes.data.data.subtitle_images.map((img) => ({
+          scene_order: img.scene_order,
+          image_url: img.image_url,
+          duration: 2,
+        })),
+      })
+
+      if (videoRes.data.success) {
+        setVideoUrl(videoRes.data.data.video_url)
+        setVideoStep('done')
+      } else {
+        setVideoError(videoRes.data.message || '영상 생성에 실패했습니다.')
+      }
+    } catch (err: any) {
+      console.error('Video render error:', err)
+      const detail = err.response?.data?.detail
+      const message = typeof detail === 'string' ? detail : err.message || '영상 생성 중 오류가 발생했습니다.'
+      setVideoError(message)
+    } finally {
+      setVideoLoading(false)
+    }
+  }
+
+  const videoStepLabel = () => {
+    switch (videoStep) {
+      case 'subtitles': return '자막 합성 중...'
+      case 'video': return '영상 렌더링 중...'
+      default: return '영상 생성 중...'
+    }
+  }
+
   return (
     <div className="flex gap-6 min-h-[calc(100vh-8rem)]">
       {/* Left Panel - Prompt & Category */}
@@ -64,7 +131,7 @@ export default function VisualCreationPage() {
             placeholder="시험 전날 밤샘하다가 갑자기 각성한 캐릭터..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            disabled={loading}
+            disabled={loading || videoLoading}
           />
           <div className="flex items-center justify-between text-xs text-warm-muted">
             <span>상세할수록 더 좋은 결과를 얻을 수 있습니다</span>
@@ -80,7 +147,7 @@ export default function VisualCreationPage() {
               <button
                 key={c.id}
                 onClick={() => setSelectedCategory(c.id)}
-                disabled={loading}
+                disabled={loading || videoLoading}
                 className={`p-4 rounded-2xl border-2 text-left transition-all btn-press ${
                   selectedCategory === c.id
                     ? 'border-primary bg-primary/5'
@@ -99,11 +166,17 @@ export default function VisualCreationPage() {
           </div>
         </div>
 
-        {/* Error Message */}
+        {/* Error Messages */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
             <span className="material-symbols-outlined text-red-500">error</span>
             <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+        {videoError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+            <span className="material-symbols-outlined text-red-500">error</span>
+            <p className="text-sm text-red-600">{videoError}</p>
           </div>
         )}
 
@@ -145,6 +218,18 @@ export default function VisualCreationPage() {
                 </div>
               ))}
             </div>
+
+            {/* 영상 플레이어 */}
+            {videoUrl && (
+              <div className="mt-4 rounded-xl overflow-hidden border border-[#e5ddd3] bg-black">
+                <video
+                  src={`http://localhost:8000${videoUrl}`}
+                  controls
+                  className="w-full"
+                  autoPlay
+                />
+              </div>
+            )}
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#e5ddd3] p-8 flex flex-col items-center justify-center min-h-[240px] animate-enter-scale" style={{ animationDelay: '300ms' }}>
@@ -157,7 +242,7 @@ export default function VisualCreationPage() {
         )}
       </div>
 
-      {/* Right Panel - Generate Button */}
+      {/* Right Panel - Buttons */}
       <div className="w-80 shrink-0 space-y-5 animate-enter" style={{ animationDelay: '200ms' }}>
         <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-4">
           <h3 className="text-base font-bold text-[#2d2926]">생성 정보</h3>
@@ -183,10 +268,10 @@ export default function VisualCreationPage() {
           </div>
         </div>
 
-        {/* Generate Button */}
+        {/* 3컷 생성 버튼 */}
         <button
           onClick={handleGenerate}
-          disabled={loading || !prompt.trim()}
+          disabled={loading || videoLoading || !prompt.trim()}
           className="w-full bg-primary hover:bg-[#b05d3f] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 btn-press"
         >
           {loading ? (
@@ -206,6 +291,65 @@ export default function VisualCreationPage() {
           <div className="bg-orange-50 rounded-xl p-4 space-y-2">
             <p className="text-xs text-warm-muted">AI가 대사와 이미지를 생성하고 있습니다.</p>
             <p className="text-xs text-warm-muted">잠시만 기다려주세요...</p>
+          </div>
+        )}
+
+        {/* 영상 생성 버튼 - 3컷 생성 완료 후 활성화 */}
+        <button
+          onClick={handleRenderVideo}
+          disabled={!result || videoLoading || loading}
+          className={`w-full font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 btn-press ${
+            result && !videoLoading
+              ? 'bg-[#2d2926] hover:bg-[#1a1714] text-white shadow-lg shadow-[#2d2926]/20'
+              : 'bg-[#e5ddd3] text-[#8a7d72] cursor-not-allowed'
+          }`}
+        >
+          {videoLoading ? (
+            <>
+              <span className="material-symbols-outlined animate-spin">progress_activity</span>
+              {videoStepLabel()}
+            </>
+          ) : videoUrl ? (
+            <>
+              <span className="material-symbols-outlined">check_circle</span>
+              영상 생성 완료!
+            </>
+          ) : (
+            <>
+              <span className="material-symbols-outlined">movie</span>
+              영상 생성하기
+            </>
+          )}
+        </button>
+
+        {videoLoading && (
+          <div className="bg-[#f9f6f0] rounded-xl p-4 space-y-3">
+            {/* 진행 단계 표시 */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className={`material-symbols-outlined text-sm ${videoStep === 'subtitles' ? 'text-primary animate-spin' : videoStep === 'video' || videoStep === 'done' ? 'text-green-500' : 'text-[#e5ddd3]'}`}>
+                  {videoStep === 'subtitles' ? 'progress_activity' : videoStep === 'video' || videoStep === 'done' ? 'check_circle' : 'radio_button_unchecked'}
+                </span>
+                <span className="text-xs text-[#2d2926]">자막 합성</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`material-symbols-outlined text-sm ${videoStep === 'video' ? 'text-primary animate-spin' : videoStep === 'done' ? 'text-green-500' : 'text-[#e5ddd3]'}`}>
+                  {videoStep === 'video' ? 'progress_activity' : videoStep === 'done' ? 'check_circle' : 'radio_button_unchecked'}
+                </span>
+                <span className="text-xs text-[#2d2926]">영상 렌더링</span>
+              </div>
+            </div>
+            <p className="text-xs text-warm-muted">이미지에 자막을 합성하고 영상을 만들고 있습니다.</p>
+          </div>
+        )}
+
+        {videoUrl && !videoLoading && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-green-500">check_circle</span>
+              <p className="text-sm font-medium text-green-700">영상이 생성되었습니다!</p>
+            </div>
+            <p className="text-xs text-green-600">왼쪽 미리보기에서 영상을 확인하세요.</p>
           </div>
         )}
       </div>
