@@ -1,5 +1,5 @@
 export type { User, LoginRequest, SignupRequest, LoginResponse } from './auth'
 export type { Project, ProjectListResponse } from './project'
-export type { GenerationRequest, GenerationResponse, GenerationStatus } from './generation'
+export type { GenerationRequest, GenerationResponse, GenerationData } from './generation'
 export type { Asset, AssetListResponse } from './asset'
 export type { DashboardStat, DashboardStats } from './dashboard'
