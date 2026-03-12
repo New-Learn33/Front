@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { generationApi } from '@/api/generation'
+import { resolveApiUrl } from '@/config/env'
 import type { GenerationData } from '@/types/generation'
 
 const categories = [
@@ -197,7 +198,7 @@ export default function VisualCreationPage() {
                   <div className="aspect-square rounded-xl overflow-hidden bg-[#f9f6f0] border border-[#e5ddd3]">
                     {result.images[idx] && (
                       <img
-                        src={`http://localhost:8000${result.images[idx].image_url}`}
+                        src={resolveApiUrl(result.images[idx].image_url)}
                         alt={scene.subtitle_text}
                         className="w-full h-full object-cover"
                       />
@@ -223,7 +224,7 @@ export default function VisualCreationPage() {
             {videoUrl && (
               <div className="mt-4 rounded-xl overflow-hidden border border-[#e5ddd3] bg-black">
                 <video
-                  src={`http://localhost:8000${videoUrl}`}
+                  src={resolveApiUrl(videoUrl)}
                   controls
                   className="w-full"
                   autoPlay
