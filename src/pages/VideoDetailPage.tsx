@@ -54,7 +54,6 @@ export default function VideoDetailPage() {
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" to="/">홈</Link>
-              <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" to="/pricing">요금제</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">

@@ -175,7 +175,7 @@ export default function MyPage() {
                 {user?.provider === 'google' ? 'Google 계정' : '이메일 계정'}
               </span>
               <span className="inline-block text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#f9f6f0] text-warm-muted">
-                무료 플랜
+                베타 사용자
               </span>
             </div>
           </div>
