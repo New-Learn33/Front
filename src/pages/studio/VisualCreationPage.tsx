@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { generationApi } from '@/api/generation'
 import { presetsApi, type Preset } from '@/api/presets'
-import { API_BASE_URL, resolveApiUrl } from '@/config/env'
+import { API_BASE_URL } from '@/config/env'
 import type { GenerationData } from '@/types/generation'
 
 const categories = [
