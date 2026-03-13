@@ -11,6 +11,7 @@ import VisualCreationPage from './pages/studio/VisualCreationPage'
 import AssetLibraryPage from './pages/studio/AssetLibraryPage'
 import SettingsPage from './pages/studio/SettingsPage'
 import MyPage from './pages/studio/MyPage'
+import PricingPage from './pages/PricingPage'
 import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
 import SupportPage from './pages/SupportPage'
@@ -29,6 +30,7 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/video/:id" element={<VideoDetailPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/support" element={<SupportPage />} />
