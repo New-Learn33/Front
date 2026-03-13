@@ -122,7 +122,7 @@ export default function MyPage() {
       <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6">
         <div className="flex items-center gap-6">
           {user?.profile_image_url ? (
-            <img src={user.profile_image_url} alt="프로필" className="size-20 rounded-full object-cover" />
+            <img src={resolveApiUrl(user.profile_image_url)} alt="프로필" className="size-20 rounded-full object-cover" />
           ) : (
             <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-primary text-3xl font-bold">{user?.name?.charAt(0) || '?'}</span>
