@@ -59,10 +59,11 @@ export default function StudioSidebar() {
           </div>
           <div>
             <p className="text-sm font-medium">사용자</p>
-            <p className="text-[11px] text-white/40">베타 사용자</p>
+            <p className="text-[11px] text-white/40">무료 플랜</p>
           </div>
         </div>
       </div>
     </aside>
   )
 }
+
