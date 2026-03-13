@@ -92,7 +92,7 @@ export default function VisualCreationPage() {
     } catch {}
   }
 
-  // 1단계: SSE 스트리밍으로 3컷 생성
+  // 1단계: SSE 스트리밍으로 6컷 생성
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       setError('프롬프트를 입력해주세요.')
@@ -252,7 +252,7 @@ export default function VisualCreationPage() {
       <div className="flex-1 space-y-6">
         <div className="space-y-3 animate-enter">
           <h1 className="text-2xl font-bold text-[#2d2926]">비주얼 생성</h1>
-          <p className="text-warm-muted text-sm">원하는 장면을 설명해 주세요. AI가 3컷 만화를 만들어 드립니다.</p>
+          <p className="text-warm-muted text-sm">원하는 장면을 설명해 주세요. AI가 6컷 만화를 만들어 드립니다.</p>
         </div>
 
         {/* Prompt Input */}
@@ -537,7 +537,7 @@ export default function VisualCreationPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-warm-muted">출력</span>
-              <span className="font-medium text-[#2d2926]">3컷 만화</span>
+              <span className="font-medium text-[#2d2926]">6컷 만화</span>
             </div>
             <div className="flex justify-between">
               <span className="text-warm-muted">AI 대사</span>
@@ -545,12 +545,12 @@ export default function VisualCreationPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-warm-muted">AI 이미지</span>
-              <span className="font-medium text-[#2d2926]">3장 생성</span>
+              <span className="font-medium text-[#2d2926]">6장 생성</span>
             </div>
           </div>
         </div>
 
-        {/* 3컷 생성 버튼 */}
+        {/* 6컷 생성 버튼 */}
         <button
           onClick={handleGenerate}
           disabled={loading || videoLoading || !prompt.trim()}
@@ -564,7 +564,7 @@ export default function VisualCreationPage() {
           ) : (
             <>
               <span className="material-symbols-outlined">auto_awesome</span>
-              3컷 생성하기
+              6컷 생성하기
             </>
           )}
         </button>
@@ -582,45 +582,21 @@ export default function VisualCreationPage() {
                 </span>
                 <span className="text-xs text-[#2d2926]">대사 생성</span>
               </div>
-              {/* 이미지 1 */}
-              <div className="flex items-center gap-2">
-                <span className={`material-symbols-outlined text-sm ${
-                  streaming.images.length >= 1 ? 'text-green-500'
-                    : streaming.step === 'image_1' ? 'text-primary animate-spin'
-                    : 'text-[#e5ddd3]'
-                }`}>
-                  {streaming.images.length >= 1 ? 'check_circle'
-                    : streaming.step === 'image_1' ? 'progress_activity'
-                    : 'radio_button_unchecked'}
-                </span>
-                <span className="text-xs text-[#2d2926]">1컷 이미지</span>
-              </div>
-              {/* 이미지 2 */}
-              <div className="flex items-center gap-2">
-                <span className={`material-symbols-outlined text-sm ${
-                  streaming.images.length >= 2 ? 'text-green-500'
-                    : streaming.step === 'image_2' ? 'text-primary animate-spin'
-                    : 'text-[#e5ddd3]'
-                }`}>
-                  {streaming.images.length >= 2 ? 'check_circle'
-                    : streaming.step === 'image_2' ? 'progress_activity'
-                    : 'radio_button_unchecked'}
-                </span>
-                <span className="text-xs text-[#2d2926]">2컷 이미지</span>
-              </div>
-              {/* 이미지 3 */}
-              <div className="flex items-center gap-2">
-                <span className={`material-symbols-outlined text-sm ${
-                  streaming.images.length >= 3 ? 'text-green-500'
-                    : streaming.step === 'image_3' ? 'text-primary animate-spin'
-                    : 'text-[#e5ddd3]'
-                }`}>
-                  {streaming.images.length >= 3 ? 'check_circle'
-                    : streaming.step === 'image_3' ? 'progress_activity'
-                    : 'radio_button_unchecked'}
-                </span>
-                <span className="text-xs text-[#2d2926]">3컷 이미지</span>
-              </div>
+              {/* 이미지 1~6 */}
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div key={n} className="flex items-center gap-2">
+                  <span className={`material-symbols-outlined text-sm ${
+                    streaming.images.length >= n ? 'text-green-500'
+                      : streaming.step === `image_${n}` ? 'text-primary animate-spin'
+                      : 'text-[#e5ddd3]'
+                  }`}>
+                    {streaming.images.length >= n ? 'check_circle'
+                      : streaming.step === `image_${n}` ? 'progress_activity'
+                      : 'radio_button_unchecked'}
+                  </span>
+                  <span className="text-xs text-[#2d2926]">{n}컷 이미지</span>
+                </div>
+              ))}
             </div>
             <div className="w-full bg-[#e5ddd3] rounded-full h-1.5">
               <div
@@ -628,7 +604,7 @@ export default function VisualCreationPage() {
                 style={{
                   width: `${
                     streaming.scenes
-                      ? 10 + streaming.images.length * 30
+                      ? 10 + streaming.images.length * 15
                       : 5
                   }%`,
                 }}

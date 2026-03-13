@@ -4,7 +4,7 @@ import aiVidLogo from '@/assets/AI_vid_logo.png'
 
 interface PublicLayoutProps {
   children: React.ReactNode
-  activeNav?: 'home' | 'pricing' | ''
+  activeNav?: 'home' | ''
 }
 
 export default function PublicLayout({ children, activeNav = '' }: PublicLayoutProps) {
@@ -22,7 +22,6 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link className={`text-sm font-medium transition-colors ${activeNav === 'home' ? 'font-semibold text-primary' : 'text-slate-600 hover:text-primary'}`} to="/">홈</Link>
-              <Link className={`text-sm font-medium transition-colors ${activeNav === 'pricing' ? 'font-semibold text-primary' : 'text-slate-600 hover:text-primary'}`} to="/pricing">요금제</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">

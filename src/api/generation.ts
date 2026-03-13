@@ -38,6 +38,6 @@ export const generationApi = {
       message: string
       data: { job_id: number; status: string; video_url: string }
     }>('/api/v1/generation/render/video/svd', data, {
-      timeout: 300000, // 5분 - SVD 변환에 시간 소요
+      timeout: 600000, // 10분 - SVD 변환에 상당히 오래 걸림
     }),
 }
