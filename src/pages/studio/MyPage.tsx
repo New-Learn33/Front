@@ -67,6 +67,7 @@ export default function MyPage() {
     try {
       const res = await userApi.updateProfile({ nickname: nickname.trim() })
       if (res.data.success) {
+        setNickname(nickname.trim())
         setIsEditingNickname(false)
         // localStorage에 유저 정보 갱신
         const stored = localStorage.getItem('user')
@@ -75,7 +76,6 @@ export default function MyPage() {
           parsed.nickname = nickname.trim()
           localStorage.setItem('user', JSON.stringify(parsed))
         }
-        window.location.reload()
       }
     } catch (err) {
       console.error('닉네임 수정 실패:', err)
@@ -159,7 +159,7 @@ export default function MyPage() {
               ) : (
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-[#2d2926]">
-                    {user?.nickname || '익명의 참가자'}
+                    {nickname || user?.nickname || '익명의 참가자'}
                   </h2>
                   <button
                     onClick={() => { setNickname(user?.nickname || ''); setIsEditingNickname(true) }}

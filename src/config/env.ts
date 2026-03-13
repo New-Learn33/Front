@@ -1,12 +1,6 @@
-function getFallbackApiBaseUrl() {
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin
-  }
+const FALLBACK_API_BASE_URL = 'http://localhost:8000'
 
-  return 'http://localhost:8000'
-}
-
-export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || getFallbackApiBaseUrl()).replace(/\/+$/, '')
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || FALLBACK_API_BASE_URL).replace(/\/+$/, '')
 export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
 
 export function resolveApiUrl(path?: string | null) {
