@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { userApi } from '../../api/user'
-import { resolveApiUrl } from '../../config/env'
 import type { UserVideo } from '../../api/user'
 
 function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
@@ -154,7 +153,7 @@ export default function DashboardPage() {
               >
                 <div className="aspect-video bg-[#f0ebe3] flex items-center justify-center relative overflow-hidden">
                   {video.thumbnail_url ? (
-                    <img src={resolveApiUrl(video.thumbnail_url)} alt={video.title} className="w-full h-full object-cover" />
+                    <img src={`http://localhost:8000${video.thumbnail_url}`} alt={video.title} className="w-full h-full object-cover" />
                   ) : (
                     <span className="material-symbols-outlined text-3xl text-[#c5beb4]">movie</span>
                   )}
