@@ -16,8 +16,7 @@ import PrivacyPage from './pages/PrivacyPage'
 import SupportPage from './pages/SupportPage'
 import ThemeToggle from './components/ThemeToggle'
 import { ThemeProvider } from './hooks/useTheme'
-
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+import { GOOGLE_CLIENT_ID } from './config/env'
 
 function App() {
   return (
