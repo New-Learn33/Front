@@ -201,45 +201,33 @@ export default function VisualCreationPage() {
     }
   }
 
-  // 2단계 + 3단계: 자막 합성 → 영상 생성
+  // 2단계: SVD 기반 영상 생성
   const handleRenderVideo = async () => {
     if (!result) return
 
     setVideoLoading(true)
     setVideoError('')
     setVideoUrl(null)
+    setVideoStep('video')
 
     try {
-      setVideoStep('subtitles')
-      const subtitleRes = await generationApi.renderSubtitles({
+      const res = await generationApi.renderVideoSvd({
         job_id: result.job_id,
         images: result.images,
-        scenes: result.scenes,
-      })
-
-      if (!subtitleRes.data.success) {
-        setVideoError(subtitleRes.data.message || '자막 합성에 실패했습니다.')
-        return
-      }
-
-      setVideoStep('video')
-      const videoRes = await generationApi.renderVideo({
-        job_id: result.job_id,
-        subtitle_images: subtitleRes.data.data.subtitle_images.map((img) => ({
-          scene_order: img.scene_order,
-          image_url: img.image_url,
-          duration: 2,
+        scenes: result.scenes.map((s) => ({
+          scene_order: s.scene_order,
+          dialogue: s.dialogue,
         })),
       })
 
-      if (videoRes.data.success) {
-        setVideoUrl(videoRes.data.data.video_url)
+      if (res.data.success) {
+        setVideoUrl(res.data.data.video_url)
         setVideoStep('done')
       } else {
-        setVideoError(videoRes.data.message || '영상 생성에 실패했습니다.')
+        setVideoError(res.data.message || '영상 생성에 실패했습니다.')
       }
     } catch (err: any) {
-      console.error('Video render error:', err)
+      console.error('SVD Video render error:', err)
       const detail = err.response?.data?.detail
       const message = typeof detail === 'string' ? detail : err.message || '영상 생성 중 오류가 발생했습니다.'
       setVideoError(message)
@@ -250,8 +238,7 @@ export default function VisualCreationPage() {
 
   const videoStepLabel = () => {
     switch (videoStep) {
-      case 'subtitles': return '자막 합성 중...'
-      case 'video': return '영상 렌더링 중...'
+      case 'video': return 'AI 영상 생성 중... (2~3분 소요)'
       default: return '영상 생성 중...'
     }
   }
@@ -681,21 +668,16 @@ export default function VisualCreationPage() {
 
         {videoLoading && (
           <div className="bg-[#f9f6f0] rounded-xl p-4 space-y-3">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className={`material-symbols-outlined text-sm ${videoStep === 'subtitles' ? 'text-primary animate-spin' : videoStep === 'video' || videoStep === 'done' ? 'text-green-500' : 'text-[#e5ddd3]'}`}>
-                  {videoStep === 'subtitles' ? 'progress_activity' : videoStep === 'video' || videoStep === 'done' ? 'check_circle' : 'radio_button_unchecked'}
-                </span>
-                <span className="text-xs text-[#2d2926]">자막 합성</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`material-symbols-outlined text-sm ${videoStep === 'video' ? 'text-primary animate-spin' : videoStep === 'done' ? 'text-green-500' : 'text-[#e5ddd3]'}`}>
-                  {videoStep === 'video' ? 'progress_activity' : videoStep === 'done' ? 'check_circle' : 'radio_button_unchecked'}
-                </span>
-                <span className="text-xs text-[#2d2926]">영상 렌더링</span>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm text-primary animate-spin">progress_activity</span>
+              <span className="text-xs text-[#2d2926] font-medium">AI 영상 변환 중</span>
             </div>
-            <p className="text-xs text-warm-muted">이미지에 자막을 합성하고 영상을 만들고 있습니다.</p>
+            <p className="text-xs text-warm-muted">
+              각 이미지를 AI가 움직이는 영상으로 변환하고 있습니다. 2~3분 정도 소요됩니다.
+            </p>
+            <div className="w-full bg-[#e5ddd3] rounded-full h-1.5">
+              <div className="bg-primary h-1.5 rounded-full animate-pulse" style={{ width: '60%' }} />
+            </div>
           </div>
         )}
 
