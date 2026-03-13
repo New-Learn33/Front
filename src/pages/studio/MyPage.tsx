@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { userApi } from '../../api/user'
-import { resolveApiUrl } from '../../config/env'
 import type { UserVideo, UserComment } from '../../api/user'
 import { Link } from 'react-router-dom'
 
@@ -231,7 +230,7 @@ export default function MyPage() {
                 >
                   <div className="aspect-video bg-[#f0ebe3] flex items-center justify-center relative overflow-hidden">
                     {video.thumbnail_url ? (
-                      <img src={resolveApiUrl(video.thumbnail_url)} alt={video.title} className="w-full h-full object-cover" />
+                      <img src={`http://localhost:8000${video.thumbnail_url}`} alt={video.title} className="w-full h-full object-cover" />
                     ) : (
                       <span className="material-symbols-outlined text-4xl text-[#c5beb4]">movie</span>
                     )}
