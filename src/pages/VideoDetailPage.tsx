@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { allVideos, getCommentsForVideo, formatCount, formatDate } from '../data/videos'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
+import { resolveApiUrl } from '@/config/env'
 
 export default function VideoDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -62,7 +63,7 @@ export default function VideoDetailPage() {
                 <Link to="/studio" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">스튜디오</Link>
                 <div className="flex items-center gap-3">
                   {user?.profile_image_url ? (
-                    <img src={user.profile_image_url} alt="프로필" className="size-8 rounded-full object-cover" />
+                    <img src={resolveApiUrl(user.profile_image_url)} alt="프로필" className="size-8 rounded-full object-cover" />
                   ) : (
                     <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                       {user?.name?.charAt(0) || '?'}
@@ -171,7 +172,7 @@ export default function VideoDetailPage() {
                 <div className="flex gap-3">
                   <div className="size-10 rounded-full overflow-hidden flex-shrink-0">
                     {user?.profile_image_url ? (
-                      <img src={user.profile_image_url} alt="내 프로필" className="w-full h-full object-cover" />
+                      <img src={resolveApiUrl(user.profile_image_url)} alt="내 프로필" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                         {user?.name?.charAt(0) || '?'}
