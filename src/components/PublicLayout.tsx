@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
+import { resolveApiUrl } from '@/config/env'
 
 interface PublicLayoutProps {
   children: React.ReactNode
@@ -30,7 +31,7 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
                 <Link to="/studio" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">스튜디오</Link>
                 <div className="flex items-center gap-3">
                   {user?.profile_image_url ? (
-                    <img src={user.profile_image_url} alt="프로필" className="size-8 rounded-full object-cover" />
+                    <img src={resolveApiUrl(user.profile_image_url)} alt="프로필" className="size-8 rounded-full object-cover" />
                   ) : (
                     <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                       {user?.name?.charAt(0) || '?'}
