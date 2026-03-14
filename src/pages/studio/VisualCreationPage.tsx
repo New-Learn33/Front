@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { generationApi } from '@/api/generation'
 import { presetsApi, type Preset } from '@/api/presets'
-import { API_BASE_URL } from '@/config/env'
+import { API_BASE_URL, resolveApiUrl } from '@/config/env'
 import type { GenerationData } from '@/types/generation'
 
 const categories = [
@@ -417,7 +417,7 @@ export default function VisualCreationPage() {
                       <div className="aspect-square rounded-xl overflow-hidden bg-[#f9f6f0] border border-[#e5ddd3] relative">
                         {img ? (
                           <img
-                            src={img.image_url}
+                            src={resolveApiUrl(img.image_url)}
                             alt={scene.subtitle_text}
                             className="w-full h-full object-cover animate-fade-in"
                           />
@@ -480,7 +480,7 @@ export default function VisualCreationPage() {
                   <div className="aspect-square rounded-xl overflow-hidden bg-[#f9f6f0] border border-[#e5ddd3]">
                     {result.images[idx] && (
                       <img
-                        src={result.images[idx].image_url}
+                        src={resolveApiUrl(result.images[idx].image_url)}
                         alt={scene.subtitle_text}
                         className="w-full h-full object-cover"
                       />
