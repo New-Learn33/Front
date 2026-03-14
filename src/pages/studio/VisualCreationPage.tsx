@@ -233,7 +233,7 @@ export default function VisualCreationPage() {
       setVideoStep('video')
 
       // 영상 생성
-      const subtitleImages = (subtitleRes.data as any).data?.images || []
+      const subtitleImages = (subtitleRes.data as any).data?.subtitle_images || (subtitleRes.data as any).data?.images || []
       const videoRes = await generationApi.renderVideo({
         job_id: result.job_id,
         subtitle_images: subtitleImages.map((img: any) => ({
