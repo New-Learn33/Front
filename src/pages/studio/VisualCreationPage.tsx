@@ -201,33 +201,54 @@ export default function VisualCreationPage() {
     }
   }
 
-  // 2단계: SVD 기반 영상 생성
+  // 2단계: 자막 합성 → 영상 생성
   const handleRenderVideo = async () => {
     if (!result) return
 
     setVideoLoading(true)
     setVideoError('')
     setVideoUrl(null)
-    setVideoStep('video')
+    setVideoStep('subtitle')
 
     try {
-      const res = await generationApi.renderVideoSvd({
+      // 자막 합성
+      const subtitleRes = await generationApi.renderSubtitles({
         job_id: result.job_id,
-        images: result.images,
+        images: result.images.map((img) => ({
+          scene_order: img.scene_order,
+          image_url: img.image_url,
+        })),
         scenes: result.scenes.map((s) => ({
           scene_order: s.scene_order,
           dialogue: s.dialogue,
         })),
       })
 
-      if (res.data.success) {
-        setVideoUrl(res.data.data.video_url)
+      if (!subtitleRes.data.success) {
+        setVideoError(subtitleRes.data.message || '자막 합성에 실패했습니다.')
+        return
+      }
+
+      setVideoStep('video')
+
+      // 영상 생성
+      const videoRes = await generationApi.renderVideo({
+        job_id: result.job_id,
+        subtitle_images: subtitleRes.data.data.images.map((img: any) => ({
+          scene_order: img.scene_order,
+          image_url: img.image_url,
+          duration: 2,
+        })),
+      })
+
+      if (videoRes.data.success) {
+        setVideoUrl(resolveApiUrl(videoRes.data.data.video_url))
         setVideoStep('done')
       } else {
-        setVideoError(res.data.message || '영상 생성에 실패했습니다.')
+        setVideoError(videoRes.data.message || '영상 생성에 실패했습니다.')
       }
     } catch (err: any) {
-      console.error('SVD Video render error:', err)
+      console.error('Video render error:', err)
       const detail = err.response?.data?.detail
       const message = typeof detail === 'string' ? detail : err.message || '영상 생성 중 오류가 발생했습니다.'
       setVideoError(message)
@@ -238,7 +259,9 @@ export default function VisualCreationPage() {
 
   const videoStepLabel = () => {
     switch (videoStep) {
-      case 'video': return 'AI 영상 생성 중... (2~3분 소요)'
+      case 'subtitle': return '자막 합성 중...'
+      case 'video': return 'AI 영상 생성 중... (1~2분 소요)'
+      case 'done': return '완료!'
       default: return '영상 생성 중...'
     }
   }
