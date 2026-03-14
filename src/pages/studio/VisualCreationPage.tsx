@@ -208,11 +208,11 @@ export default function VisualCreationPage() {
     setVideoLoading(true)
     setVideoError('')
     setVideoUrl(null)
-    setVideoStep('subtitles')
+    setVideoStep('video')
 
     try {
-      // 자막 합성
-      const subtitleRes = await generationApi.renderSubtitles({
+      // SVD 기반 영상 생성 (각 이미지를 움직이는 영상으로 변환 후 합치기)
+      const videoRes = await generationApi.renderVideoSvd({
         job_id: result.job_id,
         images: result.images.map((img) => ({
           scene_order: img.scene_order,
@@ -221,25 +221,6 @@ export default function VisualCreationPage() {
         scenes: result.scenes.map((s) => ({
           scene_order: s.scene_order,
           dialogue: s.dialogue,
-          subtitle_text: s.subtitle_text,
-        })),
-      })
-
-      if (!subtitleRes.data.success) {
-        setVideoError(subtitleRes.data.message || '자막 합성에 실패했습니다.')
-        return
-      }
-
-      setVideoStep('video')
-
-      // 영상 생성
-      const subtitleImages = (subtitleRes.data as any).data?.subtitle_images || (subtitleRes.data as any).data?.images || []
-      const videoRes = await generationApi.renderVideo({
-        job_id: result.job_id,
-        subtitle_images: subtitleImages.map((img: any) => ({
-          scene_order: img.scene_order,
-          image_url: img.image_url,
-          duration: 2,
         })),
       })
 
@@ -262,7 +243,7 @@ export default function VisualCreationPage() {
   const videoStepLabel = () => {
     switch (videoStep) {
       case 'subtitles': return '자막 합성 중...'
-      case 'video': return 'AI 영상 생성 중... (1~2분 소요)'
+      case 'video': return 'AI 영상 생성 중... (5~10분 소요)'
       case 'done': return '완료!'
       default: return '영상 생성 중...'
     }
