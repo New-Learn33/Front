@@ -2,7 +2,7 @@ import api from './client'
 import type { AssetListResponse, AssetUploadResponse } from '@/types/asset'
 
 export const assetsApi = {
-  list: (params?: { category_id?: string }) =>
+  list: (params?: { category_id?: string; tag?: string }) =>
     api.get<AssetListResponse>('/api/v1/assets', { params }),
 
   upload: (file: File, categoryId: string, name?: string) => {
@@ -18,4 +18,7 @@ export const assetsApi = {
 
   delete: (assetId: string) =>
     api.delete(`/api/v1/assets/${assetId}`),
+
+  updateTags: (assetId: string, tags: string[]) =>
+    api.patch(`/api/v1/assets/${assetId}/tags`, { tags }),
 }

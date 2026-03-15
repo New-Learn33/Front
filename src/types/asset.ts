@@ -25,6 +25,7 @@ export interface Asset {
   appearance?: AssetAppearance
   outfit?: AssetOutfit
   style_keywords?: string[]
+  custom_tags?: string[]
 }
 
 export interface AssetListResponse {
