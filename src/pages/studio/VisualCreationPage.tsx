@@ -112,9 +112,13 @@ export default function VisualCreationPage() {
     abortRef.current = controller
 
     try {
+      const token = localStorage.getItem('access_token')
       const response = await fetch(`${API_BASE}/api/v1/generation/stream`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ category_id: selectedCategory, prompt: prompt.trim() }),
         signal: controller.signal,
       })
