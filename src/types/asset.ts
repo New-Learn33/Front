@@ -1,15 +1,39 @@
+export interface AssetAppearance {
+  hair_color?: string
+  hair_style?: string
+  eye_color?: string
+  skin_tone?: string
+  body_type?: string
+  face_shape?: string
+  distinguishing_features?: string[]
+}
+
+export interface AssetOutfit {
+  top?: string
+  bottom?: string
+  shoes?: string
+  accessories?: string[]
+  overall_style?: string
+}
+
 export interface Asset {
-  id: number
+  id: string
   name: string
-  type: '이미지' | '영상' | '오디오' | '폰트'
-  size: string
-  url: string
-  created_at: string
+  image_url: string
+  category_id?: string
+  gender?: string
+  appearance?: AssetAppearance
+  outfit?: AssetOutfit
+  style_keywords?: string[]
 }
 
 export interface AssetListResponse {
-  assets: Asset[]
-  total: number
-  storage_used: string
-  storage_limit: string
+  success: boolean
+  data: Asset[]
+}
+
+export interface AssetUploadResponse {
+  success: boolean
+  message: string
+  data: Asset
 }
