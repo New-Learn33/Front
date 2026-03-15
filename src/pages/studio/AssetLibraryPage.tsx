@@ -5,10 +5,10 @@ import type { Asset } from '@/types/asset'
 
 const categories = [
   { id: '전체', label: '전체' },
-  { id: 'animation', label: '애니메이션' },
-  { id: 'hero', label: '히어로' },
-  { id: 'game', label: '게임' },
-  { id: 'fantasy', label: '판타지' },
+  { id: '1', label: '애니메이션' },
+  { id: '2', label: '히어로' },
+  { id: '3', label: '게임' },
+  { id: '4', label: '판타지' },
 ]
 
 export default function AssetLibraryPage() {
@@ -26,7 +26,15 @@ export default function AssetLibraryPage() {
     try {
       const params = activeCategory === '전체' ? {} : { category_id: activeCategory }
       const res = await assetsApi.list(params)
-      setAssets(res.data.data || [])
+      const raw = res.data.data
+      // 전체 조회 시 dict로 옴 → 모든 카테고리 배열 합치기
+      if (Array.isArray(raw)) {
+        setAssets(raw)
+      } else if (raw && typeof raw === 'object') {
+        setAssets(Object.values(raw).flat() as Asset[])
+      } else {
+        setAssets([])
+      }
     } catch (err: any) {
       console.error('에셋 로드 실패:', err)
       setError('에셋을 불러오지 못했습니다.')
@@ -44,7 +52,7 @@ export default function AssetLibraryPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    const categoryId = activeCategory === '전체' ? 'animation' : activeCategory
+    const categoryId = activeCategory === '전체' ? '1' : activeCategory
     setUploading(true)
     setError('')
     try {
@@ -52,7 +60,8 @@ export default function AssetLibraryPage() {
       await fetchAssets()
     } catch (err: any) {
       console.error('업로드 실패:', err)
-      setError(err.response?.data?.detail || '업로드에 실패했습니다.')
+      const detail = err.response?.data?.detail
+      setError(typeof detail === 'string' ? detail : '업로드에 실패했습니다.')
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
