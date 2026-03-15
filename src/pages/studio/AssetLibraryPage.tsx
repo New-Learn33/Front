@@ -68,6 +68,17 @@ export default function AssetLibraryPage() {
     }
   }
 
+  const handleDelete = async (assetId: string, assetName: string) => {
+    if (!window.confirm(`"${assetName}" 에셋을 삭제하시겠습니까?`)) return
+    try {
+      await assetsApi.delete(assetId)
+      await fetchAssets()
+    } catch (err: any) {
+      console.error('삭제 실패:', err)
+      setError('에셋 삭제에 실패했습니다.')
+    }
+  }
+
   const getCategoryLabel = (categoryId?: string) => {
     return categories.find((c) => c.id === categoryId)?.label || categoryId || '-'
   }
@@ -171,6 +182,13 @@ export default function AssetLibraryPage() {
                   }}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all" />
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleDelete(a.id, a.name) }}
+                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                  title="삭제"
+                >
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
               </div>
               <div className="p-3">
                 <p className="text-xs font-semibold text-[#2d2926] truncate">{a.name}</p>
@@ -206,6 +224,7 @@ export default function AssetLibraryPage() {
                 <th className="text-left px-6 py-3 font-medium">카테고리</th>
                 <th className="text-left px-6 py-3 font-medium">성별</th>
                 <th className="text-left px-6 py-3 font-medium">스타일</th>
+                <th className="text-right px-6 py-3 font-medium">작업</th>
               </tr>
             </thead>
             <tbody>
@@ -230,6 +249,15 @@ export default function AssetLibraryPage() {
                   <td className="px-6 py-3 text-sm text-warm-muted">{a.gender || '-'}</td>
                   <td className="px-6 py-3 text-sm text-warm-muted">
                     {a.style_keywords?.slice(0, 3).join(', ') || '-'}
+                  </td>
+                  <td className="px-6 py-3 text-right">
+                    <button
+                      onClick={() => handleDelete(a.id, a.name)}
+                      className="text-red-400 hover:text-red-600 transition-colors"
+                      title="삭제"
+                    >
+                      <span className="material-symbols-outlined text-lg">delete</span>
+                    </button>
                   </td>
                 </tr>
               ))}

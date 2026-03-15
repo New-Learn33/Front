@@ -15,4 +15,7 @@ export const assetsApi = {
       timeout: 60000,
     })
   },
+
+  delete: (assetId: string) =>
+    api.delete(`/api/v1/assets/${assetId}`),
 }
