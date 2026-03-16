@@ -107,29 +107,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Plan */}
-      <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6 space-y-4">
-        <h2 className="text-base font-bold text-[#2d2926]">플랜</h2>
-        <div className="flex items-center justify-between bg-[#f9f6f0] rounded-xl p-4">
-          <div>
-            <p className="text-sm font-semibold text-[#2d2926]">무료 플랜</p>
-            <p className="text-xs text-warm-muted">월 10개 영상 생성 · 5GB 저장공간</p>
-          </div>
-          <button className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-xl transition-all btn-press">
-            업그레이드
-          </button>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-warm-muted">
-            <span>저장공간 사용량</span>
-            <span>2.4 / 5 GB</span>
-          </div>
-          <div className="h-2 bg-[#e5ddd3] rounded-full overflow-hidden">
-            <div className="h-full w-[48%] bg-primary rounded-full" />
-          </div>
-        </div>
-      </div>
-
       {/* Save */}
       <div className="flex justify-end">
         <button className="bg-primary hover:bg-[#b05d3f] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press">

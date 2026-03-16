@@ -235,6 +235,7 @@ export default function AssetLibraryPage() {
     }
 
     await fetchAssets()
+    window.dispatchEvent(new Event('storage-updated'))
     setUploading(false)
     setUploadProgress({ current: 0, total: 0 })
     if (fileInputRef.current) fileInputRef.current.value = ''
@@ -245,6 +246,7 @@ export default function AssetLibraryPage() {
     try {
       await assetsApi.delete(assetId)
       await fetchAssets()
+      window.dispatchEvent(new Event('storage-updated'))
     } catch (err: any) {
       console.error('삭제 실패:', err)
       setError('에셋 삭제에 실패했습니다.')
