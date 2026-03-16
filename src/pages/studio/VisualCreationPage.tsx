@@ -22,12 +22,48 @@ interface StreamingState {
 
 const API_BASE = API_BASE_URL
 
+const artStyles = [
+  { id: 'webtoon', label: '웹툰', icon: 'draw' },
+  { id: 'anime', label: '애니메', icon: 'animation' },
+  { id: 'watercolor', label: '수채화', icon: 'palette' },
+  { id: '3d_render', label: '3D', icon: 'view_in_ar' },
+  { id: 'pixel', label: '픽셀', icon: 'grid_on' },
+  { id: 'realistic', label: '실사', icon: 'photo_camera' },
+]
+
+const genres = [
+  { id: 'auto', label: '자동' },
+  { id: 'comedy', label: '코미디' },
+  { id: 'action', label: '액션' },
+  { id: 'romance', label: '로맨스' },
+  { id: 'horror', label: '호러' },
+  { id: 'emotional', label: '감동' },
+]
+
+const qualityOptions = [
+  { id: 'low', label: '빠름' },
+  { id: 'medium', label: '보통' },
+  { id: 'high', label: '고품질' },
+]
+
+const motionOptions = [
+  { id: 'low', label: '약하게' },
+  { id: 'medium', label: '보통' },
+  { id: 'high', label: '강하게' },
+]
+
 export default function VisualCreationPage() {
   const [prompt, setPrompt] = useState('')
   const [selectedCategory, setSelectedCategory] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState<GenerationData | null>(null)
+
+  // 생성 옵션
+  const [artStyle, setArtStyle] = useState('webtoon')
+  const [genre, setGenre] = useState('auto')
+  const [imageQuality, setImageQuality] = useState('medium')
+  const [motionIntensity, setMotionIntensity] = useState('medium')
 
   // 스트리밍 상태
   const [streaming, setStreaming] = useState<StreamingState>({
@@ -119,7 +155,13 @@ export default function VisualCreationPage() {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ category_id: selectedCategory, prompt: prompt.trim() }),
+        body: JSON.stringify({
+          category_id: selectedCategory,
+          prompt: prompt.trim(),
+          art_style: artStyle,
+          genre,
+          image_quality: imageQuality,
+        }),
         signal: controller.signal,
       })
 
@@ -226,6 +268,7 @@ export default function VisualCreationPage() {
           scene_order: s.scene_order,
           dialogue: s.dialogue,
         })),
+        motion_intensity: motionIntensity,
       })
 
       if (videoRes.data.success) {
@@ -556,6 +599,96 @@ export default function VisualCreationPage() {
             <div className="flex justify-between">
               <span className="text-warm-muted">AI 이미지</span>
               <span className="font-medium text-[#2d2926]">6장 생성</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 생성 옵션 */}
+        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-4">
+          <h3 className="text-base font-bold text-[#2d2926]">생성 옵션</h3>
+
+          {/* 아트 스타일 */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-warm-muted">아트 스타일</label>
+            <div className="grid grid-cols-3 gap-1.5">
+              {artStyles.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setArtStyle(s.id)}
+                  disabled={loading || videoLoading}
+                  className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-xs transition-all ${
+                    artStyle === s.id
+                      ? 'bg-primary text-white'
+                      : 'bg-[#f9f6f0] text-warm-muted hover:bg-[#efe8de]'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base">{s.icon}</span>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 장르 / 분위기 */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-warm-muted">장르 / 분위기</label>
+            <div className="flex flex-wrap gap-1.5">
+              {genres.map((g) => (
+                <button
+                  key={g.id}
+                  onClick={() => setGenre(g.id)}
+                  disabled={loading || videoLoading}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    genre === g.id
+                      ? 'bg-primary text-white'
+                      : 'bg-[#f9f6f0] text-warm-muted hover:bg-[#efe8de]'
+                  }`}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 이미지 퀄리티 */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-warm-muted">이미지 퀄리티</label>
+            <div className="flex bg-[#f9f6f0] rounded-lg p-1">
+              {qualityOptions.map((q) => (
+                <button
+                  key={q.id}
+                  onClick={() => setImageQuality(q.id)}
+                  disabled={loading || videoLoading}
+                  className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    imageQuality === q.id
+                      ? 'bg-white text-[#2d2926] shadow-sm'
+                      : 'text-warm-muted'
+                  }`}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 모션 강도 */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-warm-muted">움직임 강도 (영상)</label>
+            <div className="flex bg-[#f9f6f0] rounded-lg p-1">
+              {motionOptions.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => setMotionIntensity(m.id)}
+                  disabled={loading || videoLoading}
+                  className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    motionIntensity === m.id
+                      ? 'bg-white text-[#2d2926] shadow-sm'
+                      : 'text-warm-muted'
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>

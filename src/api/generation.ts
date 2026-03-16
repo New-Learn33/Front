@@ -32,6 +32,7 @@ export const generationApi = {
     job_id: number
     images: { scene_order: number; image_url: string }[]
     scenes: { scene_order: number; dialogue: string }[]
+    motion_intensity?: string
   }) =>
     api.post<{
       success: boolean
