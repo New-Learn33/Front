@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
+import { useAuth } from '../../hooks/useAuth'
+import { userApi } from '../../api/user'
 
 const navItems = [
   { to: '/studio', icon: 'dashboard', label: '대시보드', end: true },
@@ -11,6 +14,28 @@ const navItems = [
 ]
 
 export default function StudioSidebar() {
+  const { user } = useAuth()
+  const [storageUsedGb, setStorageUsedGb] = useState(0)
+  const [storageLimitGb, setStorageLimitGb] = useState(3)
+
+  useEffect(() => {
+    async function fetchStorage() {
+      try {
+        const res = await userApi.getMyStorage()
+        if (res.data.success) {
+          setStorageUsedGb(res.data.data.storage_used_gb)
+          setStorageLimitGb(res.data.data.storage_limit_gb)
+        }
+      } catch {
+        // 무시
+      }
+    }
+    fetchStorage()
+  }, [])
+
+  const usagePercent = storageLimitGb > 0 ? Math.min(100, (storageUsedGb / storageLimitGb) * 100) : 0
+  const barColor = usagePercent > 80 ? 'bg-red-500' : 'bg-primary'
+
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#2d2926] text-white flex flex-col z-50">
       {/* Logo */}
@@ -47,10 +72,10 @@ export default function StudioSidebar() {
         <div className="px-3 space-y-2">
           <div className="flex items-center justify-between text-xs text-white/40">
             <span>저장공간</span>
-            <span>2.4 / 5 GB</span>
+            <span>{storageUsedGb} / {storageLimitGb} GB</span>
           </div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-            <div className="h-full w-[48%] bg-primary rounded-full" />
+            <div className={`h-full ${barColor} rounded-full transition-all`} style={{ width: `${usagePercent}%` }} />
           </div>
         </div>
         <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/5">
@@ -58,7 +83,7 @@ export default function StudioSidebar() {
             <span className="material-symbols-outlined text-primary text-lg">person</span>
           </div>
           <div>
-            <p className="text-sm font-medium">사용자</p>
+            <p className="text-sm font-medium">{user?.nickname || user?.name || '사용자'}</p>
             <p className="text-[11px] text-white/40">무료 플랜</p>
           </div>
         </div>
@@ -66,4 +91,3 @@ export default function StudioSidebar() {
     </aside>
   )
 }
-

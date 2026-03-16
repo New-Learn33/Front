@@ -81,6 +81,20 @@ export default function VideoDetailPage() {
     }
   }
 
+  // 댓글 삭제
+  const handleDeleteComment = async (commentId: number) => {
+    if (!confirm('댓글을 삭제하시겠습니까?')) return
+    try {
+      const res = await videosApi.deleteComment(commentId)
+      if (res.data.success) {
+        setComments((prev) => prev.filter((c) => c.comment_id !== commentId))
+      }
+    } catch (err) {
+      console.error('댓글 삭제 실패:', err)
+      alert('댓글 삭제에 실패했습니다. 본인의 댓글만 삭제할 수 있습니다.')
+    }
+  }
+
   // 댓글 작성
   const handleAddComment = async () => {
     if (!commentText.trim() || !video) return
@@ -277,12 +291,23 @@ export default function VideoDetailPage() {
                   <p className="text-sm text-[#8c8479] text-center py-8">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</p>
                 ) : (
                   comments.map((comment) => (
-                    <div key={comment.comment_id} className="flex gap-3 bg-white/40 border border-[#eee6d8] rounded-xl p-4">
+                    <div key={comment.comment_id} className="flex gap-3 bg-white/40 border border-[#eee6d8] rounded-xl p-4 group">
                       <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                         <span className="text-primary text-sm font-bold">{comment.nickname?.charAt(0) || '?'}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="font-bold text-sm text-[#2d2926]">{comment.nickname || '익명'}</span>
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-sm text-[#2d2926]">{comment.nickname || '익명'}</span>
+                          {isLoggedIn && user?.nickname === comment.nickname && (
+                            <button
+                              onClick={() => handleDeleteComment(comment.comment_id)}
+                              className="text-[#8c8479] hover:text-red-500 transition-all"
+                              title="댓글 삭제"
+                            >
+                              <span className="material-symbols-outlined text-sm">delete</span>
+                            </button>
+                          )}
+                        </div>
                         <p className="text-sm text-[#5e5452] leading-relaxed mt-1">{comment.content}</p>
                       </div>
                     </div>

@@ -50,6 +50,10 @@ export const videosApi = {
   addComment: (videoId: number, content: string) =>
     api.post<{ success: boolean; data: { comment: VideoComment } }>(`/api/v1/videos/${videoId}/comments`, { content }),
 
+  // 댓글 삭제
+  deleteComment: (commentId: number) =>
+    api.delete<{ success: boolean; data: { comment_id: number } }>(`/api/v1/comments/${commentId}`),
+
   // 좋아요 추가
   addLike: (videoId: number) =>
     api.post<{ success: boolean; data: { video_id: number; liked: boolean; like_count: number } }>(`/api/v1/videos/${videoId}/likes`),
