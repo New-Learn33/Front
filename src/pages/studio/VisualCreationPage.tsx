@@ -81,6 +81,11 @@ export default function VisualCreationPage() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [videoError, setVideoError] = useState('')
 
+  // 썸네일 선택 상태
+  const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(null)
+  const [thumbnailSaving, setThumbnailSaving] = useState(false)
+  const [thumbnailSaved, setThumbnailSaved] = useState(false)
+
   // 프리셋 상태
   const [presets, setPresets] = useState<Preset[]>([])
   const [showPresetSave, setShowPresetSave] = useState(false)
@@ -141,6 +146,8 @@ export default function VisualCreationPage() {
     setVideoUrl(null)
     setVideoStep('idle')
     setVideoError('')
+    setSelectedThumbnail(null)
+    setThumbnailSaved(false)
     setStreaming({ step: '', message: '준비 중...', scenes: null, images: [], title: '', jobId: null })
 
     // AbortController for cancellation
@@ -284,6 +291,26 @@ export default function VisualCreationPage() {
       setVideoError(message)
     } finally {
       setVideoLoading(false)
+    }
+  }
+
+  // 썸네일 선택 저장
+  const handleSelectThumbnail = async (imageUrl: string) => {
+    if (!result) return
+    setSelectedThumbnail(imageUrl)
+    setThumbnailSaving(true)
+    try {
+      const res = await generationApi.selectThumbnail({
+        job_id: result.job_id,
+        thumbnail_url: imageUrl,
+      })
+      if (res.data.success) {
+        setThumbnailSaved(true)
+      }
+    } catch (err) {
+      console.error('Thumbnail save error:', err)
+    } finally {
+      setThumbnailSaving(false)
     }
   }
 
@@ -527,31 +554,63 @@ export default function VisualCreationPage() {
               </span>
             </div>
 
+            {/* 썸네일 선택 안내 */}
+            {videoUrl && !thumbnailSaved && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-amber-500">touch_app</span>
+                <p className="text-xs text-amber-700 font-medium">이미지를 클릭하여 대표 썸네일을 선택하세요</p>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {result.scenes.map((scene, idx) => (
-                <div key={scene.scene_order} className="space-y-3">
-                  <div className="aspect-square rounded-xl overflow-hidden bg-[#f9f6f0] border border-[#e5ddd3]">
-                    {result.images[idx] && (
-                      <img
-                        src={resolveApiUrl(result.images[idx].image_url)}
-                        alt={scene.subtitle_text}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-bold">
-                        {scene.scene_order}컷
-                      </span>
-                      <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
+              {result.scenes.map((scene, idx) => {
+                const imgUrl = result.images[idx]?.image_url
+                const isSelected = selectedThumbnail === imgUrl
+                return (
+                  <div key={scene.scene_order} className="space-y-3">
+                    <div
+                      className={`aspect-square rounded-xl overflow-hidden bg-[#f9f6f0] border-2 relative transition-all ${
+                        isSelected
+                          ? 'border-primary ring-2 ring-primary/30'
+                          : videoUrl
+                          ? 'border-[#e5ddd3] hover:border-primary/50 cursor-pointer'
+                          : 'border-[#e5ddd3]'
+                      }`}
+                      onClick={() => {
+                        if (videoUrl && imgUrl) handleSelectThumbnail(imgUrl)
+                      }}
+                    >
+                      {result.images[idx] && (
+                        <img
+                          src={resolveApiUrl(result.images[idx].image_url)}
+                          alt={scene.subtitle_text}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      {/* 썸네일 선택 뱃지 */}
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg">
+                          <span className="material-symbols-outlined text-sm">
+                            {thumbnailSaving ? 'progress_activity' : 'check_circle'}
+                          </span>
+                          대표 이미지
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-[#e5ddd3]">
-                      "{scene.dialogue}"
-                    </p>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-bold">
+                          {scene.scene_order}컷
+                        </span>
+                        <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
+                      </div>
+                      <p className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-[#e5ddd3]">
+                        "{scene.dialogue}"
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* 영상 플레이어 */}
@@ -807,6 +866,14 @@ export default function VisualCreationPage() {
               <p className="text-sm font-medium text-green-700">영상이 생성되었습니다!</p>
             </div>
             <p className="text-xs text-green-600">왼쪽 미리보기에서 영상을 확인하세요.</p>
+            {thumbnailSaved ? (
+              <div className="flex items-center gap-1 pt-1">
+                <span className="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+                <p className="text-xs text-green-600 font-medium">대표 이미지가 저장되었습니다</p>
+              </div>
+            ) : (
+              <p className="text-xs text-amber-600 font-medium pt-1">이미지를 클릭하여 대표 썸네일을 선택해주세요</p>
+            )}
           </div>
         )}
       </div>

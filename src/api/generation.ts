@@ -41,4 +41,12 @@ export const generationApi = {
     }>('/api/v1/generation/render/video/svd', data, {
       timeout: 600000, // 10분 - SVD 변환에 상당히 오래 걸림
     }),
+
+  // 썸네일 선택
+  selectThumbnail: (data: { job_id: number; thumbnail_url: string }) =>
+    api.post<{
+      success: boolean
+      message: string
+      data: { job_id: number; thumbnail_url: string }
+    }>('/api/v1/generation/thumbnail/select', data),
 }

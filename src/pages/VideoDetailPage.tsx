@@ -1,36 +1,119 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { allVideos, getCommentsForVideo, formatCount, formatDate } from '../data/videos'
+import { videosApi, type VideoDetail, type VideoComment } from '../api/videos'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
 import { resolveApiUrl } from '@/config/env'
+
+function formatCount(n: number): string {
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+  return String(n)
+}
 
 export default function VideoDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user, isLoggedIn, logout } = useAuth()
+
+  const [video, setVideo] = useState<VideoDetail | null>(null)
+  const [comments, setComments] = useState<VideoComment[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [liked, setLiked] = useState(false)
+  const [likeCount, setLikeCount] = useState(0)
+  const [commentText, setCommentText] = useState('')
+  const [commentSubmitting, setCommentSubmitting] = useState(false)
 
-  const video = allVideos.find((v) => v.id === Number(id))
+  // 비디오 상세 + 댓글 로드
+  useEffect(() => {
+    if (!id) return
 
-  // 관련 비디오 (현재 비디오 제외, 랜덤 4개)
-  const relatedVideos = useMemo(() => {
-    if (!video) return []
-    const others = allVideos.filter((v) => v.id !== video.id)
-    const shuffled = [...others].sort(() => Math.random() - 0.5)
-    return shuffled.slice(0, 4)
-  }, [video])
+    async function fetchData() {
+      setLoading(true)
+      setError('')
+      try {
+        const [videoRes, commentsRes] = await Promise.all([
+          videosApi.getById(Number(id)),
+          videosApi.getComments(Number(id)),
+        ])
 
-  // 댓글
-  const comments = video ? getCommentsForVideo(video.id) : []
+        if (videoRes.data.success) {
+          const v = videoRes.data.data.videos
+          setVideo(v)
+          setLiked(v.liked)
+          setLikeCount(v.like_count)
+        } else {
+          setError('영상을 찾을 수 없습니다.')
+        }
 
-  // 404 처리
-  if (!video) {
+        if (commentsRes.data.success) {
+          setComments(commentsRes.data.data.comments)
+        }
+      } catch {
+        setError('영상을 불러오는데 실패했습니다.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [id])
+
+  // 좋아요 토글
+  const handleLike = async () => {
+    if (!video || !isLoggedIn) return
+    try {
+      if (liked) {
+        const res = await videosApi.removeLike(video.id)
+        if (res.data.success) {
+          setLiked(false)
+          setLikeCount(res.data.data.like_count)
+        }
+      } else {
+        const res = await videosApi.addLike(video.id)
+        if (res.data.success) {
+          setLiked(true)
+          setLikeCount(res.data.data.like_count)
+        }
+      }
+    } catch (err) {
+      console.error('좋아요 실패:', err)
+    }
+  }
+
+  // 댓글 작성
+  const handleAddComment = async () => {
+    if (!commentText.trim() || !video) return
+    setCommentSubmitting(true)
+    try {
+      const res = await videosApi.addComment(video.id, commentText.trim())
+      if (res.data.success) {
+        setComments((prev) => [...prev, res.data.data.comment])
+        setCommentText('')
+      }
+    } catch (err) {
+      console.error('댓글 작성 실패:', err)
+    } finally {
+      setCommentSubmitting(false)
+    }
+  }
+
+  // 로딩
+  if (loading) {
+    return (
+      <div className="bg-[#f2ece1] font-display min-h-screen flex items-center justify-center">
+        <span className="text-sm text-[#8c8479]">불러오는 중...</span>
+      </div>
+    )
+  }
+
+  // 404
+  if (error || !video) {
     return (
       <div className="bg-[#f2ece1] font-display text-slate-900 antialiased min-h-screen flex flex-col items-center justify-center">
         <span className="material-symbols-outlined text-6xl text-slate-300 mb-4">videocam_off</span>
         <h2 className="text-2xl font-bold text-[#2d2926] mb-2">비디오를 찾을 수 없습니다</h2>
-        <p className="text-[#5e5452] mb-8">존재하지 않는 비디오이거나 삭제된 비디오입니다.</p>
+        <p className="text-[#5e5452] mb-8">{error || '존재하지 않는 비디오이거나 삭제된 비디오입니다.'}</p>
         <Link
           to="/"
           className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-[#b05d3f] transition-all"
@@ -40,8 +123,6 @@ export default function VideoDetailPage() {
       </div>
     )
   }
-
-  const displayLikes = liked ? video.likes + 1 : video.likes
 
   return (
     <div className="bg-[#f2ece1] font-display text-slate-900 antialiased min-h-screen flex flex-col">
@@ -96,45 +177,44 @@ export default function VideoDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* 왼쪽: 비디오 + 정보 */}
           <div className="lg:col-span-2 space-y-8">
-            {/* 비디오 플레이어 영역 */}
-            <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-lg group cursor-pointer">
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url("${video.image}")` }}
-              />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-              {/* 재생 버튼 */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="size-20 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-4xl text-primary ml-1">play_arrow</span>
-                </div>
+            {/* 비디오 플레이어 */}
+            {video.video_url ? (
+              <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-black">
+                <video
+                  src={resolveApiUrl(video.video_url)}
+                  controls
+                  autoPlay
+                  className="w-full h-full"
+                  poster={video.thumbnail_url ? resolveApiUrl(video.thumbnail_url) : undefined}
+                />
               </div>
-              {/* 길이 */}
-              <div className="absolute bottom-4 right-4">
-                <span className="text-sm bg-black/50 backdrop-blur-md text-white px-3 py-1.5 rounded-lg font-medium">{video.duration}</span>
+            ) : (
+              <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-[#f0ebe3] flex items-center justify-center">
+                {video.thumbnail_url ? (
+                  <img src={resolveApiUrl(video.thumbnail_url)} alt={video.title} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="material-symbols-outlined text-6xl text-[#c5beb4]">movie</span>
+                )}
               </div>
-            </div>
+            )}
 
             {/* 비디오 정보 */}
             <div className="space-y-6">
               <h1 className="text-3xl md:text-4xl font-black text-[#2d2926] tracking-tight">{video.title}</h1>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                {/* 크리에이터 */}
-                <div className="flex items-center gap-3">
-                  <div className="size-12 rounded-full overflow-hidden ring-2 ring-primary/20">
-                    <img className="w-full h-full object-cover" src={video.avatar} alt={video.creator} />
-                  </div>
-                  <div>
-                    <p className="font-bold text-[#2d2926]">{video.creator}</p>
-                    <p className="text-xs text-[#8c8479]">{formatDate(video.createdAt)}</p>
-                  </div>
+                <div className="flex items-center gap-3 text-sm text-[#8c8479]">
+                  <span className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    조회 {video.view_count?.toLocaleString() || 0}
+                  </span>
                 </div>
 
                 {/* 액션 버튼 */}
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setLiked(!liked)}
+                    onClick={handleLike}
+                    disabled={!isLoggedIn}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                       liked
                         ? 'bg-red-50 text-red-500 border border-red-200'
@@ -142,21 +222,13 @@ export default function VideoDetailPage() {
                     }`}
                   >
                     <span className="material-symbols-outlined text-lg">{liked ? 'favorite' : 'favorite_border'}</span>
-                    {formatCount(displayLikes)}
+                    {formatCount(likeCount)}
                   </button>
                   <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-[#5e5452] border border-[#e5ddd3] text-sm font-medium">
                     <span className="material-symbols-outlined text-lg">chat_bubble_outline</span>
-                    {formatCount(video.comments)}
+                    {comments.length}
                   </div>
-                  <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-[#5e5452] border border-[#e5ddd3] hover:border-primary hover:text-primary text-sm font-medium transition-all">
-                    <span className="material-symbols-outlined text-lg">share</span>
-                  </button>
                 </div>
-              </div>
-
-              {/* 설명 */}
-              <div className="bg-white/60 border border-[#e5ddd3] rounded-2xl p-6">
-                <p className="text-[#5e5452] leading-relaxed">{video.description}</p>
               </div>
             </div>
 
@@ -179,81 +251,68 @@ export default function VideoDetailPage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 relative">
+                  <div className="flex-1 flex gap-2">
                     <input
-                      className="w-full px-4 py-3 bg-white border border-[#e5ddd3] rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                      className="flex-1 px-4 py-3 bg-white border border-[#e5ddd3] rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                       placeholder="댓글을 입력하세요..."
-                      type="text"
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
+                      disabled={commentSubmitting}
                     />
+                    <button
+                      onClick={handleAddComment}
+                      disabled={!commentText.trim() || commentSubmitting}
+                      className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-[#b05d3f] disabled:opacity-40 transition-all"
+                    >
+                      {commentSubmitting ? '...' : '작성'}
+                    </button>
                   </div>
                 </div>
               )}
 
               {/* 댓글 리스트 */}
               <div className="space-y-4">
-                {comments.map((comment) => (
-                  <div key={comment.id} className="flex gap-3 bg-white/40 border border-[#eee6d8] rounded-xl p-4">
-                    <div className="size-10 rounded-full overflow-hidden flex-shrink-0">
-                      <img className="w-full h-full object-cover" src={comment.avatar} alt={comment.author} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-sm text-[#2d2926]">{comment.author}</span>
-                        <span className="text-xs text-[#8c8479]">{formatDate(comment.createdAt)}</span>
+                {comments.length === 0 ? (
+                  <p className="text-sm text-[#8c8479] text-center py-8">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</p>
+                ) : (
+                  comments.map((comment) => (
+                    <div key={comment.comment_id} className="flex gap-3 bg-white/40 border border-[#eee6d8] rounded-xl p-4">
+                      <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary text-sm font-bold">{comment.nickname?.charAt(0) || '?'}</span>
                       </div>
-                      <p className="text-sm text-[#5e5452] leading-relaxed">{comment.content}</p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <button className="flex items-center gap-1 text-xs text-[#8c8479] hover:text-primary transition-colors">
-                          <span className="material-symbols-outlined text-sm">thumb_up</span>
-                          {comment.likes}
-                        </button>
-                        <button className="text-xs text-[#8c8479] hover:text-primary transition-colors">답글</button>
+                      <div className="flex-1 min-w-0">
+                        <span className="font-bold text-sm text-[#2d2926]">{comment.nickname || '익명'}</span>
+                        <p className="text-sm text-[#5e5452] leading-relaxed mt-1">{comment.content}</p>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>
 
-          {/* 오른쪽: 관련 비디오 */}
+          {/* 오른쪽: 빈 공간 (나중에 관련 영상 추가 가능) */}
           <div className="lg:col-span-1">
             <h3 className="text-lg font-bold text-[#2d2926] mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined">playlist_play</span>
-              관련 비디오
+              <span className="material-symbols-outlined">info</span>
+              영상 정보
             </h3>
-            <div className="space-y-4">
-              {relatedVideos.map((rv) => (
-                <Link
-                  key={rv.id}
-                  to={`/video/${rv.id}`}
-                  className="flex gap-3 group bg-white/50 hover:bg-white border border-[#eee6d8] hover:border-primary/30 rounded-xl p-3 transition-all hover:shadow-md"
-                >
-                  <div className="relative w-36 flex-shrink-0 aspect-video rounded-lg overflow-hidden">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300"
-                      style={{ backgroundImage: `url("${rv.image}")` }}
-                    />
-                    <div className="absolute bottom-1 right-1">
-                      <span className="text-[10px] bg-black/50 backdrop-blur-sm text-white px-1.5 py-0.5 rounded">{rv.duration}</span>
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0 py-1">
-                    <h4 className="font-bold text-sm text-[#2d2926] truncate group-hover:text-primary transition-colors">{rv.title}</h4>
-                    <p className="text-xs text-[#8c8479] mt-1">{rv.creator}</p>
-                    <div className="flex items-center gap-3 mt-2 text-[#8c8479]">
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-xs">favorite</span>
-                        <span className="text-xs">{formatCount(rv.likes)}</span>
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-xs">chat_bubble</span>
-                        <span className="text-xs">{formatCount(rv.comments)}</span>
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+            <div className="bg-white/60 border border-[#e5ddd3] rounded-2xl p-5 space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-[#8c8479]">카테고리</span>
+                <span className="font-medium text-[#2d2926]">
+                  {video.category_id === 1 ? '애니메이션' : video.category_id === 2 ? '히어로' : video.category_id === 3 ? '게임' : '판타지'}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-[#8c8479]">좋아요</span>
+                <span className="font-medium text-[#2d2926]">{likeCount}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-[#8c8479]">댓글</span>
+                <span className="font-medium text-[#2d2926]">{comments.length}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -266,12 +325,7 @@ export default function VideoDetailPage() {
             <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
             <span className="font-bold text-[#2d2926]">AI 비디오</span>
           </div>
-          <div className="flex gap-8 text-sm text-[#5e5452]">
-            <Link className="hover:text-primary transition-colors" to="/terms">이용약관</Link>
-            <Link className="hover:text-primary transition-colors" to="/privacy">개인정보처리방침</Link>
-            <Link className="hover:text-primary transition-colors" to="/support">고객센터</Link>
-          </div>
-          <p className="text-sm text-slate-400">© 2024 AI Video Studio. All rights reserved.</p>
+          <p className="text-sm text-slate-400">&copy; 2024 AI Video Studio. All rights reserved.</p>
         </div>
       </footer>
     </div>
