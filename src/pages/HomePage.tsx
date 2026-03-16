@@ -1,20 +1,22 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { allVideos, formatCount } from '../data/videos'
+import { videosApi, type VideoListItem } from '../api/videos'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
 import { resolveApiUrl } from '@/config/env'
 
 // 정렬 필터
 const sortFilters = [
-  { label: '인기순', icon: 'trending_up' },
-  { label: '최신순', icon: 'schedule' },
+  { label: '인기순', icon: 'trending_up', value: 'popular' },
+  { label: '최신순', icon: 'schedule', value: 'latest' },
 ]
 
 const PAGE_SIZE = 8
 
-// 좋아요 기준 TOP 5 랭킹
-const topVideos = [...allVideos].sort((a, b) => b.likes - a.likes).slice(0, 5)
+function formatCount(n: number): string {
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+  return String(n)
+}
 
 export default function HomePage() {
   const { user, isLoggedIn, logout } = useAuth()
@@ -22,27 +24,40 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
-  // 정렬 + 검색 필터링
+  // API 데이터
+  const [videos, setVideos] = useState<VideoListItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // 영상 목록 불러오기
+  useEffect(() => {
+    async function fetchVideos() {
+      setLoading(true)
+      try {
+        const sortValue = sortFilters[activeSort].value
+        const res = await videosApi.getAll(sortValue)
+        if (res.data.success) {
+          setVideos(res.data.data.videos || [])
+        }
+      } catch (err) {
+        console.error('영상 목록 조회 실패:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchVideos()
+  }, [activeSort])
+
+  // 검색 필터링 (클라이언트 사이드)
   const filteredVideos = useMemo(() => {
-    let result = [...allVideos]
+    if (!searchQuery.trim()) return videos
+    const q = searchQuery.toLowerCase()
+    return videos.filter((v) => v.title.toLowerCase().includes(q))
+  }, [videos, searchQuery])
 
-    // 검색
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      result = result.filter(
-        (v) => v.title.toLowerCase().includes(q) || v.creator.toLowerCase().includes(q)
-      )
-    }
-
-    // 정렬
-    if (activeSort === 0) {
-      result.sort((a, b) => b.likes - a.likes) // 인기순
-    } else {
-      result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // 최신순
-    }
-
-    return result
-  }, [activeSort, searchQuery])
+  // 인기 랭킹 TOP 5 (좋아요 높은 순)
+  const topVideos = useMemo(() => {
+    return [...videos].sort((a, b) => (b.like_count || 0) - (a.like_count || 0)).slice(0, 5)
+  }, [videos])
 
   const visibleVideos = filteredVideos.slice(0, visibleCount)
   const hasMore = visibleCount < filteredVideos.length
@@ -103,56 +118,51 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Ranking */}
-        <div className="mb-14">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="material-symbols-outlined text-2xl text-amber-500">emoji_events</span>
-            <h3 className="text-2xl font-black text-[#2d2926] tracking-tight">인기 랭킹 TOP 5</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {topVideos.map((video, index) => (
-              <Link
-                key={video.id}
-                to={`/video/${video.id}`}
-                className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#eee6d8]"
-              >
-                {/* 썸네일 */}
-                <div className="relative aspect-[3/4] w-full overflow-hidden">
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                    style={{ backgroundImage: `url("${video.image}")` }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  {/* 순위 뱃지 */}
-                  <div className={`absolute top-3 left-3 size-9 rounded-full flex items-center justify-center font-black text-sm shadow-lg ${
-                    index === 0 ? 'bg-amber-400 text-amber-900' :
-                    index === 1 ? 'bg-slate-300 text-slate-700' :
-                    index === 2 ? 'bg-amber-600 text-amber-100' :
-                    'bg-white/90 text-[#2d2926] rank-badge-light'
-                  }`}>
-                    {index + 1}
-                  </div>
-                  {/* 하단 정보 */}
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <h4 className="font-bold text-sm truncate mb-1">{video.title}</h4>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <div className="size-5 rounded-full overflow-hidden">
-                          <img className="w-full h-full object-cover" src={video.avatar} alt={video.creator} />
-                        </div>
-                        <span className="text-xs text-white/80">{video.creator}</span>
+        {/* Ranking TOP 5 */}
+        {topVideos.length > 0 && (
+          <div className="mb-14">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="material-symbols-outlined text-2xl text-amber-500">emoji_events</span>
+              <h3 className="text-2xl font-black text-[#2d2926] tracking-tight">인기 랭킹 TOP 5</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {topVideos.map((video, index) => (
+                <Link
+                  key={video.id}
+                  to={`/video/${video.id}`}
+                  className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#eee6d8]"
+                >
+                  <div className="relative aspect-[3/4] w-full overflow-hidden">
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                      style={{ backgroundImage: video.thumbnail_url ? `url("${resolveApiUrl(video.thumbnail_url)}")` : undefined, backgroundColor: '#e5ddd3' }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    {/* 순위 뱃지 */}
+                    <div className={`absolute top-3 left-3 size-9 rounded-full flex items-center justify-center font-black text-sm shadow-lg ${
+                      index === 0 ? 'bg-amber-400 text-amber-900' :
+                      index === 1 ? 'bg-slate-300 text-slate-700' :
+                      index === 2 ? 'bg-amber-600 text-amber-100' :
+                      'bg-white/90 text-[#2d2926]'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    {/* 하단 정보 */}
+                    <div className="absolute bottom-3 left-3 right-3 text-white">
+                      <h4 className="font-bold text-sm truncate mb-1">{video.title}</h4>
+                      <div className="flex items-center justify-end">
+                        <span className="flex items-center gap-1 text-xs text-white/80">
+                          <span className="material-symbols-outlined text-xs text-red-400">favorite</span>
+                          {formatCount(video.like_count || 0)}
+                        </span>
                       </div>
-                      <span className="flex items-center gap-1 text-xs text-white/80">
-                        <span className="material-symbols-outlined text-xs text-red-400">favorite</span>
-                        {formatCount(video.likes)}
-                      </span>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Filters + Search */}
         <div className="flex flex-col gap-6 mb-10">
@@ -176,7 +186,7 @@ export default function HomePage() {
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
             <input
               className="w-full pl-12 pr-4 py-4 bg-white border border-[#e5ddd3] rounded-2xl text-base focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-sm outline-none transition-all"
-              placeholder="비디오 제목이나 크리에이터 검색..."
+              placeholder="비디오 제목 검색..."
               type="text"
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setVisibleCount(PAGE_SIZE) }}
@@ -184,56 +194,68 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Loading */}
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <span className="text-sm text-[#8c8479]">영상을 불러오는 중...</span>
+          </div>
+        )}
+
         {/* Video Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {visibleVideos.map((video) => (
-            <Link
-              to={`/video/${video.id}`}
-              key={video.id}
-              className="group relative flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#eee6d8] cursor-pointer"
-            >
-              <div className="relative aspect-[9/16] w-full overflow-hidden">
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                  style={{ backgroundImage: `url("${video.image}")` }}
-                />
-                <div className="absolute inset-0 video-card-gradient opacity-60" />
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
-                  <span className="text-xs bg-black/40 backdrop-blur-md px-2 py-1 rounded">{video.duration}</span>
-                  <span className="material-symbols-outlined text-lg opacity-0 group-hover:opacity-100 transition-opacity">play_arrow</span>
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-[#2d2926] mb-2 truncate">{video.title}</h3>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="size-6 rounded-full overflow-hidden">
-                      <img className="w-full h-full object-cover" src={video.avatar} alt={video.creator} />
+        {!loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {visibleVideos.map((video) => (
+              <Link
+                to={`/video/${video.id}`}
+                key={video.id}
+                className="group relative flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#eee6d8] cursor-pointer"
+              >
+                <div className="relative aspect-[9/16] w-full overflow-hidden">
+                  {video.thumbnail_url ? (
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                      style={{ backgroundImage: `url("${resolveApiUrl(video.thumbnail_url)}")` }}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-[#e5ddd3] flex items-center justify-center">
+                      <span className="material-symbols-outlined text-4xl text-[#c5beb4]">movie</span>
                     </div>
-                    <span className="text-xs font-medium text-[#5e5452]">{video.creator}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-[#5e5452]">
-                    <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-sm">favorite</span>
-                      <span className="text-xs">{formatCount(video.likes)}</span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-sm">chat_bubble</span>
-                      <span className="text-xs">{formatCount(video.comments)}</span>
-                    </span>
+                  )}
+                  <div className="absolute inset-0 video-card-gradient opacity-60" />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
+                    <span className="material-symbols-outlined text-lg opacity-0 group-hover:opacity-100 transition-opacity">play_arrow</span>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-[#2d2926] mb-2 truncate">{video.title}</h3>
+                  <div className="flex items-center justify-end">
+                    <div className="flex items-center gap-3 text-[#5e5452]">
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm">favorite</span>
+                        <span className="text-xs">{formatCount(video.like_count || 0)}</span>
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm">chat_bubble</span>
+                        <span className="text-xs">{formatCount(video.comment_count || 0)}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
         {/* Empty State */}
-        {visibleVideos.length === 0 && (
+        {!loading && visibleVideos.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <span className="material-symbols-outlined text-5xl text-slate-300 mb-4">search_off</span>
-            <p className="text-lg font-bold text-slate-400">검색 결과가 없습니다</p>
-            <p className="text-sm text-slate-400 mt-1">다른 키워드로 검색해보세요.</p>
+            <p className="text-lg font-bold text-slate-400">
+              {searchQuery ? '검색 결과가 없습니다' : '아직 영상이 없습니다'}
+            </p>
+            <p className="text-sm text-slate-400 mt-1">
+              {searchQuery ? '다른 키워드로 검색해보세요.' : '첫 번째 영상을 만들어보세요!'}
+            </p>
           </div>
         )}
 
