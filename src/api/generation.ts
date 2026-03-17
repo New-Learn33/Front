@@ -32,36 +32,12 @@ export const generationApi = {
     job_id: number
     images: { scene_order: number; image_url: string }[]
     scenes: { scene_order: number; dialogue: string }[]
-    motion_intensity?: string
   }) =>
     api.post<{
       success: boolean
       message: string
       data: { job_id: number; status: string; video_url: string }
     }>('/api/v1/generation/render/video/svd', data, {
-      timeout: 1800000, // 30분 - Minimax 영상 변환에 오래 걸림
+      timeout: 600000, // 10분 - SVD 변환에 상당히 오래 걸림
     }),
-
-  // 썸네일 선택
-  selectThumbnail: (data: { job_id: number; thumbnail_url: string }) =>
-    api.post<{
-      success: boolean
-      message: string
-      data: { job_id: number; thumbnail_url: string }
-    }>('/api/v1/generation/thumbnail/select', data),
-
-  // 텍스트 수정 (제목, 대사, 자막)
-  updateText: (jobId: number, data: {
-    title?: string
-    scenes?: { scene_order: number; dialogue?: string; subtitle_text?: string }[]
-  }) =>
-    api.patch<{
-      success: boolean
-      message: string
-      data: {
-        job_id: number
-        title: string
-        scenes: { scene_order: number; dialogue: string; subtitle_text: string }[]
-      }
-    }>(`/api/v1/generation/jobs/${jobId}/text`, data),
 }

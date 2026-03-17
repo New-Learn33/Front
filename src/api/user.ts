@@ -45,14 +45,6 @@ export const userApi = {
   getMyComments: () =>
     api.get<{ success: boolean; data: { comments: UserComment[] } }>('/api/v1/users/me/comments'),
 
-  // 좋아요한 영상 목록 조회
-  getMyLikes: () =>
-    api.get<{ success: boolean; data: { videos: UserVideo[] } }>('/api/v1/users/me/likes'),
-
-  // 저장공간 조회
-  getMyStorage: () =>
-    api.get<{ success: boolean; data: { storage_used: number; storage_limit: number; storage_used_gb: number; storage_limit_gb: number } }>('/api/v1/users/me/storage'),
-
   // 댓글 삭제
   deleteComment: (commentId: number) =>
     api.delete<{ success: boolean }>(`/api/v1/comments/${commentId}`),
