@@ -26,13 +26,13 @@ export default function VideoDetailPage() {
   // 404 처리
   if (!video) {
     return (
-      <div className="bg-[#f2ece1] font-display text-slate-900 antialiased min-h-screen flex flex-col items-center justify-center">
+      <div className="bg-[#09111f] font-display text-slate-100 antialiased min-h-screen flex flex-col items-center justify-center">
         <span className="material-symbols-outlined text-6xl text-slate-300 mb-4">videocam_off</span>
-        <h2 className="text-2xl font-bold text-[#2d2926] mb-2">비디오를 찾을 수 없습니다</h2>
-        <p className="text-[#5e5452] mb-8">존재하지 않는 비디오이거나 삭제된 비디오입니다.</p>
+        <h2 className="text-2xl font-bold text-white mb-2">비디오를 찾을 수 없습니다</h2>
+        <p className="text-slate-400 mb-8">존재하지 않는 비디오이거나 삭제된 비디오입니다.</p>
         <Link
           to="/"
-          className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-[#2647d8] transition-all"
+          className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-[#58717c] transition-all"
         >
           홈으로 돌아가기
         </Link>
@@ -43,23 +43,23 @@ export default function VideoDetailPage() {
   const displayLikes = liked ? video.likes + 1 : video.likes
 
   return (
-    <div className="bg-[#f2ece1] font-display text-slate-900 antialiased min-h-screen flex flex-col">
+    <div className="bg-[#09111f] font-display text-slate-100 antialiased min-h-screen flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#e5ddd3]/50 bg-[#f2ece1]/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#09111f]/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 lg:px-20 h-20 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
               <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
-              <h2 className="text-lg font-bold tracking-tight text-[#1a1a1a]">SceneFlow</h2>
+              <h2 className="text-lg font-bold tracking-tight text-white">SceneFlow</h2>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" to="/">홈</Link>
+              <Link className="text-sm font-medium text-slate-400 hover:text-primary transition-colors" to="/">홈</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
               <>
-                <Link to="/studio" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">스튜디오</Link>
+                <Link to="/studio" className="text-sm font-medium text-slate-400 hover:text-primary transition-colors">스튜디오</Link>
                 <div className="flex items-center gap-3">
                   {user?.profile_image_url ? (
                     <img src={user.profile_image_url} alt="프로필" className="size-8 rounded-full object-cover" />
@@ -68,14 +68,14 @@ export default function VideoDetailPage() {
                       {user?.name?.charAt(0) || '?'}
                     </div>
                   )}
-                  <span className="hidden sm:block text-sm font-medium text-slate-700">{user?.nickname || user?.name}</span>
-                  <button onClick={logout} className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">로그아웃</button>
+                  <span className="hidden sm:block text-sm font-medium text-slate-200">{user?.nickname || user?.name}</span>
+                  <button onClick={logout} className="text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors">로그아웃</button>
                 </div>
               </>
             ) : (
               <>
-                <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-600">로그인</Link>
-                <Link to="/signup" className="bg-primary hover:bg-[#2647d8] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
+                <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-400">로그인</Link>
+                <Link to="/signup" className="bg-primary hover:bg-[#58717c] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
               </>
             )}
           </div>
@@ -86,7 +86,7 @@ export default function VideoDetailPage() {
         {/* 뒤로가기 */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-[#5e5452] hover:text-primary transition-colors mb-6 group"
+          className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors mb-6 group"
         >
           <span className="material-symbols-outlined text-lg group-hover:-translate-x-1 transition-transform">arrow_back</span>
           <span className="text-sm font-medium">뒤로가기</span>
@@ -116,7 +116,7 @@ export default function VideoDetailPage() {
 
             {/* 비디오 정보 */}
             <div className="space-y-6">
-              <h1 className="text-3xl md:text-4xl font-black text-[#2d2926] tracking-tight">{video.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">{video.title}</h1>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 {/* 크리에이터 */}
@@ -125,8 +125,8 @@ export default function VideoDetailPage() {
                     <img className="w-full h-full object-cover" src={video.avatar} alt={video.creator} />
                   </div>
                   <div>
-                    <p className="font-bold text-[#2d2926]">{video.creator}</p>
-                    <p className="text-xs text-[#8c8479]">{formatDate(video.createdAt)}</p>
+                    <p className="font-bold text-white">{video.creator}</p>
+                    <p className="text-xs text-slate-400">{formatDate(video.createdAt)}</p>
                   </div>
                 </div>
 
@@ -137,31 +137,31 @@ export default function VideoDetailPage() {
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                       liked
                         ? 'bg-red-50 text-red-500 border border-red-200'
-                        : 'bg-white text-[#5e5452] border border-[#e5ddd3] hover:border-primary hover:text-primary'
+                        : 'bg-white/5 text-slate-300 border border-white/10 hover:border-primary hover:text-primary'
                     }`}
                   >
                     <span className="material-symbols-outlined text-lg">{liked ? 'favorite' : 'favorite_border'}</span>
                     {formatCount(displayLikes)}
                   </button>
-                  <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-[#5e5452] border border-[#e5ddd3] text-sm font-medium">
+                  <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 text-slate-300 border border-white/10 text-sm font-medium">
                     <span className="material-symbols-outlined text-lg">chat_bubble_outline</span>
                     {formatCount(video.comments)}
                   </div>
-                  <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-[#5e5452] border border-[#e5ddd3] hover:border-primary hover:text-primary text-sm font-medium transition-all">
+                  <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 text-slate-300 border border-white/10 hover:border-primary hover:text-primary text-sm font-medium transition-all">
                     <span className="material-symbols-outlined text-lg">share</span>
                   </button>
                 </div>
               </div>
 
               {/* 설명 */}
-              <div className="bg-white/60 border border-[#e5ddd3] rounded-2xl p-6">
-                <p className="text-[#5e5452] leading-relaxed">{video.description}</p>
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                <p className="text-slate-300 leading-relaxed">{video.description}</p>
               </div>
             </div>
 
             {/* 댓글 섹션 */}
             <div className="space-y-6">
-              <h3 className="text-xl font-bold text-[#2d2926] flex items-center gap-2">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
                 <span className="material-symbols-outlined">chat_bubble</span>
                 댓글 {comments.length}개
               </h3>
@@ -180,7 +180,7 @@ export default function VideoDetailPage() {
                   </div>
                   <div className="flex-1 relative">
                     <input
-                      className="w-full px-4 py-3 bg-white border border-[#e5ddd3] rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-500"
                       placeholder="댓글을 입력하세요..."
                       type="text"
                     />
@@ -191,22 +191,22 @@ export default function VideoDetailPage() {
               {/* 댓글 리스트 */}
               <div className="space-y-4">
                 {comments.map((comment) => (
-                  <div key={comment.id} className="flex gap-3 bg-white/40 border border-[#eee6d8] rounded-xl p-4">
+                  <div key={comment.id} className="flex gap-3 bg-white/5 border border-white/10 rounded-xl p-4">
                     <div className="size-10 rounded-full overflow-hidden flex-shrink-0">
                       <img className="w-full h-full object-cover" src={comment.avatar} alt={comment.author} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-sm text-[#2d2926]">{comment.author}</span>
-                        <span className="text-xs text-[#8c8479]">{formatDate(comment.createdAt)}</span>
+                        <span className="font-bold text-sm text-white">{comment.author}</span>
+                        <span className="text-xs text-slate-400">{formatDate(comment.createdAt)}</span>
                       </div>
-                      <p className="text-sm text-[#5e5452] leading-relaxed">{comment.content}</p>
+                      <p className="text-sm text-slate-300 leading-relaxed">{comment.content}</p>
                       <div className="flex items-center gap-3 mt-2">
-                        <button className="flex items-center gap-1 text-xs text-[#8c8479] hover:text-primary transition-colors">
+                        <button className="flex items-center gap-1 text-xs text-slate-400 hover:text-primary transition-colors">
                           <span className="material-symbols-outlined text-sm">thumb_up</span>
                           {comment.likes}
                         </button>
-                        <button className="text-xs text-[#8c8479] hover:text-primary transition-colors">답글</button>
+                        <button className="text-xs text-slate-400 hover:text-primary transition-colors">답글</button>
                       </div>
                     </div>
                   </div>

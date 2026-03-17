@@ -12,11 +12,11 @@ const navItems = [
 
 export default function StudioSidebar() {
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#2d2926] text-white flex flex-col z-50">
+    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#0b1324] text-white flex flex-col z-50 border-r border-white/10">
       {/* Logo */}
       <div className="px-6 h-16 flex items-center gap-3 border-b border-white/10">
         <Link to="/" className="flex items-center gap-3">
-          <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-md bg-primary p-1 object-contain" />
+          <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-md bg-primary/90 p-1 object-contain" />
           <span className="text-base font-bold tracking-tight">SceneFlow</span>
         </Link>
       </div>
@@ -31,7 +31,7 @@ export default function StudioSidebar() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-primary/20 text-primary'
+                  ? 'bg-primary/12 text-primary border border-primary/20'
                   : 'text-white/60 hover:text-white hover:bg-white/5'
               }`
             }
@@ -54,7 +54,7 @@ export default function StudioSidebar() {
           </div>
         </div>
         <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/5">
-          <div className="size-9 rounded-full bg-primary/20 flex items-center justify-center">
+          <div className="size-9 rounded-full bg-primary/12 flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-lg">person</span>
           </div>
           <div>

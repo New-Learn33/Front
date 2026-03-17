@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --font-ui: "Pretendard Variable", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+    --font-icon: "Material Symbols Outlined";
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  }
+
   html {
     color-scheme: light;
   }
@@ -12,16 +18,27 @@
   }
 
   body {
-    font-family: "Space Grotesk", sans-serif;
+    font-family: var(--font-ui);
     overflow-x: hidden;
-    background-color: #f4f6fb;
-    color: #0f172a;
+    background-color: #09111f;
+    color: #e5edf9;
     transition: background-color 200ms ease, color 200ms ease;
   }
 
   .dark body {
     background-color: #1f1b19;
     color: #f1f5f9;
+  }
+
+  .material-symbols-outlined {
+    font-family: var(--font-icon);
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--font-mono);
   }
 }
 
@@ -30,7 +47,7 @@
     background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(52, 87, 246, 0.12);
+    border: 1px solid rgba(107, 135, 148, 0.12);
   }
 
   .dark .glass {
@@ -39,8 +56,8 @@
   }
 
   .hero-gradient {
-    background: radial-gradient(circle at top right, rgba(52, 87, 246, 0.16), transparent),
-                radial-gradient(circle at bottom left, rgba(143, 211, 255, 0.14), transparent);
+    background: radial-gradient(circle at top right, rgba(107, 135, 148, 0.16), transparent),
+                radial-gradient(circle at bottom left, rgba(144, 168, 178, 0.12), transparent);
   }
 
   .no-scrollbar::-webkit-scrollbar {

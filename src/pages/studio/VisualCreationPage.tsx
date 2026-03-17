@@ -274,7 +274,7 @@ export default function VisualCreationPage() {
           <div className="flex items-center gap-2 pt-1">
             <button
               onClick={() => setShowPresets(!showPresets)}
-              className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#2647d8] transition-colors"
+              className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#58717c] transition-colors"
             >
               <span className="material-symbols-outlined text-sm">folder_open</span>
               프리셋 불러오기
@@ -303,7 +303,7 @@ export default function VisualCreationPage() {
               <button
                 onClick={handleSavePreset}
                 disabled={!presetName.trim()}
-                className="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#2647d8] disabled:opacity-40 transition-colors"
+                className="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#58717c] disabled:opacity-40 transition-colors"
               >
                 저장
               </button>
@@ -554,7 +554,7 @@ export default function VisualCreationPage() {
         <button
           onClick={handleGenerate}
           disabled={loading || videoLoading || !prompt.trim()}
-          className="w-full bg-primary hover:bg-[#2647d8] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 btn-press"
+          className="w-full bg-primary hover:bg-[#58717c] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 btn-press"
         >
           {loading ? (
             <>
