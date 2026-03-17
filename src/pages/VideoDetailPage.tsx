@@ -130,7 +130,7 @@ export default function VideoDetailPage() {
         <p className="text-[#5e5452] mb-8">{error || '존재하지 않는 비디오이거나 삭제된 비디오입니다.'}</p>
         <Link
           to="/"
-          className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-[#b05d3f] transition-all"
+          className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-[#1b2d52] transition-all"
         >
           홈으로 돌아가기
         </Link>
@@ -171,7 +171,7 @@ export default function VideoDetailPage() {
             ) : (
               <>
                 <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-600">로그인</Link>
-                <Link to="/signup" className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
+                <Link to="/signup" className="bg-primary hover:bg-[#1b2d52] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
               </>
             )}
           </div>
@@ -277,7 +277,7 @@ export default function VideoDetailPage() {
                     <button
                       onClick={handleAddComment}
                       disabled={!commentText.trim() || commentSubmitting}
-                      className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-[#b05d3f] disabled:opacity-40 transition-all"
+                      className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-[#1b2d52] disabled:opacity-40 transition-all"
                     >
                       {commentSubmitting ? '...' : '작성'}
                     </button>

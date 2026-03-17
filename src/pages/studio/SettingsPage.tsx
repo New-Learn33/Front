@@ -109,7 +109,7 @@ export default function SettingsPage() {
 
       {/* Save */}
       <div className="flex justify-end">
-        <button className="bg-primary hover:bg-[#b05d3f] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press">
+        <button className="bg-primary hover:bg-[#1b2d52] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press">
           변경사항 저장
         </button>
       </div>
