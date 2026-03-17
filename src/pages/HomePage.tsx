@@ -383,7 +383,6 @@ export default function HomePage() {
           <div className="flex gap-8 text-sm text-slate-400">
             <Link className="transition-colors hover:text-primary" to="/terms">이용약관</Link>
             <Link className="transition-colors hover:text-primary" to="/privacy">개인정보처리방침</Link>
-            <Link className="transition-colors hover:text-primary" to="/support">고객센터</Link>
           </div>
           <p className="text-sm text-slate-400">© 2026 SceneFlow. All rights reserved.</p>
         </div>

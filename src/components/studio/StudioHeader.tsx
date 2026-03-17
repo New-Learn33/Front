@@ -135,9 +135,6 @@ export default function StudioHeader() {
           )}
         </div>
 
-        <button className="size-9 rounded-lg bg-white border border-[#e5ddd3] flex items-center justify-center text-warm-muted hover:text-primary transition-colors">
-          <span className="material-symbols-outlined text-xl">help</span>
-        </button>
       </div>
     </header>
   )

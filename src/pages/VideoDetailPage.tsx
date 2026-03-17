@@ -464,7 +464,6 @@ export default function VideoDetailPage() {
           <div className="flex gap-8 text-sm text-[#5e5452]">
             <Link className="hover:text-primary transition-colors" to="/terms">이용약관</Link>
             <Link className="hover:text-primary transition-colors" to="/privacy">개인정보처리방침</Link>
-            <Link className="hover:text-primary transition-colors" to="/support">고객센터</Link>
           </div>
           <p className="text-sm text-warm-muted">© 2026 SceneFlow. All rights reserved.</p>
         </div>
