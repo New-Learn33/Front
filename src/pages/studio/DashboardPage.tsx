@@ -149,7 +149,7 @@ export default function DashboardPage() {
             {myVideos.slice(0, 4).map((video) => (
               <Link
                 key={video.id}
-                to={`/video/`}
+                to={`/video/${video.id}`}
                 state={{ video }}
                 className="group bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden hover:shadow-lg transition-all"
               >

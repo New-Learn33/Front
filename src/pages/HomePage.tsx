@@ -101,7 +101,6 @@ export default function HomePage() {
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
               <>
-                <Link to="/studio" className="text-sm font-medium text-slate-400 transition-colors hover:text-primary">워크스페이스</Link>
                 <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-1 shadow-sm shadow-black/20">
                   {user?.profile_image_url ? (
                     <img src={user.profile_image_url} alt="프로필" className="size-8 rounded-full object-cover" />

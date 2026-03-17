@@ -1,29 +1,85 @@
-import { useState, useMemo } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { allVideos, getCommentsForVideo, formatCount, formatDate } from '../data/videos'
+import { videosApi, type VideoListItem } from '../api/videos'
+import { resolveApiUrl } from '../config/env'
+import { getCommentsForVideo, formatCount, formatDate } from '../data/videos'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
+
+type RouteState = {
+  video?: VideoListItem
+}
 
 export default function VideoDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, isLoggedIn, logout } = useAuth()
   const [liked, setLiked] = useState(false)
+  const [video, setVideo] = useState<VideoListItem | null>(null)
+  const [relatedVideos, setRelatedVideos] = useState<VideoListItem[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const video = allVideos.find((v) => v.id === Number(id))
+  const numericId = Number(id)
+  const stateVideo = (location.state as RouteState | null)?.video
 
-  // 관련 비디오 (현재 비디오 제외, 랜덤 4개)
-  const relatedVideos = useMemo(() => {
-    if (!video) return []
-    const others = allVideos.filter((v) => v.id !== video.id)
-    const shuffled = [...others].sort(() => Math.random() - 0.5)
-    return shuffled.slice(0, 4)
-  }, [video])
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [id])
 
-  // 댓글
-  const comments = video ? getCommentsForVideo(video.id) : []
+  useEffect(() => {
+    let cancelled = false
 
-  // 404 처리
+    async function fetchDetail() {
+      setLoading(true)
+
+      if (stateVideo && stateVideo.id === numericId && !cancelled) {
+        setVideo(stateVideo)
+      }
+
+      try {
+        const res = await videosApi.getAll('latest')
+        if (!res.data.success || cancelled) return
+
+        const list = res.data.data.videos
+        const current = list.find((v) => v.id === numericId) ?? null
+        const related = list.filter((v) => v.id !== numericId).slice(0, 4)
+
+        setVideo(current ?? (stateVideo && stateVideo.id === numericId ? stateVideo : null))
+        setRelatedVideos(related)
+      } catch (err) {
+        console.error('비디오 상세 조회 실패:', err)
+        if (!cancelled && stateVideo && stateVideo.id === numericId) {
+          setVideo(stateVideo)
+          setRelatedVideos([])
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    if (!Number.isNaN(numericId)) fetchDetail()
+    else {
+      setVideo(null)
+      setRelatedVideos([])
+      setLoading(false)
+    }
+
+    return () => {
+      cancelled = true
+    }
+  }, [numericId, stateVideo])
+
+  const comments = useMemo(() => getCommentsForVideo(numericId), [numericId])
+
+  if (loading) {
+    return (
+      <div className="bg-[#09111f] font-display text-slate-100 antialiased min-h-screen flex items-center justify-center">
+        <span className="text-sm text-slate-300">불러오는 중...</span>
+      </div>
+    )
+  }
+
   if (!video) {
     return (
       <div className="bg-[#09111f] font-display text-slate-100 antialiased min-h-screen flex flex-col items-center justify-center">
@@ -40,11 +96,11 @@ export default function VideoDetailPage() {
     )
   }
 
-  const displayLikes = liked ? video.likes + 1 : video.likes
+  const displayLikes = liked ? (video.like_count || 0) + 1 : (video.like_count || 0)
+  const previewImage = resolveApiUrl(video.thumbnail_url)
 
   return (
     <div className="bg-[#09111f] font-display text-slate-100 antialiased min-h-screen flex flex-col">
-      {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#09111f]/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 lg:px-20 h-20 flex items-center justify-between">
           <div className="flex items-center gap-8">
@@ -83,7 +139,6 @@ export default function VideoDetailPage() {
       </header>
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-20 py-8">
-        {/* 뒤로가기 */}
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors mb-6 group"
@@ -93,44 +148,34 @@ export default function VideoDetailPage() {
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* 왼쪽: 비디오 + 정보 */}
           <div className="lg:col-span-2 space-y-8">
-            {/* 비디오 플레이어 영역 */}
-            <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-lg group cursor-pointer">
+            <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-lg group">
               <div
                 className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url("${video.image}")` }}
+                style={{ backgroundImage: `url("${previewImage}")` }}
               />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-              {/* 재생 버튼 */}
+              <div className="absolute inset-0 bg-black/25" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="size-20 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                <div className="size-20 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-xl">
                   <span className="material-symbols-outlined text-4xl text-primary ml-1">play_arrow</span>
                 </div>
               </div>
-              {/* 길이 */}
-              <div className="absolute bottom-4 right-4">
-                <span className="text-sm bg-black/50 backdrop-blur-md text-white px-3 py-1.5 rounded-lg font-medium">{video.duration}</span>
-              </div>
             </div>
 
-            {/* 비디오 정보 */}
             <div className="space-y-6">
               <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">{video.title}</h1>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                {/* 크리에이터 */}
                 <div className="flex items-center gap-3">
-                  <div className="size-12 rounded-full overflow-hidden ring-2 ring-primary/20">
-                    <img className="w-full h-full object-cover" src={video.avatar} alt={video.creator} />
+                  <div className="size-12 rounded-full overflow-hidden ring-2 ring-primary/20 bg-white/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-slate-300">person</span>
                   </div>
                   <div>
-                    <p className="font-bold text-white">{video.creator}</p>
-                    <p className="text-xs text-slate-400">{formatDate(video.createdAt)}</p>
+                    <p className="font-bold text-white">{video.creator_nickname || video.creator || '작성자'}</p>
+                    <p className="text-xs text-slate-400">{video.created_at ? formatDate(video.created_at) : '-'}</p>
                   </div>
                 </div>
 
-                {/* 액션 버튼 */}
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setLiked(!liked)}
@@ -145,28 +190,18 @@ export default function VideoDetailPage() {
                   </button>
                   <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 text-slate-300 border border-white/10 text-sm font-medium">
                     <span className="material-symbols-outlined text-lg">chat_bubble_outline</span>
-                    {formatCount(video.comments)}
+                    {formatCount(video.comment_count || 0)}
                   </div>
-                  <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 text-slate-300 border border-white/10 hover:border-primary hover:text-primary text-sm font-medium transition-all">
-                    <span className="material-symbols-outlined text-lg">share</span>
-                  </button>
                 </div>
-              </div>
-
-              {/* 설명 */}
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                <p className="text-slate-300 leading-relaxed">{video.description}</p>
               </div>
             </div>
 
-            {/* 댓글 섹션 */}
             <div className="space-y-6">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
                 <span className="material-symbols-outlined">chat_bubble</span>
                 댓글 {comments.length}개
               </h3>
 
-              {/* 댓글 입력 */}
               {isLoggedIn && (
                 <div className="flex gap-3">
                   <div className="size-10 rounded-full overflow-hidden flex-shrink-0">
@@ -188,7 +223,6 @@ export default function VideoDetailPage() {
                 </div>
               )}
 
-              {/* 댓글 리스트 */}
               <div className="space-y-4">
                 {comments.map((comment) => (
                   <div key={comment.id} className="flex gap-3 bg-white/5 border border-white/10 rounded-xl p-4">
@@ -201,13 +235,6 @@ export default function VideoDetailPage() {
                         <span className="text-xs text-slate-400">{formatDate(comment.createdAt)}</span>
                       </div>
                       <p className="text-sm text-slate-300 leading-relaxed">{comment.content}</p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <button className="flex items-center gap-1 text-xs text-slate-400 hover:text-primary transition-colors">
-                          <span className="material-symbols-outlined text-sm">thumb_up</span>
-                          {comment.likes}
-                        </button>
-                        <button className="text-xs text-slate-400 hover:text-primary transition-colors">답글</button>
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -215,7 +242,6 @@ export default function VideoDetailPage() {
             </div>
           </div>
 
-          {/* 오른쪽: 관련 비디오 */}
           <div className="lg:col-span-1">
             <h3 className="text-lg font-bold text-[#2d2926] mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined">playlist_play</span>
@@ -226,28 +252,25 @@ export default function VideoDetailPage() {
                 <Link
                   key={rv.id}
                   to={`/video/${rv.id}`}
+                  state={{ video: rv }}
                   className="flex gap-3 group bg-white/50 hover:bg-white border border-[#eee6d8] hover:border-primary/30 rounded-xl p-3 transition-all hover:shadow-md"
                 >
                   <div className="relative w-36 flex-shrink-0 aspect-video rounded-lg overflow-hidden">
                     <div
                       className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300"
-                      style={{ backgroundImage: `url("${rv.image}")` }}
+                      style={{ backgroundImage: `url("${resolveApiUrl(rv.thumbnail_url)}")` }}
                     />
-                    <div className="absolute bottom-1 right-1">
-                      <span className="text-[10px] bg-black/50 backdrop-blur-sm text-white px-1.5 py-0.5 rounded">{rv.duration}</span>
-                    </div>
                   </div>
                   <div className="flex-1 min-w-0 py-1">
                     <h4 className="font-bold text-sm text-[#2d2926] truncate group-hover:text-primary transition-colors">{rv.title}</h4>
-                    <p className="text-xs text-[#8c8479] mt-1">{rv.creator}</p>
                     <div className="flex items-center gap-3 mt-2 text-[#8c8479]">
                       <span className="flex items-center gap-1">
                         <span className="material-symbols-outlined text-xs">favorite</span>
-                        <span className="text-xs">{formatCount(rv.likes)}</span>
+                        <span className="text-xs">{formatCount(rv.like_count || 0)}</span>
                       </span>
                       <span className="flex items-center gap-1">
                         <span className="material-symbols-outlined text-xs">chat_bubble</span>
-                        <span className="text-xs">{formatCount(rv.comments)}</span>
+                        <span className="text-xs">{formatCount(rv.comment_count || 0)}</span>
                       </span>
                     </div>
                   </div>
@@ -258,7 +281,6 @@ export default function VideoDetailPage() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="mt-20 border-t border-[#e5ddd3]/50 bg-[#f9f6f0]/30 px-6 lg:px-20 py-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
