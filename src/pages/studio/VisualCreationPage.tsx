@@ -199,7 +199,7 @@ export default function VisualCreationPage() {
           <div className="flex items-center gap-2 pt-1">
             <button
               onClick={() => setShowPresets(!showPresets)}
-              className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#b05d3f] transition-colors"
+              className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#1b2d52] transition-colors"
             >
               <span className="material-symbols-outlined text-sm">folder_open</span>
               프리셋 불러오기
@@ -228,7 +228,7 @@ export default function VisualCreationPage() {
               <button
                 onClick={handleSavePreset}
                 disabled={!presetName.trim()}
-                className="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#b05d3f] disabled:opacity-40 transition-colors"
+                className="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#1b2d52] disabled:opacity-40 transition-colors"
               >
                 저장
               </button>
@@ -414,7 +414,7 @@ export default function VisualCreationPage() {
                       <button
                         onClick={handleSaveEdit}
                         disabled={textSaving}
-                        className="flex items-center gap-1 text-xs font-medium text-white bg-primary hover:bg-[#b05d3f] px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
+                        className="flex items-center gap-1 text-xs font-medium text-white bg-primary hover:bg-[#1b2d52] px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
                       >
                         <span className="material-symbols-outlined text-sm">
                           {textSaving ? 'progress_activity' : 'check'}
@@ -432,7 +432,7 @@ export default function VisualCreationPage() {
                   ) : (
                     <button
                       onClick={handleStartEdit}
-                      className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#b05d3f] px-2 py-1 rounded-lg transition-all hover:bg-primary/5"
+                      className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#1b2d52] px-2 py-1 rounded-lg transition-all hover:bg-primary/5"
                       title="제목과 대사를 수정합니다"
                     >
                       <span className="material-symbols-outlined text-sm">edit</span>
@@ -667,7 +667,7 @@ export default function VisualCreationPage() {
         <button
           onClick={handleGenerate}
           disabled={loading || videoLoading || !prompt.trim()}
-          className="w-full bg-primary hover:bg-[#b05d3f] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 btn-press"
+          className="w-full bg-primary hover:bg-[#1b2d52] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 btn-press"
         >
           {loading ? (
             <>

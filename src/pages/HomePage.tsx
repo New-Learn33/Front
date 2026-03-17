@@ -95,7 +95,7 @@ export default function HomePage() {
             ) : (
               <>
                 <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-600">로그인</Link>
-                <Link to="/signup" className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
+                <Link to="/signup" className="bg-primary hover:bg-[#1b2d52] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
               </>
             )}
           </div>

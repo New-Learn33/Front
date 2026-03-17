@@ -158,7 +158,7 @@ function TagEditModal({
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-5 py-2 text-sm bg-primary hover:bg-[#b05d3f] text-white rounded-lg font-medium transition-all disabled:opacity-50"
+            className="px-5 py-2 text-sm bg-primary hover:bg-[#1b2d52] text-white rounded-lg font-medium transition-all disabled:opacity-50"
           >
             {saving ? '저장 중...' : '저장'}
           </button>
@@ -283,7 +283,7 @@ export default function AssetLibraryPage() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all btn-press disabled:opacity-50"
+            className="bg-primary hover:bg-[#1b2d52] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all btn-press disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-lg">
               {uploading ? 'hourglass_empty' : 'upload'}
