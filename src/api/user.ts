@@ -45,6 +45,10 @@ export const userApi = {
   getMyComments: () =>
     api.get<{ success: boolean; data: { comments: UserComment[] } }>('/api/v1/users/me/comments'),
 
+  // 내 좋아요 영상 조회
+  getMyLikes: () =>
+    api.get<{ success: boolean; data: { videos: UserVideo[] } }>('/api/v1/users/me/likes'),
+
   // 댓글 삭제
   deleteComment: (commentId: number) =>
     api.delete<{ success: boolean }>(`/api/v1/comments/${commentId}`),

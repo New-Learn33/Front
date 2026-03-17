@@ -375,7 +375,7 @@ export default function VisualCreationPage() {
       </div>
 
       {/* Right Panel */}
-      <div className="w-80 shrink-0 space-y-5 animate-enter" style={{ animationDelay: '200ms' }}>
+      <div className="w-80 shrink-0 space-y-5 animate-enter sticky top-8 self-start max-h-[calc(100vh-6rem)] overflow-y-auto" style={{ animationDelay: '200ms' }}>
         <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-4">
           <h3 className="text-base font-bold text-[#2d2926]">생성 정보</h3>
           <div className="space-y-3 text-sm">
