@@ -16,8 +16,14 @@ export default function VisualCreationPage() {
     loading, error,
     result,
     streaming,
+    artStyle, setArtStyle,
+    genre, setGenre,
+    imageQuality, setImageQuality,
+    motionIntensity, setMotionIntensity,
     videoLoading, videoStep, videoUrl, videoError, videoProgress,
-    handleGenerate, handleRenderVideo,
+    selectedThumbnail, setSelectedThumbnail,
+    thumbnailSaving, thumbnailSaved,
+    handleGenerate, handleRenderVideo, handleSelectThumbnail,
   } = useGeneration()
 
   // 프리셋 상태
@@ -393,6 +399,153 @@ export default function VisualCreationPage() {
             </div>
           </div>
         </div>
+
+        {/* 상세설정 */}
+        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-4">
+          <h3 className="text-base font-bold text-[#2d2926]">상세설정</h3>
+
+          {/* 아트 스타일 */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-[#2d2926]">아트 스타일</label>
+            <div className="grid grid-cols-3 gap-1.5">
+              {([
+                { value: 'webtoon', label: '웹툰', icon: 'draw' },
+                { value: 'anime', label: '애니메', icon: 'animation' },
+                { value: 'watercolor', label: '수채화', icon: 'palette' },
+                { value: '3d_render', label: '3D', icon: 'view_in_ar' },
+                { value: 'pixel', label: '픽셀', icon: 'grid_on' },
+                { value: 'realistic', label: '실사', icon: 'photo_camera' },
+              ] as const).map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => setArtStyle(s.value)}
+                  disabled={loading || videoLoading}
+                  className={`flex flex-col items-center gap-1 py-2 rounded-lg text-xs font-medium transition-all ${
+                    artStyle === s.value
+                      ? 'bg-primary text-white'
+                      : 'bg-[#f9f6f0] text-[#5e5452] hover:bg-primary/10'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base">{s.icon}</span>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 장르 / 분위기 */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-[#2d2926]">장르 / 분위기</label>
+            <div className="flex flex-wrap gap-1.5">
+              {([
+                { value: 'auto', label: '자동' },
+                { value: 'comedy', label: '코미디' },
+                { value: 'action', label: '액션' },
+                { value: 'romance', label: '로맨스' },
+                { value: 'horror', label: '호러' },
+                { value: 'emotional', label: '감동' },
+              ] as const).map((g) => (
+                <button
+                  key={g.value}
+                  onClick={() => setGenre(g.value)}
+                  disabled={loading || videoLoading}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    genre === g.value
+                      ? 'bg-primary text-white'
+                      : 'bg-[#f9f6f0] text-[#5e5452] hover:bg-primary/10'
+                  }`}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 이미지 퀄리티 */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-[#2d2926]">이미지 퀄리티</label>
+            <div className="grid grid-cols-3 gap-1.5">
+              {([
+                { value: 'low', label: '빠름' },
+                { value: 'medium', label: '보통' },
+                { value: 'high', label: '고품질' },
+              ] as const).map((q) => (
+                <button
+                  key={q.value}
+                  onClick={() => setImageQuality(q.value)}
+                  disabled={loading || videoLoading}
+                  className={`py-2 rounded-lg text-xs font-medium transition-all ${
+                    imageQuality === q.value
+                      ? 'bg-primary text-white'
+                      : 'bg-[#f9f6f0] text-[#5e5452] hover:bg-primary/10'
+                  }`}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 움직임 강도 */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-[#2d2926]">움직임 강도</label>
+            <div className="grid grid-cols-3 gap-1.5">
+              {([
+                { value: 'low', label: '약하게' },
+                { value: 'medium', label: '보통' },
+                { value: 'high', label: '강하게' },
+              ] as const).map((m) => (
+                <button
+                  key={m.value}
+                  onClick={() => setMotionIntensity(m.value)}
+                  disabled={loading || videoLoading}
+                  className={`py-2 rounded-lg text-xs font-medium transition-all ${
+                    motionIntensity === m.value
+                      ? 'bg-primary text-white'
+                      : 'bg-[#f9f6f0] text-[#5e5452] hover:bg-primary/10'
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 썸네일 선택 */}
+        {result && (
+          <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-3">
+            <h3 className="text-base font-bold text-[#2d2926]">썸네일 선택</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {result.images.map((img) => (
+                <button
+                  key={img.scene_order}
+                  onClick={() => handleSelectThumbnail(img.image_url)}
+                  disabled={thumbnailSaving}
+                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                    selectedThumbnail === img.image_url
+                      ? 'border-primary ring-2 ring-primary/20'
+                      : 'border-[#e5ddd3] hover:border-primary/40'
+                  }`}
+                >
+                  <img src={img.image_url} alt={`씬 ${img.scene_order}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+            {thumbnailSaving && (
+              <p className="text-xs text-primary flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                저장 중...
+              </p>
+            )}
+            {thumbnailSaved && !thumbnailSaving && (
+              <p className="text-xs text-green-600 flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">check_circle</span>
+                썸네일이 저장되었습니다
+              </p>
+            )}
+          </div>
+        )}
 
         {/* 6컷 생성 버튼 */}
         <button

@@ -1,5 +1,10 @@
+import { useState, useEffect } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
+import { authApi } from '@/api/auth'
+import type { User } from '@/types/auth'
+
+const STORAGE_LIMIT = 3 * 1024 * 1024 * 1024 // 3GB
 
 const navItems = [
   { to: '/studio', icon: 'dashboard', label: '대시보드', end: true },
@@ -10,7 +15,26 @@ const navItems = [
   { to: '/studio/settings', icon: 'settings', label: '환경설정' },
 ]
 
+function formatStorage(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
+}
+
 export default function StudioSidebar() {
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+    authApi.me().then(res => {
+      if (res.data.success) setUser(res.data.data)
+    }).catch(() => {})
+  }, [])
+
+  const storageUsed = user?.storage_used || 0
+  const storagePercent = Math.min(100, Math.round((storageUsed / STORAGE_LIMIT) * 100))
+
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#0b1324] text-white flex flex-col z-50 border-r border-white/10">
       {/* Logo */}
@@ -47,10 +71,13 @@ export default function StudioSidebar() {
         <div className="px-3 space-y-2">
           <div className="flex items-center justify-between text-xs text-white/40">
             <span>저장공간</span>
-            <span>2.4 / 5 GB</span>
+            <span>{formatStorage(storageUsed)} / {formatStorage(STORAGE_LIMIT)}</span>
           </div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-            <div className="h-full w-[48%] bg-primary rounded-full" />
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-500"
+              style={{ width: `${storagePercent}%` }}
+            />
           </div>
         </div>
         <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/5">
@@ -58,7 +85,7 @@ export default function StudioSidebar() {
             <span className="material-symbols-outlined text-primary text-lg">person</span>
           </div>
           <div>
-            <p className="text-sm font-medium">사용자</p>
+            <p className="text-sm font-medium">{user?.name || '사용자'}</p>
             <p className="text-[11px] text-white/40">무료 플랜</p>
           </div>
         </div>

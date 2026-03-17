@@ -8,6 +8,7 @@ export interface User {
   provider_id?: string
   plan?: 'free' | 'pro' | 'enterprise'
   avatar_url?: string
+  storage_used?: number
   created_at?: string
 }
 

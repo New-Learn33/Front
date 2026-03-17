@@ -1,15 +1,22 @@
 export interface Asset {
-  id: number
+  id: string
   name: string
-  type: '이미지' | '영상' | '오디오' | '폰트'
-  size: string
-  url: string
-  created_at: string
+  image_url: string
+  category_id: string
+  category_hint?: string
+  character_name?: string
+  gender?: string
+  appearance?: Record<string, string>
+  outfit?: Record<string, string>
+  style_keywords?: string[]
+  forbidden_changes?: string[]
+  custom_tags?: string[]
+  file_size?: number
+  created_at?: string
 }
 
 export interface AssetListResponse {
-  assets: Asset[]
-  total: number
-  storage_used: string
-  storage_limit: string
+  success: boolean
+  message: string
+  data: Asset[]
 }

@@ -109,8 +109,8 @@ export default function HomePage() {
                       {user?.name?.charAt(0) || '?'}
                     </div>
                   )}
-                  <span className="hidden sm:block text-sm font-medium text-slate-200">{user?.nickname || user?.name}</span>
-                  <button onClick={logout} className="px-3 text-sm font-medium text-slate-400 transition-colors hover:text-slate-200">로그아웃</button>
+                  <span className="hidden sm:block text-sm font-medium text-[#2d2926]">{user?.nickname || user?.name}</span>
+                  <button onClick={logout} className="px-3 text-sm font-medium text-[#8a7d72] transition-colors hover:text-[#2d2926]">로그아웃</button>
                 </div>
               </>
             ) : (
