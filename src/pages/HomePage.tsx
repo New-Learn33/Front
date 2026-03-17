@@ -178,7 +178,7 @@ export default function HomePage() {
 
               <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0f1c38]">
                 {heroVideo ? (
-                  <div className="relative min-h-[360px] p-5">
+                  <div className="relative h-full min-h-[360px] p-5">
                     <div
                       className="absolute inset-0 bg-cover bg-center opacity-80"
                       style={{ backgroundImage: `url("${resolveApiUrl(heroVideo.thumbnail_url)}")` }}
@@ -220,6 +220,7 @@ export default function HomePage() {
                 <Link
                   key={video.id}
                   to={`/video/${video.id}`}
+                  state={{ video }}
                   className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 transition-all hover:border-primary/20 hover:bg-white/[0.05]"
                 >
                   <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-sm font-black text-primary">
@@ -313,6 +314,7 @@ export default function HomePage() {
                 <Link
                   key={video.id}
                   to={`/video/${video.id}`}
+                  state={{ video }}
                   className="group overflow-hidden rounded-[26px] border border-white/10 bg-[#101a30] shadow-[0_24px_55px_-34px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-32px_rgba(37,99,235,0.22)]"
                 >
                   <div className="relative aspect-[9/16] overflow-hidden">

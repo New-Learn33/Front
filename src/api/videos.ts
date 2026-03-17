@@ -5,6 +5,13 @@ export interface VideoListItem {
   title: string
   category_id: number
   thumbnail_url: string
+  video_url?: string
+  created_at?: string
+  creator?: string
+  creator_nickname?: string
+  creator_avatar_url?: string
+  description?: string
+  duration?: string
   like_count: number
   comment_count: number
   liked?: boolean
