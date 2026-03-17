@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { generationApi } from '@/api/generation'
 import { presetsApi, type Preset } from '@/api/presets'
-import { API_BASE_URL, resolveApiUrl } from '@/config/env'
-import type { GenerationData } from '@/types/generation'
+import { resolveApiUrl } from '@/config/env'
+import { useGeneration } from '@/hooks/useGeneration'
 
 const categories = [
   { id: 1, label: '애니메이션', icon: 'animation', desc: '생동감 넘치는 애니 스타일' },
@@ -11,47 +11,63 @@ const categories = [
   { id: 4, label: '판타지', icon: 'auto_awesome', desc: '에픽 판타지 스타일' },
 ]
 
-interface StreamingState {
-  step: string
-  message: string
-  scenes: any[] | null
-  images: { scene_order: number; image_url: string }[]
-  title: string
-  jobId: number | null
-}
+const artStyles = [
+  { id: 'webtoon', label: '웹툰', icon: 'draw' },
+  { id: 'anime', label: '애니메', icon: 'animation' },
+  { id: 'watercolor', label: '수채화', icon: 'palette' },
+  { id: '3d_render', label: '3D', icon: 'view_in_ar' },
+  { id: 'pixel', label: '픽셀', icon: 'grid_on' },
+  { id: 'realistic', label: '실사', icon: 'photo_camera' },
+]
 
-const API_BASE = API_BASE_URL
+const genres = [
+  { id: 'auto', label: '자동' },
+  { id: 'comedy', label: '코미디' },
+  { id: 'action', label: '액션' },
+  { id: 'romance', label: '로맨스' },
+  { id: 'horror', label: '호러' },
+  { id: 'emotional', label: '감동' },
+]
+
+const qualityOptions = [
+  { id: 'low', label: '빠름' },
+  { id: 'medium', label: '보통' },
+  { id: 'high', label: '고품질' },
+]
+
+const motionOptions = [
+  { id: 'low', label: '약하게' },
+  { id: 'medium', label: '보통' },
+  { id: 'high', label: '강하게' },
+]
 
 export default function VisualCreationPage() {
-  const [prompt, setPrompt] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState(1)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [result, setResult] = useState<GenerationData | null>(null)
+  const {
+    prompt, setPrompt,
+    selectedCategory, setSelectedCategory,
+    loading, error,
+    result, setResult,
+    streaming,
+    artStyle, setArtStyle,
+    genre, setGenre,
+    imageQuality, setImageQuality,
+    motionIntensity, setMotionIntensity,
+    videoLoading, videoStep, videoUrl, videoError,
+    selectedThumbnail, thumbnailSaving, thumbnailSaved,
+    handleGenerate, handleRenderVideo, handleSelectThumbnail,
+  } = useGeneration()
 
-  // 스트리밍 상태
-  const [streaming, setStreaming] = useState<StreamingState>({
-    step: '',
-    message: '',
-    scenes: null,
-    images: [],
-    title: '',
-    jobId: null,
-  })
-
-  // 영상 생성 상태
-  const [videoLoading, setVideoLoading] = useState(false)
-  const [videoStep, setVideoStep] = useState<'idle' | 'subtitles' | 'video' | 'done'>('idle')
-  const [videoUrl, setVideoUrl] = useState<string | null>(null)
-  const [videoError, setVideoError] = useState('')
-
-  // 프리셋 상태
+  // 프리셋 상태 (페이지 로컬)
   const [presets, setPresets] = useState<Preset[]>([])
   const [showPresetSave, setShowPresetSave] = useState(false)
   const [presetName, setPresetName] = useState('')
   const [showPresets, setShowPresets] = useState(false)
 
-  const abortRef = useRef<AbortController | null>(null)
+  // 텍스트 편집 상태 (페이지 로컬)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [editScenes, setEditScenes] = useState<{ scene_order: number; dialogue: string; subtitle_text: string }[]>([])
+  const [textSaving, setTextSaving] = useState(false)
 
   // 프리셋 목록 로드
   useEffect(() => {
@@ -92,177 +108,61 @@ export default function VisualCreationPage() {
     } catch {}
   }
 
-  // 1단계: SSE 스트리밍으로 6컷 생성
-  const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      setError('프롬프트를 입력해주세요.')
-      return
-    }
-
-    setLoading(true)
-    setError('')
-    setResult(null)
-    setVideoUrl(null)
-    setVideoStep('idle')
-    setVideoError('')
-    setStreaming({ step: '', message: '준비 중...', scenes: null, images: [], title: '', jobId: null })
-
-    // AbortController for cancellation
-    const controller = new AbortController()
-    abortRef.current = controller
-
-    try {
-      const response = await fetch(`${API_BASE}/api/v1/generation/stream`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category_id: selectedCategory, prompt: prompt.trim() }),
-        signal: controller.signal,
-      })
-
-      if (!response.ok) {
-        throw new Error(`서버 오류: ${response.status}`)
-      }
-
-      const reader = response.body?.getReader()
-      if (!reader) throw new Error('스트림을 읽을 수 없습니다.')
-
-      const decoder = new TextDecoder()
-      let buffer = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        buffer += decoder.decode(value, { stream: true })
-
-        // SSE 파싱: "data: {...}\n\n"
-        const lines = buffer.split('\n\n')
-        buffer = lines.pop() || ''
-
-        for (const line of lines) {
-          const dataLine = line.trim()
-          if (!dataLine.startsWith('data: ')) continue
-          const jsonStr = dataLine.slice(6)
-
-          try {
-            const event = JSON.parse(jsonStr)
-
-            switch (event.type) {
-              case 'step':
-                setStreaming((prev) => ({ ...prev, step: event.step, message: event.message }))
-                break
-
-              case 'script':
-                setStreaming((prev) => ({
-                  ...prev,
-                  scenes: event.scenes,
-                  title: event.title,
-                  jobId: event.job_id,
-                }))
-                break
-
-              case 'image':
-                setStreaming((prev) => ({
-                  ...prev,
-                  images: [...prev.images, { scene_order: event.scene_order, image_url: event.image_url }],
-                }))
-                break
-
-              case 'done':
-                // 스트리밍 완료 → result로 전환
-                setResult({
-                  job_id: event.job_id,
-                  title: event.title,
-                  category_id: event.category_id,
-                  selected_template_image: event.selected_template_image,
-                  scenes: event.scenes,
-                  images: event.images,
-                })
-                setStreaming({ step: '', message: '', scenes: null, images: [], title: '', jobId: null })
-                break
-
-              case 'error':
-                setError(event.message)
-                break
-            }
-          } catch {
-            // JSON 파싱 실패 무시
-          }
-        }
-      }
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        console.error('Stream error:', err)
-        setError(err.message || '서버 오류가 발생했습니다.')
-      }
-    } finally {
-      setLoading(false)
-      abortRef.current = null
-    }
+  // 텍스트 편집 시작
+  const handleStartEdit = () => {
+    if (!result) return
+    setEditTitle(result.title)
+    setEditScenes(result.scenes.map(s => ({
+      scene_order: s.scene_order,
+      dialogue: s.dialogue,
+      subtitle_text: s.subtitle_text,
+    })))
+    setIsEditing(true)
   }
 
-  // 2단계: 자막 합성 → 영상 생성
-  const handleRenderVideo = async () => {
+  // 텍스트 편집 저장
+  const handleSaveEdit = async () => {
     if (!result) return
-
-    setVideoLoading(true)
-    setVideoError('')
-    setVideoUrl(null)
-    setVideoStep('subtitles')
-
+    setTextSaving(true)
     try {
-      // 자막 합성
-      const subtitleRes = await generationApi.renderSubtitles({
-        job_id: result.job_id,
-        images: result.images.map((img) => ({
-          scene_order: img.scene_order,
-          image_url: img.image_url,
-        })),
-        scenes: result.scenes.map((s) => ({
+      const res = await generationApi.updateText(result.job_id, {
+        title: editTitle !== result.title ? editTitle : undefined,
+        scenes: editScenes.map(s => ({
           scene_order: s.scene_order,
           dialogue: s.dialogue,
           subtitle_text: s.subtitle_text,
         })),
       })
-
-      if (!subtitleRes.data.success) {
-        setVideoError(subtitleRes.data.message || '자막 합성에 실패했습니다.')
-        return
+      if (res.data.success) {
+        // result 업데이트
+        setResult({
+          ...result,
+          title: res.data.data.title,
+          scenes: res.data.data.scenes.map(s => ({
+            ...s,
+            subtitle_text: s.subtitle_text || '',
+          })),
+        })
+        setIsEditing(false)
       }
-
-      setVideoStep('video')
-
-      // 영상 생성
-      const subtitleImages = (subtitleRes.data as any).data?.images || []
-      const videoRes = await generationApi.renderVideo({
-        job_id: result.job_id,
-        subtitle_images: subtitleImages.map((img: any) => ({
-          scene_order: img.scene_order,
-          image_url: img.image_url,
-          duration: 2,
-        })),
-      })
-
-      if (videoRes.data.success) {
-        setVideoUrl(resolveApiUrl(videoRes.data.data.video_url))
-        setVideoStep('done')
-      } else {
-        setVideoError(videoRes.data.message || '영상 생성에 실패했습니다.')
-      }
-    } catch (err: any) {
-      console.error('Video render error:', err)
-      const detail = err.response?.data?.detail
-      const message = typeof detail === 'string' ? detail : err.message || '영상 생성 중 오류가 발생했습니다.'
-      setVideoError(message)
+    } catch (err) {
+      console.error('Text update error:', err)
     } finally {
-      setVideoLoading(false)
+      setTextSaving(false)
     }
+  }
+
+  // 편집 scene 업데이트 헬퍼
+  const updateEditScene = (sceneOrder: number, field: 'dialogue' | 'subtitle_text', value: string) => {
+    setEditScenes(prev => prev.map(s =>
+      s.scene_order === sceneOrder ? { ...s, [field]: value } : s
+    ))
   }
 
   const videoStepLabel = () => {
     switch (videoStep) {
       case 'subtitles': return '자막 합성 중...'
-      case 'video': return 'AI 영상 생성 중... (1~2분 소요)'
+      case 'video': return 'AI 영상 생성 중... (5~10분 소요)'
       case 'done': return '완료!'
       default: return '영상 생성 중...'
     }
@@ -299,7 +199,7 @@ export default function VisualCreationPage() {
           <div className="flex items-center gap-2 pt-1">
             <button
               onClick={() => setShowPresets(!showPresets)}
-              className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#b05d3f] transition-colors"
+              className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#1b2d52] transition-colors"
             >
               <span className="material-symbols-outlined text-sm">folder_open</span>
               프리셋 불러오기
@@ -328,7 +228,7 @@ export default function VisualCreationPage() {
               <button
                 onClick={handleSavePreset}
                 disabled={!presetName.trim()}
-                className="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#b05d3f] disabled:opacity-40 transition-colors"
+                className="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#1b2d52] disabled:opacity-40 transition-colors"
               >
                 저장
               </button>
@@ -493,37 +393,135 @@ export default function VisualCreationPage() {
         {result ? (
           <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6 space-y-5 animate-enter-scale">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-[#2d2926]">{result.title}</h3>
-              <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
-                {categories.find(c => c.id === result.category_id)?.label}
-              </span>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="text-lg font-bold text-[#2d2926] bg-[#f9f6f0] border border-primary/30 rounded-lg px-3 py-1 outline-none focus:ring-2 focus:ring-primary/20 flex-1 mr-3"
+                  maxLength={255}
+                />
+              ) : (
+                <h3 className="text-lg font-bold text-[#2d2926]">{result.title}</h3>
+              )}
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
+                  {categories.find(c => c.id === result.category_id)?.label}
+                </span>
+                {!videoLoading && (
+                  isEditing ? (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={handleSaveEdit}
+                        disabled={textSaving}
+                        className="flex items-center gap-1 text-xs font-medium text-white bg-primary hover:bg-[#1b2d52] px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          {textSaving ? 'progress_activity' : 'check'}
+                        </span>
+                        {textSaving ? '저장 중...' : '저장'}
+                      </button>
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        disabled={textSaving}
+                        className="flex items-center gap-1 text-xs font-medium text-warm-muted hover:text-[#2d2926] px-2 py-1.5 rounded-lg transition-all"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleStartEdit}
+                      className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#1b2d52] px-2 py-1 rounded-lg transition-all hover:bg-primary/5"
+                      title="제목과 대사를 수정합니다"
+                    >
+                      <span className="material-symbols-outlined text-sm">edit</span>
+                      수정
+                    </button>
+                  )
+                )}
+              </div>
             </div>
 
+            {/* 썸네일 선택 안내 */}
+            {videoUrl && !thumbnailSaved && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-amber-500">touch_app</span>
+                <p className="text-xs text-amber-700 font-medium">이미지를 클릭하여 대표 썸네일을 선택하세요</p>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {result.scenes.map((scene, idx) => (
-                <div key={scene.scene_order} className="space-y-3">
-                  <div className="aspect-square rounded-xl overflow-hidden bg-[#f9f6f0] border border-[#e5ddd3]">
-                    {result.images[idx] && (
-                      <img
-                        src={resolveApiUrl(result.images[idx].image_url)}
-                        alt={scene.subtitle_text}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-bold">
-                        {scene.scene_order}컷
-                      </span>
-                      <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
+              {result.scenes.map((scene, idx) => {
+                const imgUrl = result.images[idx]?.image_url
+                const isSelected = selectedThumbnail === imgUrl
+                return (
+                  <div key={scene.scene_order} className="space-y-3">
+                    <div
+                      className={`aspect-square rounded-xl overflow-hidden bg-[#f9f6f0] border-2 relative transition-all ${
+                        isSelected
+                          ? 'border-primary ring-2 ring-primary/30'
+                          : videoUrl
+                          ? 'border-[#e5ddd3] hover:border-primary/50 cursor-pointer'
+                          : 'border-[#e5ddd3]'
+                      }`}
+                      onClick={() => {
+                        if (videoUrl && imgUrl) handleSelectThumbnail(imgUrl)
+                      }}
+                    >
+                      {result.images[idx] && (
+                        <img
+                          src={resolveApiUrl(result.images[idx].image_url)}
+                          alt={scene.subtitle_text}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      {/* 썸네일 선택 뱃지 */}
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg">
+                          <span className="material-symbols-outlined text-sm">
+                            {thumbnailSaving ? 'progress_activity' : 'check_circle'}
+                          </span>
+                          대표 이미지
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-[#e5ddd3]">
-                      "{scene.dialogue}"
-                    </p>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-bold">
+                          {scene.scene_order}컷
+                        </span>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editScenes.find(s => s.scene_order === scene.scene_order)?.subtitle_text || ''}
+                            onChange={(e) => updateEditScene(scene.scene_order, 'subtitle_text', e.target.value)}
+                            className="text-xs text-warm-muted bg-[#f9f6f0] border border-primary/20 rounded px-2 py-0.5 outline-none focus:ring-1 focus:ring-primary/20 flex-1"
+                            placeholder="장면 설명"
+                            maxLength={500}
+                          />
+                        ) : (
+                          <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
+                        )}
+                      </div>
+                      {isEditing ? (
+                        <textarea
+                          value={editScenes.find(s => s.scene_order === scene.scene_order)?.dialogue || ''}
+                          onChange={(e) => updateEditScene(scene.scene_order, 'dialogue', e.target.value)}
+                          className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-primary/30 outline-none focus:ring-2 focus:ring-primary/20 w-full resize-none"
+                          rows={3}
+                          maxLength={500}
+                          placeholder="대사를 입력하세요"
+                        />
+                      ) : (
+                        <p className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-[#e5ddd3]">
+                          "{scene.dialogue}"
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* 영상 플레이어 */}
@@ -575,11 +573,101 @@ export default function VisualCreationPage() {
           </div>
         </div>
 
+        {/* 생성 옵션 */}
+        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-4">
+          <h3 className="text-base font-bold text-[#2d2926]">생성 옵션</h3>
+
+          {/* 아트 스타일 */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-warm-muted">아트 스타일</label>
+            <div className="grid grid-cols-3 gap-1.5">
+              {artStyles.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setArtStyle(s.id)}
+                  disabled={loading || videoLoading}
+                  className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-xs transition-all ${
+                    artStyle === s.id
+                      ? 'bg-primary text-white'
+                      : 'bg-[#f9f6f0] text-warm-muted hover:bg-[#efe8de]'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base">{s.icon}</span>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 장르 / 분위기 */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-warm-muted">장르 / 분위기</label>
+            <div className="flex flex-wrap gap-1.5">
+              {genres.map((g) => (
+                <button
+                  key={g.id}
+                  onClick={() => setGenre(g.id)}
+                  disabled={loading || videoLoading}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    genre === g.id
+                      ? 'bg-primary text-white'
+                      : 'bg-[#f9f6f0] text-warm-muted hover:bg-[#efe8de]'
+                  }`}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 이미지 퀄리티 */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-warm-muted">이미지 퀄리티</label>
+            <div className="flex bg-[#f9f6f0] rounded-lg p-1">
+              {qualityOptions.map((q) => (
+                <button
+                  key={q.id}
+                  onClick={() => setImageQuality(q.id)}
+                  disabled={loading || videoLoading}
+                  className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    imageQuality === q.id
+                      ? 'bg-white text-[#2d2926] shadow-sm'
+                      : 'text-warm-muted'
+                  }`}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 모션 강도 */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-warm-muted">움직임 강도 (영상)</label>
+            <div className="flex bg-[#f9f6f0] rounded-lg p-1">
+              {motionOptions.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => setMotionIntensity(m.id)}
+                  disabled={loading || videoLoading}
+                  className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    motionIntensity === m.id
+                      ? 'bg-white text-[#2d2926] shadow-sm'
+                      : 'text-warm-muted'
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* 6컷 생성 버튼 */}
         <button
           onClick={handleGenerate}
           disabled={loading || videoLoading || !prompt.trim()}
-          className="w-full bg-primary hover:bg-[#b05d3f] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 btn-press"
+          className="w-full bg-primary hover:bg-[#1b2d52] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 btn-press"
         >
           {loading ? (
             <>
@@ -689,6 +777,14 @@ export default function VisualCreationPage() {
               <p className="text-sm font-medium text-green-700">영상이 생성되었습니다!</p>
             </div>
             <p className="text-xs text-green-600">왼쪽 미리보기에서 영상을 확인하세요.</p>
+            {thumbnailSaved ? (
+              <div className="flex items-center gap-1 pt-1">
+                <span className="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+                <p className="text-xs text-green-600 font-medium">대표 이미지가 저장되었습니다</p>
+              </div>
+            ) : (
+              <p className="text-xs text-amber-600 font-medium pt-1">이미지를 클릭하여 대표 썸네일을 선택해주세요</p>
+            )}
           </div>
         )}
       </div>
