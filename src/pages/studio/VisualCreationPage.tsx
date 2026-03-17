@@ -52,7 +52,7 @@ export default function VisualCreationPage() {
     genre, setGenre,
     imageQuality, setImageQuality,
     motionIntensity, setMotionIntensity,
-    videoLoading, videoStep, videoUrl, videoError,
+    videoLoading, videoStep, videoUrl, videoError, videoProgress,
     selectedThumbnail, thumbnailSaving, thumbnailSaved,
     handleGenerate, handleRenderVideo, handleSelectThumbnail,
   } = useGeneration()
@@ -162,7 +162,7 @@ export default function VisualCreationPage() {
   const videoStepLabel = () => {
     switch (videoStep) {
       case 'subtitles': return '자막 합성 중...'
-      case 'video': return 'AI 영상 생성 중... (5~10분 소요)'
+      case 'video': return `AI 영상 생성 중... (${videoProgress}%)`
       case 'done': return '완료!'
       default: return '영상 생성 중...'
     }
@@ -193,6 +193,19 @@ export default function VisualCreationPage() {
           <div className="flex items-center justify-between text-xs text-warm-muted">
             <span>상세할수록 더 좋은 결과를 얻을 수 있습니다</span>
             <span>{prompt.length}/500</span>
+          </div>
+
+          {/* 콘텐츠 정책 안내 */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 space-y-1">
+            <div className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-amber-500 text-sm">info</span>
+              <span className="text-xs font-semibold text-amber-700">콘텐츠 생성 가이드</span>
+            </div>
+            <ul className="text-[11px] text-amber-600 space-y-0.5 pl-5 list-disc">
+              <li>특정 캐릭터(마블, 디즈니, 원피스 등) 및 브랜드 이름은 직접 언급할 수 없습니다</li>
+              <li>폭력적이거나 선정적인 내용은 생성할 수 없습니다</li>
+              <li>실존 인물의 이름이나 초상을 사용할 수 없습니다</li>
+            </ul>
           </div>
 
           {/* 프리셋 버튼 */}
@@ -306,15 +319,15 @@ export default function VisualCreationPage() {
 
         {/* Error Messages */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-            <span className="material-symbols-outlined text-red-500">error</span>
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+            <span className="material-symbols-outlined text-red-500 mt-0.5">error</span>
+            <p className="text-sm text-red-600 whitespace-pre-line">{error}</p>
           </div>
         )}
         {videoError && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-            <span className="material-symbols-outlined text-red-500">error</span>
-            <p className="text-sm text-red-600">{videoError}</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+            <span className="material-symbols-outlined text-red-500 mt-0.5">error</span>
+            <p className="text-sm text-red-600 whitespace-pre-line">{videoError}</p>
           </div>
         )}
 
@@ -762,11 +775,12 @@ export default function VisualCreationPage() {
               <span className="text-xs text-[#2d2926] font-medium">AI 영상 변환 중</span>
             </div>
             <p className="text-xs text-warm-muted">
-              각 이미지를 AI가 움직이는 영상으로 변환하고 있습니다. 2~3분 정도 소요됩니다.
+              백그라운드에서 영상을 생성 중입니다. 다른 페이지로 이동해도 작업이 계속됩니다.
             </p>
             <div className="w-full bg-[#e5ddd3] rounded-full h-1.5">
-              <div className="bg-primary h-1.5 rounded-full animate-pulse" style={{ width: '60%' }} />
+              <div className="bg-primary h-1.5 rounded-full transition-all duration-500" style={{ width: `${Math.max(videoProgress, 10)}%` }} />
             </div>
+            <p className="text-[10px] text-warm-muted text-right">{videoProgress}%</p>
           </div>
         )}
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useRef, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useRef, useCallback, useEffect, type ReactNode } from 'react'
 import { generationApi } from '@/api/generation'
 import { API_BASE_URL, resolveApiUrl } from '@/config/env'
 import type { GenerationData } from '@/types/generation'
@@ -41,6 +41,7 @@ interface GenerationContextType {
   videoStep: 'idle' | 'subtitles' | 'video' | 'done'
   videoUrl: string | null
   videoError: string
+  videoProgress: number
 
   // 썸네일
   selectedThumbnail: string | null
@@ -54,6 +55,26 @@ interface GenerationContextType {
   handleSelectThumbnail: (imageUrl: string) => Promise<void>
   handleAbort: () => void
   resetAll: () => void
+}
+
+/** 백엔드 에러 메시지를 사용자 친화적 메시지로 변환 */
+function friendlyError(msg: string): string {
+  const lower = msg.toLowerCase()
+  if (lower.includes('moderation') || lower.includes('safety') || lower.includes('policy') || lower.includes('차단')) {
+    return '콘텐츠 정책에 의해 이미지 생성이 차단되었습니다.\n\n' +
+      '다음 내용은 생성할 수 없습니다:\n' +
+      '• 특정 캐릭터 (마블, 디즈니, 원피스 등) 및 브랜드\n' +
+      '• 폭력적이거나 선정적인 내용\n' +
+      '• 실존 인물의 이름이나 초상\n\n' +
+      '프롬프트를 수정한 후 다시 시도해주세요.'
+  }
+  if (lower.includes('rate limit') || lower.includes('too many')) {
+    return '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.'
+  }
+  if (lower.includes('timeout') || lower.includes('timed out')) {
+    return '서버 응답 시간이 초과되었습니다. 다시 시도해주세요.'
+  }
+  return msg
 }
 
 const GenerationContext = createContext<GenerationContextType | null>(null)
@@ -90,6 +111,8 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
   const [videoStep, setVideoStep] = useState<'idle' | 'subtitles' | 'video' | 'done'>('idle')
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [videoError, setVideoError] = useState('')
+  const [videoProgress, setVideoProgress] = useState(0)
+  const activeJobIdRef = useRef<number | null>(null)
 
   // 썸네일
   const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(null)
@@ -185,7 +208,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
                 setStreaming(INITIAL_STREAMING)
                 break
               case 'error':
-                setError(event.message)
+                setError(friendlyError(event.message))
                 break
             }
           } catch {
@@ -196,7 +219,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
     } catch (err: any) {
       if (err.name !== 'AbortError') {
         console.error('Stream error:', err)
-        setError(err.message || '서버 오류가 발생했습니다.')
+        setError(friendlyError(err.message || '서버 오류가 발생했습니다.'))
       }
     } finally {
       setLoading(false)
@@ -204,7 +227,41 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
     }
   }, [prompt, selectedCategory, artStyle, genre, imageQuality])
 
-  // ── 영상 생성 (SVD/Minimax) ──
+  // ── WebSocket 기반 영상 진행률 수신 ──
+  useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+
+    const wsBase = API_BASE_URL.replace(/^http/, 'ws')
+    const ws = new WebSocket(`${wsBase}/api/v1/notifications/ws/notifications?token=${token}`)
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        if (data.type !== 'job') return
+        if (activeJobIdRef.current && data.job_id !== activeJobIdRef.current) return
+
+        if (data.event === 'progress') {
+          setVideoProgress(data.progress || 0)
+        } else if (data.event === 'completed') {
+          setVideoUrl(resolveApiUrl(data.video_url))
+          setVideoStep('done')
+          setVideoLoading(false)
+          setVideoProgress(100)
+          activeJobIdRef.current = null
+        } else if (data.event === 'failed') {
+          setVideoError(data.message || '영상 생성에 실패했습니다.')
+          setVideoLoading(false)
+          setVideoProgress(0)
+          activeJobIdRef.current = null
+        }
+      } catch { /* ignore */ }
+    }
+
+    return () => ws.close()
+  }, [])
+
+  // ── 영상 생성 (백그라운드 + WebSocket) ──
   const handleRenderVideo = useCallback(async () => {
     if (!result) return
 
@@ -212,9 +269,11 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
     setVideoError('')
     setVideoUrl(null)
     setVideoStep('video')
+    setVideoProgress(0)
+    activeJobIdRef.current = result.job_id
 
     try {
-      const videoRes = await generationApi.renderVideoSvd({
+      const videoRes = await generationApi.renderVideoSvdBackground({
         job_id: result.job_id,
         images: result.images.map(img => ({
           scene_order: img.scene_order,
@@ -228,18 +287,19 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
       })
 
       if (videoRes.data.success) {
-        setVideoUrl(resolveApiUrl(videoRes.data.data.video_url))
-        setVideoStep('done')
+        setVideoProgress(videoRes.data.data.progress || 40)
+        // 이후 진행은 WebSocket으로 수신
       } else {
         setVideoError(videoRes.data.message || '영상 생성에 실패했습니다.')
+        setVideoLoading(false)
       }
     } catch (err: any) {
       console.error('Video render error:', err)
       const detail = err.response?.data?.detail
       const message = typeof detail === 'string' ? detail : err.message || '영상 생성 중 오류가 발생했습니다.'
-      setVideoError(message)
-    } finally {
+      setVideoError(friendlyError(message))
       setVideoLoading(false)
+      activeJobIdRef.current = null
     }
   }, [result, motionIntensity])
 
@@ -280,6 +340,8 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
     setVideoStep('idle')
     setVideoUrl(null)
     setVideoError('')
+    setVideoProgress(0)
+    activeJobIdRef.current = null
     setSelectedThumbnail(null)
     setThumbnailSaving(false)
     setThumbnailSaved(false)
@@ -297,7 +359,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
         genre, setGenre,
         imageQuality, setImageQuality,
         motionIntensity, setMotionIntensity,
-        videoLoading, videoStep, videoUrl, videoError,
+        videoLoading, videoStep, videoUrl, videoError, videoProgress,
         selectedThumbnail, setSelectedThumbnail,
         thumbnailSaving, thumbnailSaved,
         handleGenerate, handleRenderVideo, handleSelectThumbnail,

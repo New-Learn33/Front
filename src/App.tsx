@@ -17,6 +17,7 @@ import SupportPage from './pages/SupportPage'
 import ThemeToggle from './components/ThemeToggle'
 import { ThemeProvider } from './hooks/useTheme'
 import { GenerationProvider } from './hooks/useGeneration'
+import { NotificationProvider } from './hooks/useNotification'
 
 import { GOOGLE_CLIENT_ID } from './config/env'
 
@@ -24,6 +25,7 @@ function App() {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <ThemeProvider>
+        <NotificationProvider>
         <GenerationProvider>
         <BrowserRouter>
           <Routes>
@@ -46,6 +48,7 @@ function App() {
           <ThemeToggle />
         </BrowserRouter>
         </GenerationProvider>
+        </NotificationProvider>
       </ThemeProvider>
     </GoogleOAuthProvider>
   )
