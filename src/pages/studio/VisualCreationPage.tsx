@@ -21,7 +21,7 @@ export default function VisualCreationPage() {
     imageQuality, setImageQuality,
     motionIntensity, setMotionIntensity,
     videoLoading, videoStep, videoUrl, videoError, videoProgress,
-    selectedThumbnail, setSelectedThumbnail,
+    selectedThumbnail,
     thumbnailSaving, thumbnailSaved,
     handleGenerate, handleRenderVideo, handleSelectThumbnail,
   } = useGeneration()
