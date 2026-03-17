@@ -67,15 +67,15 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="flex flex-col items-center gap-3">
             <Link to="/" className="flex items-center justify-center">
-              <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-11 rounded-lg bg-primary p-1.5 object-contain" />
+              <img src={aiVidLogo} alt="SceneFlow 로고" className="size-11 rounded-lg bg-primary p-1.5 object-contain" />
             </Link>
-            <Link to="/" className="text-xl font-bold tracking-tight">AI Video Studio</Link>
+            <Link to="/" className="text-xl font-bold tracking-tight">SceneFlow</Link>
           </div>
 
           {/* Header */}
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-bold tracking-tight">로그인</h1>
-            <p className="text-warm-muted text-base">AI 비디오 스튜디오에 오신 것을 환영합니다.</p>
+            <p className="text-warm-muted text-base">장면 중심으로 만드는 생성형 비디오 워크스페이스에 로그인하세요.</p>
           </div>
 
           {/* Form */}

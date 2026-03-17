@@ -145,7 +145,7 @@ export default function MyPage() {
                   <button
                     onClick={handleNicknameSave}
                     disabled={nicknameSaving}
-                    className="h-9 px-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-[#b05d3f] transition-all disabled:opacity-50"
+                    className="h-9 px-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-[#2647d8] transition-all disabled:opacity-50"
                   >
                     {nicknameSaving ? '저장 중...' : '저장'}
                   </button>

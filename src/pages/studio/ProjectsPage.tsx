@@ -30,7 +30,7 @@ export default function ProjectsPage() {
           <h1 className="text-2xl font-bold text-[#2d2926]">프로젝트</h1>
           <p className="text-warm-muted text-sm mt-1">총 {projects.length}개의 프로젝트</p>
         </div>
-        <button className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all btn-press">
+        <button className="bg-primary hover:bg-[#2647d8] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all btn-press">
           <span className="material-symbols-outlined text-lg">add</span>
           새 프로젝트
         </button>

@@ -32,7 +32,7 @@ export default function VideoDetailPage() {
         <p className="text-[#5e5452] mb-8">존재하지 않는 비디오이거나 삭제된 비디오입니다.</p>
         <Link
           to="/"
-          className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-[#b05d3f] transition-all"
+          className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-[#2647d8] transition-all"
         >
           홈으로 돌아가기
         </Link>
@@ -49,8 +49,8 @@ export default function VideoDetailPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-20 h-20 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
-              <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
-              <h2 className="text-lg font-bold tracking-tight text-[#1a1a1a]">AI 비디오</h2>
+              <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
+              <h2 className="text-lg font-bold tracking-tight text-[#1a1a1a]">SceneFlow</h2>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" to="/">홈</Link>
@@ -75,7 +75,7 @@ export default function VideoDetailPage() {
             ) : (
               <>
                 <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-600">로그인</Link>
-                <Link to="/signup" className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
+                <Link to="/signup" className="bg-primary hover:bg-[#2647d8] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
               </>
             )}
           </div>
@@ -262,15 +262,15 @@ export default function VideoDetailPage() {
       <footer className="mt-20 border-t border-[#e5ddd3]/50 bg-[#f9f6f0]/30 px-6 lg:px-20 py-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
-            <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
-            <span className="font-bold text-[#2d2926]">AI 비디오</span>
+            <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
+            <span className="font-bold text-[#2d2926]">SceneFlow</span>
           </div>
           <div className="flex gap-8 text-sm text-[#5e5452]">
             <Link className="hover:text-primary transition-colors" to="/terms">이용약관</Link>
             <Link className="hover:text-primary transition-colors" to="/privacy">개인정보처리방침</Link>
             <Link className="hover:text-primary transition-colors" to="/support">고객센터</Link>
           </div>
-          <p className="text-sm text-slate-400">© 2024 AI Video Studio. All rights reserved.</p>
+          <p className="text-sm text-slate-400">© 2026 SceneFlow. All rights reserved.</p>
         </div>
       </footer>
     </div>

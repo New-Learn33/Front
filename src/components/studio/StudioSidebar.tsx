@@ -16,8 +16,8 @@ export default function StudioSidebar() {
       {/* Logo */}
       <div className="px-6 h-16 flex items-center gap-3 border-b border-white/10">
         <Link to="/" className="flex items-center gap-3">
-          <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-8 rounded-md bg-primary p-1 object-contain" />
-          <span className="text-base font-bold tracking-tight">AI Video Studio</span>
+          <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-md bg-primary p-1 object-contain" />
+          <span className="text-base font-bold tracking-tight">SceneFlow</span>
         </Link>
       </div>
 
@@ -66,4 +66,3 @@ export default function StudioSidebar() {
     </aside>
   )
 }
-
