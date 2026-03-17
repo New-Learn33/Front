@@ -205,21 +205,21 @@ export default function VideoDetailPage() {
   return (
     <div className="bg-[#f2ece1] font-display text-[#2d2926] antialiased min-h-screen flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#e5ddd3] bg-[#f2ece1]/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-[#1b2f57] bg-[#0b1f44]/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 lg:px-20 h-20 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
               <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
-              <h2 className="text-lg font-bold tracking-tight text-[#2d2926]">SceneFlow</h2>
+              <h2 className="text-lg font-bold tracking-tight text-white">SceneFlow</h2>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link className="text-sm font-medium text-warm-muted hover:text-primary transition-colors" to="/">홈</Link>
+              <Link className="text-sm font-medium text-[#b7c8e8] hover:text-white transition-colors" to="/">홈</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
               <>
-                <Link to="/studio" className="text-sm font-medium text-warm-muted hover:text-primary transition-colors">스튜디오</Link>
+                <Link to="/studio" className="text-sm font-medium text-[#b7c8e8] hover:text-white transition-colors">스튜디오</Link>
                 <div className="flex items-center gap-3">
                   {user?.profile_image_url ? (
                     <img src={user.profile_image_url} alt="프로필" className="size-8 rounded-full object-cover" />
@@ -228,13 +228,13 @@ export default function VideoDetailPage() {
                       {user?.name?.charAt(0) || '?'}
                     </div>
                   )}
-                  <span className="hidden sm:block text-sm font-medium text-[#2d2926]">{user?.nickname || user?.name}</span>
-                  <button onClick={logout} className="text-sm font-medium text-warm-muted hover:text-[#2d2926] transition-colors">로그아웃</button>
+                  <span className="hidden sm:block text-sm font-medium text-white">{user?.nickname || user?.name}</span>
+                  <button onClick={logout} className="text-sm font-medium text-[#b7c8e8] hover:text-white transition-colors">로그아웃</button>
                 </div>
               </>
             ) : (
               <>
-                <Link to="/login" className="hidden sm:block text-sm font-medium text-warm-muted">로그인</Link>
+                <Link to="/login" className="hidden sm:block text-sm font-medium text-[#b7c8e8] hover:text-white transition-colors">로그인</Link>
                 <Link to="/signup" className="bg-primary hover:bg-[#58717c] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
               </>
             )}
