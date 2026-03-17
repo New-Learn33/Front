@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { User } from '@/types/auth'
 import { authApi } from '@/api/auth'
-import { normalizeUser } from '@/utils/auth'
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
@@ -19,7 +18,7 @@ export function useAuth() {
     // /auth/me API로 현재 유저 정보 조회
     authApi.me()
       .then((res) => {
-        const userData = normalizeUser(res.data.data)
+        const userData = res.data.data
         setUser(userData)
         setIsLoggedIn(true)
         localStorage.setItem('user', JSON.stringify(userData))

@@ -16,7 +16,6 @@ import PrivacyPage from './pages/PrivacyPage'
 import SupportPage from './pages/SupportPage'
 import ThemeToggle from './components/ThemeToggle'
 import { ThemeProvider } from './hooks/useTheme'
-import { GenerationProvider } from './hooks/useGeneration'
 
 import { GOOGLE_CLIENT_ID } from './config/env'
 
@@ -24,7 +23,6 @@ function App() {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <ThemeProvider>
-        <GenerationProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -45,7 +43,6 @@ function App() {
           </Routes>
           <ThemeToggle />
         </BrowserRouter>
-        </GenerationProvider>
       </ThemeProvider>
     </GoogleOAuthProvider>
   )

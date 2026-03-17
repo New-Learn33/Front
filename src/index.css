@@ -14,8 +14,8 @@
   body {
     font-family: "Space Grotesk", sans-serif;
     overflow-x: hidden;
-    background-color: #f2ece1;
-    color: #2d2926;
+    background-color: #f4f6fb;
+    color: #0f172a;
     transition: background-color 200ms ease, color 200ms ease;
   }
 
@@ -30,7 +30,7 @@
     background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(36, 59, 107, 0.14);
+    border: 1px solid rgba(52, 87, 246, 0.12);
   }
 
   .dark .glass {
@@ -39,8 +39,8 @@
   }
 
   .hero-gradient {
-    background: radial-gradient(circle at top right, rgba(36, 59, 107, 0.18), transparent),
-                radial-gradient(circle at bottom left, rgba(79, 110, 168, 0.1), transparent);
+    background: radial-gradient(circle at top right, rgba(52, 87, 246, 0.16), transparent),
+                radial-gradient(circle at bottom left, rgba(143, 211, 255, 0.14), transparent);
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -185,7 +185,7 @@
 .dark .border-\[\#e5ddd3\],
 .dark .border-\[\#e5ddd3\]\/50,
 .dark .border-\[\#eee6d8\] {
-  border-color: rgba(79, 110, 168, 0.28) !important;
+  border-color: rgba(52, 87, 246, 0.28) !important;
 }
 
 .dark .text-\[\#1a1a1a\],

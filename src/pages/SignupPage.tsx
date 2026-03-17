@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { authApi } from '@/api/auth'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
-import { normalizeUser } from '@/utils/auth'
 
 export default function SignupPage() {
   const navigate = useNavigate()
@@ -37,8 +36,7 @@ export default function SignupPage() {
     try {
       setIsLoading(true)
       const res = await authApi.signup({ name, email, password })
-      const { access_token } = res.data.data
-      const user = normalizeUser(res.data.data.user)
+      const { access_token, user } = res.data.data
 
       localStorage.setItem('access_token', access_token)
       localStorage.setItem('user', JSON.stringify(user))
@@ -63,8 +61,7 @@ export default function SignupPage() {
     try {
       setIsLoading(true)
       const res = await authApi.googleLogin({ id_token: idToken })
-      const { access_token } = res.data.data
-      const user = normalizeUser(res.data.data.user)
+      const { access_token, user } = res.data.data
 
       localStorage.setItem('access_token', access_token)
       localStorage.setItem('user', JSON.stringify(user))
@@ -81,8 +78,8 @@ export default function SignupPage() {
       {/* Top Navigation Bar */}
       <header className="flex items-center justify-between px-6 py-6 lg:px-20 border-b border-[#e5ddd3]/50">
         <Link to="/" className="flex items-center gap-3">
-          <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-11 rounded-lg bg-primary p-1.5 object-contain" />
-          <h2 className="text-xl font-bold tracking-tight">AI Video Studio</h2>
+          <img src={aiVidLogo} alt="SceneFlow 로고" className="size-11 rounded-lg bg-primary p-1.5 object-contain" />
+          <h2 className="text-xl font-bold tracking-tight">SceneFlow</h2>
         </Link>
         <div className="hidden md:flex gap-6 items-center">
           <Link className="text-sm font-medium text-warm-muted hover:text-primary transition-colors" to="/login">로그인</Link>
@@ -96,7 +93,7 @@ export default function SignupPage() {
           <div className="text-center space-y-3">
             <h1 className="text-4xl font-bold tracking-tight">회원가입</h1>
             <p className="text-warm-muted text-base">
-              지금 바로 AI 비디오 제작의 미래를 경험해 보세요.
+              프롬프트에서 장면까지 자연스럽게 이어지는 비디오 제작 흐름을 시작해보세요.
             </p>
           </div>
 
@@ -234,7 +231,7 @@ export default function SignupPage() {
       {/* Footer */}
       <footer className="py-8 px-6 lg:px-20 text-center border-t border-[#e5ddd3]/50">
         <p className="text-xs text-warm-muted/60">
-          © 2024 AI Video Studio. All rights reserved.
+          © 2026 SceneFlow. All rights reserved.
         </p>
       </footer>
     </div>

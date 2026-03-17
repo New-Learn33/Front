@@ -15,10 +15,8 @@ export default function MyPage() {
   const [nicknameSaving, setNicknameSaving] = useState(false)
 
   const [videos, setVideos] = useState<UserVideo[]>([])
-  const [likedVideos, setLikedVideos] = useState<UserVideo[]>([])
   const [comments, setComments] = useState<UserComment[]>([])
   const [loadingVideos, setLoadingVideos] = useState(false)
-  const [loadingLikes, setLoadingLikes] = useState(false)
   const [loadingComments, setLoadingComments] = useState(false)
 
   // 유저 닉네임 초기화
@@ -42,24 +40,6 @@ export default function MyPage() {
       }
     }
     fetchVideos()
-  }, [])
-
-  // 좋아요한 영상 불러오기
-  useEffect(() => {
-    async function fetchLikes() {
-      setLoadingLikes(true)
-      try {
-        const res = await userApi.getMyLikes()
-        if (res.data.success) {
-          setLikedVideos(res.data.data.videos)
-        }
-      } catch (err) {
-        console.error('좋아요 영상 조회 실패:', err)
-      } finally {
-        setLoadingLikes(false)
-      }
-    }
-    fetchLikes()
   }, [])
 
   // 내 댓글 불러오기
@@ -87,7 +67,6 @@ export default function MyPage() {
     try {
       const res = await userApi.updateProfile({ nickname: nickname.trim() })
       if (res.data.success) {
-        setNickname(nickname.trim())
         setIsEditingNickname(false)
         // localStorage에 유저 정보 갱신
         const stored = localStorage.getItem('user')
@@ -96,6 +75,7 @@ export default function MyPage() {
           parsed.nickname = nickname.trim()
           localStorage.setItem('user', JSON.stringify(parsed))
         }
+        window.location.reload()
       }
     } catch (err) {
       console.error('닉네임 수정 실패:', err)
@@ -119,7 +99,7 @@ export default function MyPage() {
 
   const tabs: { key: Tab; label: string; icon: string; count: number }[] = [
     { key: 'videos', label: '내 영상', icon: 'movie', count: videos.length },
-    { key: 'likes', label: '좋아요', icon: 'favorite', count: likedVideos.length },
+    { key: 'likes', label: '좋아요', icon: 'favorite', count: 0 },
     { key: 'comments', label: '내 댓글', icon: 'chat_bubble', count: comments.length },
   ]
 
@@ -142,7 +122,7 @@ export default function MyPage() {
       <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6">
         <div className="flex items-center gap-6">
           {user?.profile_image_url ? (
-            <img src={resolveApiUrl(user.profile_image_url)} alt="프로필" className="size-20 rounded-full object-cover" />
+            <img src={user.profile_image_url} alt="프로필" className="size-20 rounded-full object-cover" />
           ) : (
             <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-primary text-3xl font-bold">{user?.name?.charAt(0) || '?'}</span>
@@ -165,7 +145,7 @@ export default function MyPage() {
                   <button
                     onClick={handleNicknameSave}
                     disabled={nicknameSaving}
-                    className="h-9 px-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-[#1b2d52] transition-all disabled:opacity-50"
+                    className="h-9 px-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-[#2647d8] transition-all disabled:opacity-50"
                   >
                     {nicknameSaving ? '저장 중...' : '저장'}
                   </button>
@@ -179,7 +159,7 @@ export default function MyPage() {
               ) : (
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-[#2d2926]">
-                    {nickname || user?.nickname || '익명의 참가자'}
+                    {user?.nickname || '익명의 참가자'}
                   </h2>
                   <button
                     onClick={() => { setNickname(user?.nickname || ''); setIsEditingNickname(true) }}
@@ -284,53 +264,9 @@ export default function MyPage() {
 
       {/* Tab Content - 좋아요 */}
       {activeTab === 'likes' && (
-        <div className="space-y-4">
-          {loadingLikes ? (
-            <div className="flex items-center justify-center py-16">
-              <span className="text-sm text-warm-muted">불러오는 중...</span>
-            </div>
-          ) : likedVideos.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-warm-muted">
-              <span className="material-symbols-outlined text-5xl mb-3">favorite</span>
-              <p className="text-sm">좋아요한 영상이 없습니다</p>
-              <Link to="/" className="mt-4 text-sm text-primary font-medium hover:underline">
-                영상 둘러보기
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {likedVideos.map((video) => (
-                <Link
-                  key={video.id}
-                  to={`/video/${video.id}`}
-                  className="group bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden hover:shadow-lg transition-all"
-                >
-                  <div className="aspect-video bg-[#f0ebe3] flex items-center justify-center relative overflow-hidden">
-                    {video.thumbnail_url ? (
-                      <img src={resolveApiUrl(video.thumbnail_url)} alt={video.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="material-symbols-outlined text-4xl text-[#c5beb4]">movie</span>
-                    )}
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <h3 className="text-sm font-bold text-[#2d2926] truncate group-hover:text-primary transition-colors">
-                      {video.title}
-                    </h3>
-                    <div className="flex items-center gap-3 text-xs text-warm-muted">
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-xs">visibility</span>
-                        {video.view_count?.toLocaleString() || 0}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-xs text-red-400">favorite</span>
-                        {video.like_count?.toLocaleString() || 0}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+        <div className="flex flex-col items-center justify-center py-16 text-warm-muted">
+          <span className="material-symbols-outlined text-5xl mb-3">favorite</span>
+          <p className="text-sm">좋아요 기능은 준비 중입니다</p>
         </div>
       )}
 
