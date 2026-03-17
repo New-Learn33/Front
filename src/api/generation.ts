@@ -32,14 +32,13 @@ export const generationApi = {
     job_id: number
     images: { scene_order: number; image_url: string }[]
     scenes: { scene_order: number; dialogue: string }[]
-    motion_intensity?: string
   }) =>
     api.post<{
       success: boolean
       message: string
       data: { job_id: number; status: string; video_url: string }
     }>('/api/v1/generation/render/video/svd', data, {
-      timeout: 1800000, // 30분 - Minimax 영상 변환에 오래 걸림
+      timeout: 600000, // 10분 - SVD 변환에 상당히 오래 걸림
     }),
 
   // SVD 백그라운드 영상 생성 (즉시 응답, WebSocket으로 진행률 수신)

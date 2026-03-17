@@ -1,10 +1,6 @@
 export interface GenerationRequest {
   category_id: number
   prompt: string
-  art_style?: string
-  genre?: string
-  image_quality?: string
-  motion_intensity?: string
 }
 
 export interface SceneItem {

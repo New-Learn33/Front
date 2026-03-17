@@ -1,290 +1,391 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { videosApi, type VideoListItem } from '../api/videos'
+import { formatCount } from '../data/videos'
+import { resolveApiUrl } from '../config/env'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
-import { resolveApiUrl } from '@/config/env'
 
-// 정렬 필터
 const sortFilters = [
-  { label: '인기순', icon: 'trending_up', value: 'popular' },
-  { label: '최신순', icon: 'schedule', value: 'latest' },
+  { label: '인기순', value: 'popular' as const, icon: 'trending_up' },
+  { label: '최신순', value: 'latest' as const, icon: 'schedule' },
 ]
 
 const PAGE_SIZE = 8
 
-function formatCount(n: number): string {
-  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
-  return String(n)
+const categoryLabels: Record<number, string> = {
+  1: '애니메이션',
+  2: '히어로',
+  3: '게임',
+  4: '판타지',
 }
 
 export default function HomePage() {
   const { user, isLoggedIn, logout } = useAuth()
-  const [activeSort, setActiveSort] = useState(0)
+  const [activeSort, setActiveSort] = useState<'popular' | 'latest'>('popular')
   const [searchQuery, setSearchQuery] = useState('')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-
-  // API 데이터
   const [videos, setVideos] = useState<VideoListItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  // 영상 목록 불러오기
   useEffect(() => {
+    let cancelled = false
+
     async function fetchVideos() {
       setLoading(true)
+      setError('')
+
       try {
-        const sortValue = sortFilters[activeSort].value
-        const res = await videosApi.getAll(sortValue)
-        if (res.data.success) {
-          setVideos(res.data.data.videos || [])
+        const res = searchQuery.trim()
+          ? await videosApi.search(searchQuery.trim())
+          : await videosApi.getAll(activeSort)
+
+        if (!cancelled && res.data.success) {
+          setVideos(res.data.data.videos)
         }
       } catch (err) {
-        console.error('영상 목록 조회 실패:', err)
+        console.error('홈 영상 조회 실패:', err)
+        if (!cancelled) {
+          setVideos([])
+          setError('영상을 불러오지 못했습니다.')
+        }
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
+
     fetchVideos()
-  }, [activeSort])
+    return () => {
+      cancelled = true
+    }
+  }, [activeSort, searchQuery])
 
-  // 검색 필터링 (클라이언트 사이드)
-  const filteredVideos = useMemo(() => {
-    if (!searchQuery.trim()) return videos
-    const q = searchQuery.toLowerCase()
-    return videos.filter((v) => v.title.toLowerCase().includes(q))
-  }, [videos, searchQuery])
+  const topVideos = useMemo(() => videos.slice(0, 4), [videos])
+  const heroVideo = topVideos[0]
+  const visibleVideos = useMemo(() => videos.slice(0, visibleCount), [videos, visibleCount])
+  const hasMore = visibleCount < videos.length
 
-  // 인기 랭킹 TOP 5 (좋아요 높은 순)
-  const topVideos = useMemo(() => {
-    return [...videos].sort((a, b) => (b.like_count || 0) - (a.like_count || 0)).slice(0, 5)
+  const stats = useMemo(() => {
+    const likes = videos.reduce((sum, video) => sum + video.like_count, 0)
+    const comments = videos.reduce((sum, video) => sum + video.comment_count, 0)
+
+    return {
+      videos: videos.length,
+      likes: formatCount(likes),
+      comments: formatCount(comments),
+    }
   }, [videos])
 
-  const visibleVideos = filteredVideos.slice(0, visibleCount)
-  const hasMore = visibleCount < filteredVideos.length
-
   return (
-    <div className="bg-[#f2ece1] font-display text-slate-900 antialiased min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#e5ddd3]/50 bg-[#f2ece1]/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 lg:px-20 h-20 flex items-center justify-between">
+    <div className="min-h-screen bg-[#f2ece1] text-slate-900 dark:bg-[#09111f] font-display dark:text-slate-100 antialiased">
+      <div className="absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_top_left,_rgba(201,152,102,0.16),_transparent_40%),radial-gradient(circle_at_top_right,_rgba(52,87,246,0.06),_transparent_35%),linear-gradient(180deg,_#f8f3ea_0%,_#f2ece1_58%,_#f2ece1_100%)] dark:hidden" />
+      <div className="absolute inset-x-0 top-0 -z-10 hidden h-[420px] bg-[radial-gradient(circle_at_top_left,_rgba(52,87,246,0.20),_transparent_38%),radial-gradient(circle_at_top_right,_rgba(125,211,252,0.08),_transparent_30%),linear-gradient(180deg,_#0d1730_0%,_#09111f_58%,_#09111f_100%)] dark:block" />
+
+      <header className="sticky top-0 z-50 border-b border-[#e5ddd3] bg-[#f2ece1]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#09111f]/80">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-20">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
-              <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
-              <h2 className="text-lg font-bold tracking-tight text-[#1a1a1a]">AI 비디오</h2>
+              <img src={aiVidLogo} alt="SceneFlow 로고" className="size-9 rounded-xl bg-primary p-1.5 object-contain shadow-lg shadow-primary/20" />
+              <div>
+                <h2 className="text-lg font-bold tracking-tight text-[#2d2926] dark:text-white">SceneFlow</h2>
+                <p className="text-[11px] font-medium tracking-[0.12em] text-slate-500">GENERATIVE VIDEO STUDIO</p>
+              </div>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link className="text-sm font-semibold text-primary" to="/">홈</Link>
+              <Link className="text-sm font-semibold text-primary" to="/">탐색</Link>
+              <Link className="text-sm font-medium text-slate-400 transition-colors hover:text-primary" to="/studio">스튜디오</Link>
             </nav>
           </div>
+
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
               <>
-                <Link to="/studio" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">스튜디오</Link>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-1 shadow-sm shadow-black/20">
                   {user?.profile_image_url ? (
-                    <img src={resolveApiUrl(user.profile_image_url)} alt="프로필" className="size-8 rounded-full object-cover" />
+                    <img src={user.profile_image_url} alt="프로필" className="size-8 rounded-full object-cover" />
                   ) : (
-                    <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
+                    <div className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                       {user?.name?.charAt(0) || '?'}
                     </div>
                   )}
-                  <span className="hidden sm:block text-sm font-medium text-slate-700">{user?.nickname || user?.name}</span>
-                  <button onClick={logout} className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">로그아웃</button>
+                  <span className="hidden sm:block text-sm font-medium text-slate-200">{user?.nickname || user?.name}</span>
+                  <button onClick={logout} className="px-3 text-sm font-medium text-slate-400 transition-colors hover:text-slate-200">로그아웃</button>
                 </div>
               </>
             ) : (
               <>
-                <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-600">로그인</Link>
-                <Link to="/signup" className="bg-primary hover:bg-[#b05d3f] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
+                <Link to="/login" className="hidden text-sm font-medium text-slate-400 sm:block">로그인</Link>
+                <Link to="/signup" className="rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-[#58717c]">
+                  시작하기
+                </Link>
               </>
             )}
           </div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-20 py-10">
-        {/* Hero */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div className="space-y-2">
-            <span className="text-primary font-bold text-sm tracking-widest uppercase">Community Showcase</span>
-            <h2 className="text-4xl md:text-5xl font-black text-[#2d2926] tracking-tight">커뮤니티 쇼케이스</h2>
-            <p className="text-[#5e5452] text-lg max-w-xl">전 세계 크리에이터들이 AI로 창조한 마법 같은 순간들을 감상해보세요.</p>
-          </div>
-          {isLoggedIn && (
-            <Link to="/studio/create" className="flex items-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 px-6 py-3 rounded-xl font-bold transition-all border border-primary/20">
-              <span className="material-symbols-outlined">add</span>
-              새 영상 만들기
-            </Link>
-          )}
-        </div>
+      <main className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-16 pt-10 lg:px-20">
+        <section className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+          <div className="overflow-hidden rounded-[32px] border border-[#243454] dark:border-white/10 bg-[#081225] px-7 py-8 text-white shadow-[0_30px_80px_-30px_rgba(15,23,42,0.55)] sm:px-9 sm:py-10">
+            <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-primary">
+                    쇼케이스
+                  </span>
+                  <h1 className="max-w-[520px] break-keep text-[36px] font-black leading-[1.08] tracking-tight sm:text-[44px] xl:text-[52px]">
+                    영상으로
+                    <br />
+                    바로 둘러보는
+                    <span className="block text-primary">SceneFlow 쇼케이스</span>
+                  </h1>
+                </div>
 
-        {/* Ranking TOP 5 */}
-        {topVideos.length > 0 && (
-          <div className="mb-14">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="material-symbols-outlined text-2xl text-amber-500">emoji_events</span>
-              <h3 className="text-2xl font-black text-[#2d2926] tracking-tight">인기 랭킹 TOP 5</h3>
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <Link
+                    to={isLoggedIn ? '/studio/create' : '/signup'}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto"
+                  >
+                    <span className="material-symbols-outlined text-lg">auto_awesome</span>
+                    영상 생성하기
+                  </Link>
+                  <a
+                    href="#showcase"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10 sm:w-auto"
+                  >
+                    <span className="material-symbols-outlined text-lg">south</span>
+                    쇼케이스 보기
+                  </a>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-xs tracking-[0.12em] text-slate-400">영상</p>
+                    <p className="mt-2 text-xl font-bold">{stats.videos}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-xs tracking-[0.12em] text-slate-400">좋아요</p>
+                    <p className="mt-2 text-xl font-bold">{stats.likes}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-xs tracking-[0.12em] text-slate-400">댓글</p>
+                    <p className="mt-2 text-xl font-bold">{stats.comments}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0f1c38]">
+                {heroVideo ? (
+                  <div className="relative h-full min-h-[360px] p-5">
+                    <div
+                      className="absolute inset-0 bg-cover bg-center opacity-80"
+                      style={{ backgroundImage: `url("${resolveApiUrl(heroVideo.thumbnail_url)}")` }}
+                    />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,37,0.12)_0%,rgba(8,18,37,0.88)_100%)]" />
+                    <div className="relative flex h-full flex-col justify-end space-y-3">
+                      <span className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary backdrop-blur-md">
+                        대표 영상
+                      </span>
+                      <div>
+                        <h2 className="text-2xl font-black tracking-tight">{heroVideo.title}</h2>
+                        <p className="mt-2 text-sm text-white/68">{categoryLabels[heroVideo.category_id] || '비디오'}</p>
+                      </div>
+                      <div className="flex gap-4 text-sm text-slate-300">
+                        <span>좋아요 {formatCount(heroVideo.like_count)}</span>
+                        <span>댓글 {formatCount(heroVideo.comment_count)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex min-h-[360px] items-center justify-center text-sm text-white/55">
+                    {loading ? '불러오는 중...' : '표시할 영상이 없습니다'}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          </div>
+
+          <div className="rounded-[28px] border border-white/10 bg-[#101a30] p-6 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.45)]">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.14em] text-primary">인기 순위</p>
+                <h3 className="mt-2 text-2xl font-black tracking-tight text-white">인기 영상</h3>
+              </div>
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">실시간 목록</span>
+            </div>
+            <div className="mt-5 space-y-3">
               {topVideos.map((video, index) => (
                 <Link
                   key={video.id}
                   to={`/video/${video.id}`}
-                  className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#eee6d8]"
+                  state={{ video }}
+                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 transition-all hover:border-primary/20 hover:bg-white/[0.05]"
                 >
-                  <div className="relative aspect-[3/4] w-full overflow-hidden">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                      style={{ backgroundImage: video.thumbnail_url ? `url("${resolveApiUrl(video.thumbnail_url)}")` : undefined, backgroundColor: '#e5ddd3' }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                    {/* 순위 뱃지 */}
-                    <div className={`absolute top-3 left-3 size-9 rounded-full flex items-center justify-center font-black text-sm shadow-lg ${
-                      index === 0 ? 'bg-amber-400 text-amber-900' :
-                      index === 1 ? 'bg-slate-300 text-slate-700' :
-                      index === 2 ? 'bg-amber-600 text-amber-100' :
-                      'bg-white/90 text-[#2d2926]'
-                    }`}>
-                      {index + 1}
-                    </div>
-                    {/* 하단 정보 */}
-                    <div className="absolute bottom-3 left-3 right-3 text-white">
-                      <h4 className="font-bold text-sm truncate mb-1">{video.title}</h4>
-                      <div className="flex items-center justify-end">
-                        <span className="flex items-center gap-1 text-xs text-white/80">
-                          <span className="material-symbols-outlined text-xs text-red-400">favorite</span>
-                          {formatCount(video.like_count || 0)}
-                        </span>
-                      </div>
-                    </div>
+                  <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-sm font-black text-primary">
+                    {index + 1}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold text-white">{video.title}</p>
+                    <p className="mt-1 text-xs text-slate-400">{categoryLabels[video.category_id] || '비디오'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-white">{formatCount(video.like_count)}</p>
+                    <p className="text-xs text-slate-500">좋아요</p>
                   </div>
                 </Link>
               ))}
+              {!loading && topVideos.length === 0 && (
+                <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-500">
+                  표시할 영상이 없습니다
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </section>
 
-        {/* Filters + Search */}
-        <div className="flex flex-col gap-6 mb-10">
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar">
-            {sortFilters.map((filter, i) => (
-              <button
-                key={filter.label}
-                onClick={() => { setActiveSort(i); setVisibleCount(PAGE_SIZE) }}
-                className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                  activeSort === i
-                    ? 'bg-primary text-white'
-                    : 'bg-white border border-[#e5ddd3] hover:border-primary'
-                }`}
-              >
-                <span className="material-symbols-outlined text-sm">{filter.icon}</span>
-                {filter.label}
-              </button>
-            ))}
-          </div>
-          <div className="relative w-full">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-            <input
-              className="w-full pl-12 pr-4 py-4 bg-white border border-[#e5ddd3] rounded-2xl text-base focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-sm outline-none transition-all"
-              placeholder="비디오 제목 검색..."
-              type="text"
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setVisibleCount(PAGE_SIZE) }}
-            />
-          </div>
-        </div>
-
-        {/* Loading */}
-        {loading && (
-          <div className="flex items-center justify-center py-20">
-            <span className="text-sm text-[#8c8479]">영상을 불러오는 중...</span>
-          </div>
-        )}
-
-        {/* Video Grid */}
-        {!loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {visibleVideos.map((video) => (
+        <section id="showcase" className="space-y-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h2 className="text-3xl font-black tracking-tight text-white">쇼케이스</h2>
+              <p className="mt-2 text-sm text-slate-400">실제 업로드된 영상만 보여줍니다.</p>
+            </div>
+            {isLoggedIn && (
               <Link
-                to={`/video/${video.id}`}
-                key={video.id}
-                className="group relative flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#eee6d8] cursor-pointer"
+                to="/studio/create"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/20 bg-white/5 px-6 py-3 text-sm font-bold text-primary shadow-sm transition-colors hover:bg-primary/10"
               >
-                <div className="relative aspect-[9/16] w-full overflow-hidden">
-                  {video.thumbnail_url ? (
+                <span className="material-symbols-outlined">add</span>
+                새 영상 만들기
+              </Link>
+            )}
+          </div>
+
+          <div className="grid gap-4 rounded-[28px] border border-white/10 bg-[#101a30] p-5 shadow-[0_24px_60px_-32px_rgba(0,0,0,0.45)] md:grid-cols-[auto_1fr] md:items-center md:p-6">
+            <div className="flex items-center gap-3 overflow-x-auto pb-1 no-scrollbar">
+              {sortFilters.map((filter) => (
+                <button
+                  key={filter.value}
+                  onClick={() => {
+                    setActiveSort(filter.value)
+                    setVisibleCount(PAGE_SIZE)
+                  }}
+                  className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-all ${
+                    activeSort === filter.value
+                      ? 'bg-primary text-white'
+                      : 'border border-white/10 bg-white/[0.03] text-slate-300 hover:border-primary/25 hover:text-primary'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm">{filter.icon}</span>
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative w-full">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+              <input
+                className="w-full rounded-2xl border border-white/10 bg-white/[0.03] py-4 pl-12 pr-4 text-base text-white outline-none transition-all placeholder:text-slate-500 focus:border-primary focus:ring-2 focus:ring-primary/15"
+                placeholder="영상 제목 검색"
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setVisibleCount(PAGE_SIZE)
+                }}
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              {error}
+            </div>
+          )}
+
+          {loading ? (
+            <div className="flex items-center justify-center rounded-[28px] border border-white/10 bg-[#101a30] px-6 py-20 text-sm text-slate-400">
+              영상을 불러오는 중...
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+              {visibleVideos.map((video) => (
+                <Link
+                  key={video.id}
+                  to={`/video/${video.id}`}
+                  state={{ video }}
+                  className="group overflow-hidden rounded-[26px] border border-white/10 bg-[#101a30] shadow-[0_24px_55px_-34px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-32px_rgba(37,99,235,0.22)]"
+                >
+                  <div className="relative aspect-[9/16] overflow-hidden">
                     <div
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
                       style={{ backgroundImage: `url("${resolveApiUrl(video.thumbnail_url)}")` }}
                     />
-                  ) : (
-                    <div className="absolute inset-0 bg-[#e5ddd3] flex items-center justify-center">
-                      <span className="material-symbols-outlined text-4xl text-[#c5beb4]">movie</span>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 video-card-gradient opacity-60" />
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
-                    <span className="material-symbols-outlined text-lg opacity-0 group-hover:opacity-100 transition-opacity">play_arrow</span>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-[#2d2926] mb-2 truncate">{video.title}</h3>
-                  <div className="flex items-center justify-end">
-                    <div className="flex items-center gap-3 text-[#5e5452]">
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm">favorite</span>
-                        <span className="text-xs">{formatCount(video.like_count || 0)}</span>
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm">chat_bubble</span>
-                        <span className="text-xs">{formatCount(video.comment_count || 0)}</span>
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.04)_0%,rgba(15,23,42,0.72)_100%)]" />
+                    <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
+                      <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-[#0f172a] backdrop-blur-md">
+                        {categoryLabels[video.category_id] || '비디오'}
                       </span>
                     </div>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="truncate text-lg font-bold tracking-tight text-white">{video.title}</h3>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
 
-        {/* Empty State */}
-        {!loading && visibleVideos.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <span className="material-symbols-outlined text-5xl text-slate-300 mb-4">search_off</span>
-            <p className="text-lg font-bold text-slate-400">
-              {searchQuery ? '검색 결과가 없습니다' : '아직 영상이 없습니다'}
-            </p>
-            <p className="text-sm text-slate-400 mt-1">
-              {searchQuery ? '다른 키워드로 검색해보세요.' : '첫 번째 영상을 만들어보세요!'}
-            </p>
-          </div>
-        )}
+                  <div className="flex items-center justify-between p-4 text-sm text-slate-400">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base text-primary">favorite</span>
+                      {formatCount(video.like_count)}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base">chat_bubble</span>
+                      {formatCount(video.comment_count)}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-primary">
+                      상세
+                      <span className="material-symbols-outlined text-base transition-transform group-hover:translate-x-1">arrow_forward</span>
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
 
-        {/* Load More */}
-        {hasMore && (
-          <div className="flex justify-center mt-16">
-            <button
-              onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-              className="px-8 py-3 bg-white border border-[#e5ddd3] rounded-xl font-bold text-[#5e5452] hover:border-primary hover:text-primary transition-all shadow-sm"
-            >
-              더 많은 비디오 불러오기
-            </button>
-          </div>
-        )}
+          {!loading && visibleVideos.length === 0 && !error && (
+            <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-white/10 bg-[#101a30] px-6 py-20 text-center">
+              <span className="material-symbols-outlined mb-4 text-5xl text-slate-300">search_off</span>
+              <p className="text-lg font-bold text-slate-300">검색 결과가 없습니다</p>
+            </div>
+          )}
+
+          {!loading && hasMore && (
+            <div className="flex justify-center">
+              <button
+                onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                className="rounded-full border border-white/10 bg-white/[0.04] px-8 py-3 text-sm font-bold text-slate-200 shadow-sm transition-all hover:border-primary/25 hover:text-primary"
+              >
+                더 보기
+              </button>
+            </div>
+          )}
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-20 border-t border-[#e5ddd3]/50 bg-[#f9f6f0]/30 px-6 lg:px-20 py-12">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+      <footer className="border-t border-[#e5ddd3] bg-[#f9f6f0]/30 px-6 py-12 lg:px-20 dark:border-white/10 dark:bg-[#0d1729]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
-            <img src={aiVidLogo} alt="AI Video Studio 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
-            <span className="font-bold text-[#2d2926]">AI 비디오</span>
+            <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-xl bg-primary p-1.5 object-contain" />
+            <div>
+              <p className="font-bold text-[#2d2926] dark:text-white">SceneFlow</p>
+              <p className="text-sm text-slate-400">AI 비디오 쇼케이스</p>
+            </div>
           </div>
-          <div className="flex gap-8 text-sm text-[#5e5452]">
-            <Link className="hover:text-primary transition-colors" to="/terms">이용약관</Link>
-            <Link className="hover:text-primary transition-colors" to="/privacy">개인정보처리방침</Link>
-            <Link className="hover:text-primary transition-colors" to="/support">고객센터</Link>
+          <div className="flex gap-8 text-sm text-slate-400">
+            <Link className="transition-colors hover:text-primary" to="/terms">이용약관</Link>
+            <Link className="transition-colors hover:text-primary" to="/privacy">개인정보처리방침</Link>
+            <Link className="transition-colors hover:text-primary" to="/support">고객센터</Link>
           </div>
-          <p className="text-sm text-slate-400">© 2024 AI Video Studio. All rights reserved.</p>
+          <p className="text-sm text-slate-400">© 2026 SceneFlow. All rights reserved.</p>
         </div>
       </footer>
     </div>

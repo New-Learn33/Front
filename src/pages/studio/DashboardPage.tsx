@@ -150,6 +150,7 @@ export default function DashboardPage() {
               <Link
                 key={video.id}
                 to={`/video/${video.id}`}
+                state={{ video }}
                 className="group bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden hover:shadow-lg transition-all"
               >
                 <div className="aspect-video bg-[#f0ebe3] flex items-center justify-center relative overflow-hidden">

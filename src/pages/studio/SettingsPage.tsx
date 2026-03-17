@@ -4,7 +4,6 @@ import { useTheme } from '../../hooks/useTheme'
 export default function SettingsPage() {
   const { isDark, toggleTheme } = useTheme()
   const [notifications, setNotifications] = useState(true)
-  const [emailUpdates, setEmailUpdates] = useState(false)
   const [autoSave, setAutoSave] = useState(true)
   const [quality, setQuality] = useState('high')
   const [language, setLanguage] = useState('ko')
@@ -44,19 +43,6 @@ export default function SettingsPage() {
               className={`w-11 h-6 rounded-full transition-all ${notifications ? 'bg-primary' : 'bg-[#e5ddd3]'}`}
             >
               <div className={`size-5 bg-white rounded-full shadow transition-transform ${notifications ? 'translate-x-[22px]' : 'translate-x-[2px]'}`} />
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between py-2 border-t border-[#e5ddd3]">
-            <div>
-              <p className="text-sm font-medium text-[#2d2926]">이메일 업데이트</p>
-              <p className="text-xs text-warm-muted">새 기능 및 업데이트 소식을 이메일로 받습니다</p>
-            </div>
-            <button
-              onClick={() => setEmailUpdates(!emailUpdates)}
-              className={`w-11 h-6 rounded-full transition-all ${emailUpdates ? 'bg-primary' : 'bg-[#e5ddd3]'}`}
-            >
-              <div className={`size-5 bg-white rounded-full shadow transition-transform ${emailUpdates ? 'translate-x-[22px]' : 'translate-x-[2px]'}`} />
             </button>
           </div>
 
@@ -109,7 +95,7 @@ export default function SettingsPage() {
 
       {/* Save */}
       <div className="flex justify-end">
-        <button className="bg-primary hover:bg-[#b05d3f] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press">
+        <button className="bg-primary hover:bg-[#58717c] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press">
           변경사항 저장
         </button>
       </div>
