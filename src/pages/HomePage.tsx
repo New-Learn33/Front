@@ -256,7 +256,7 @@ export default function HomePage() {
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/20 bg-white/5 px-6 py-3 text-sm font-bold text-primary shadow-sm transition-colors hover:bg-primary/10"
               >
                 <span className="material-symbols-outlined">add</span>
-                새 영상 만들기
+                영상 생성하기
               </Link>
             )}
           </div>

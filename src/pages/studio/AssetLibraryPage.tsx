@@ -104,7 +104,7 @@ export default function AssetLibraryPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between animate-enter">
         <div>
-          <h1 className="text-2xl font-bold text-[#2d2926]">에셋 라이브러리</h1>
+          <h1 className="text-2xl font-bold text-[#2d2926]">내 자료함</h1>
           <p className="text-warm-muted text-sm mt-1">
             총 {assets.length}개의 에셋 · {formatSize(totalSize)} 사용 중
           </p>
@@ -180,7 +180,7 @@ export default function AssetLibraryPage() {
           <div className="size-16 rounded-2xl bg-[#f9f6f0] flex items-center justify-center mb-4">
             <span className="material-symbols-outlined text-3xl text-primary/40">perm_media</span>
           </div>
-          <p className="text-sm font-semibold text-[#2d2926]">에셋이 없습니다</p>
+          <p className="text-sm font-semibold text-[#2d2926]">자료가 없습니다</p>
           <p className="text-xs text-warm-muted mt-1">이미지를 업로드하여 캐릭터 프로필을 생성하세요</p>
         </div>
       ) : viewMode === 'grid' ? (
