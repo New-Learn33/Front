@@ -13,7 +13,7 @@ export default function StudioHeader() {
   const label = routeLabels[pathname] || '마이페이지'
 
   return (
-    <header className="h-16 bg-[#f2ece1] border-b border-[#e5ddd3] flex items-center justify-between px-8">
+    <header className="h-16 bg-[#f2ece1] border-b border-[#e5ddd3] dark:border-b-0 flex items-center justify-between px-8">
       <div className="flex items-center gap-2 text-sm">
         <span className="text-warm-muted">스튜디오</span>
         <span className="text-warm-muted">/</span>

@@ -115,7 +115,7 @@ export default function SettingsPage() {
             <p className="text-sm font-semibold text-[#2d2926]">무료 플랜</p>
             <p className="text-xs text-warm-muted">월 10개 영상 생성 · 5GB 저장공간</p>
           </div>
-          <button className="bg-primary hover:bg-[#2647d8] text-white text-sm font-bold px-5 py-2 rounded-xl transition-all btn-press">
+          <button className="bg-primary hover:bg-[#58717c] text-white text-sm font-bold px-5 py-2 rounded-xl transition-all btn-press">
             업그레이드
           </button>
         </div>
@@ -132,7 +132,7 @@ export default function SettingsPage() {
 
       {/* Save */}
       <div className="flex justify-end">
-        <button className="bg-primary hover:bg-[#2647d8] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press">
+        <button className="bg-primary hover:bg-[#58717c] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press">
           변경사항 저장
         </button>
       </div>

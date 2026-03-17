@@ -32,7 +32,7 @@ export default function AssetLibraryPage() {
           <h1 className="text-2xl font-bold text-[#2d2926]">에셋 라이브러리</h1>
           <p className="text-warm-muted text-sm mt-1">총 {assets.length}개의 에셋 · 115.3 MB 사용 중</p>
         </div>
-        <button className="bg-primary hover:bg-[#2647d8] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all btn-press">
+        <button className="bg-primary hover:bg-[#58717c] text-white text-sm font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all btn-press">
           <span className="material-symbols-outlined text-lg">upload</span>
           업로드
         </button>

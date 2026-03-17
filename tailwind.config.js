@@ -8,8 +8,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#3457f6",
-        accent: "#8fd3ff",
+        primary: "#6b8794",
+        accent: "#90a8b2",
         "background-light": "#f4f1ea",
         "background-dark": "#1f1b19",
         "surface-dark": "#2b2523",
@@ -19,7 +19,9 @@ export default {
         "warm-muted": "#8c8479",
       },
       fontFamily: {
-        display: ["Space Grotesk", "sans-serif"],
+        sans: ["Pretendard Variable", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", "sans-serif"],
+        display: ["Pretendard Variable", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "monospace"],
       },
       borderRadius: {
         DEFAULT: "0.5rem",
