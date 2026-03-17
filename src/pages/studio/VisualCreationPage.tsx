@@ -45,7 +45,7 @@ export default function VisualCreationPage() {
   const {
     prompt, setPrompt,
     selectedCategory, setSelectedCategory,
-    loading, error, setError,
+    loading, error,
     result, setResult,
     streaming,
     artStyle, setArtStyle,
