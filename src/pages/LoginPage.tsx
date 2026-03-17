@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { authApi } from '@/api/auth'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
+import { normalizeUser } from '@/utils/auth'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -23,7 +24,8 @@ export default function LoginPage() {
     try {
       setIsLoading(true)
       const res = await authApi.login({ email, password })
-      const { access_token, user } = res.data.data
+      const { access_token } = res.data.data
+      const user = normalizeUser(res.data.data.user)
 
       localStorage.setItem('access_token', access_token)
       localStorage.setItem('user', JSON.stringify(user))
@@ -48,7 +50,8 @@ export default function LoginPage() {
     try {
       setIsLoading(true)
       const res = await authApi.googleLogin({ id_token: idToken })
-      const { access_token, user } = res.data.data
+      const { access_token } = res.data.data
+      const user = normalizeUser(res.data.data.user)
 
       localStorage.setItem('access_token', access_token)
       localStorage.setItem('user', JSON.stringify(user))

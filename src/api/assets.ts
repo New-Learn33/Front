@@ -1,21 +1,24 @@
 import api from './client'
-import type { Asset, AssetListResponse } from '@/types/asset'
+import type { AssetListResponse, AssetUploadResponse } from '@/types/asset'
 
 export const assetsApi = {
-  list: (params?: { type?: string }) =>
-    api.get<AssetListResponse>('/assets', { params }),
+  list: (params?: { category_id?: string; tag?: string }) =>
+    api.get<AssetListResponse>('/api/v1/assets', { params }),
 
-  get: (id: number) =>
-    api.get<Asset>(`/assets/${id}`),
-
-  upload: (file: File) => {
+  upload: (file: File, categoryId: string, name?: string) => {
     const formData = new FormData()
     formData.append('file', file)
-    return api.post<Asset>('/assets/upload', formData, {
+    formData.append('category_id', categoryId)
+    if (name) formData.append('name', name)
+    return api.post<AssetUploadResponse>('/api/v1/assets/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000,
     })
   },
 
-  delete: (id: number) =>
-    api.delete(`/assets/${id}`),
+  delete: (assetId: string) =>
+    api.delete(`/api/v1/assets/${assetId}`),
+
+  updateTags: (assetId: string, tags: string[]) =>
+    api.patch(`/api/v1/assets/${assetId}/tags`, { tags }),
 }
