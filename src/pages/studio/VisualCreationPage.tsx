@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { generationApi } from '@/api/generation'
 import { presetsApi, type Preset } from '@/api/presets'
-import { API_BASE_URL, resolveApiUrl } from '@/config/env'
-import type { GenerationData } from '@/types/generation'
+import { resolveApiUrl } from '@/config/env'
+import { useGeneration } from '@/hooks/useGeneration'
 
 const categories = [
   { id: 1, label: '애니메이션', icon: 'animation', desc: '생동감 넘치는 애니 스타일' },
@@ -10,17 +10,6 @@ const categories = [
   { id: 3, label: '게임', icon: 'sports_esports', desc: '게임 시네마틱 스타일' },
   { id: 4, label: '판타지', icon: 'auto_awesome', desc: '에픽 판타지 스타일' },
 ]
-
-interface StreamingState {
-  step: string
-  message: string
-  scenes: any[] | null
-  images: { scene_order: number; image_url: string }[]
-  title: string
-  jobId: number | null
-}
-
-const API_BASE = API_BASE_URL
 
 const artStyles = [
   { id: 'webtoon', label: '웹툰', icon: 'draw' },
@@ -53,46 +42,32 @@ const motionOptions = [
 ]
 
 export default function VisualCreationPage() {
-  const [prompt, setPrompt] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState(1)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [result, setResult] = useState<GenerationData | null>(null)
+  const {
+    prompt, setPrompt,
+    selectedCategory, setSelectedCategory,
+    loading, error, setError,
+    result, setResult,
+    streaming,
+    artStyle, setArtStyle,
+    genre, setGenre,
+    imageQuality, setImageQuality,
+    motionIntensity, setMotionIntensity,
+    videoLoading, videoStep, videoUrl, videoError,
+    selectedThumbnail, thumbnailSaving, thumbnailSaved,
+    handleGenerate, handleRenderVideo, handleSelectThumbnail,
+  } = useGeneration()
 
-  // 생성 옵션
-  const [artStyle, setArtStyle] = useState('webtoon')
-  const [genre, setGenre] = useState('auto')
-  const [imageQuality, setImageQuality] = useState('medium')
-  const [motionIntensity, setMotionIntensity] = useState('medium')
-
-  // 스트리밍 상태
-  const [streaming, setStreaming] = useState<StreamingState>({
-    step: '',
-    message: '',
-    scenes: null,
-    images: [],
-    title: '',
-    jobId: null,
-  })
-
-  // 영상 생성 상태
-  const [videoLoading, setVideoLoading] = useState(false)
-  const [videoStep, setVideoStep] = useState<'idle' | 'subtitles' | 'video' | 'done'>('idle')
-  const [videoUrl, setVideoUrl] = useState<string | null>(null)
-  const [videoError, setVideoError] = useState('')
-
-  // 썸네일 선택 상태
-  const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(null)
-  const [thumbnailSaving, setThumbnailSaving] = useState(false)
-  const [thumbnailSaved, setThumbnailSaved] = useState(false)
-
-  // 프리셋 상태
+  // 프리셋 상태 (페이지 로컬)
   const [presets, setPresets] = useState<Preset[]>([])
   const [showPresetSave, setShowPresetSave] = useState(false)
   const [presetName, setPresetName] = useState('')
   const [showPresets, setShowPresets] = useState(false)
 
-  const abortRef = useRef<AbortController | null>(null)
+  // 텍스트 편집 상태 (페이지 로컬)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [editScenes, setEditScenes] = useState<{ scene_order: number; dialogue: string; subtitle_text: string }[]>([])
+  const [textSaving, setTextSaving] = useState(false)
 
   // 프리셋 목록 로드
   useEffect(() => {
@@ -133,185 +108,55 @@ export default function VisualCreationPage() {
     } catch {}
   }
 
-  // 1단계: SSE 스트리밍으로 6컷 생성
-  const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      setError('프롬프트를 입력해주세요.')
-      return
-    }
-
-    setLoading(true)
-    setError('')
-    setResult(null)
-    setVideoUrl(null)
-    setVideoStep('idle')
-    setVideoError('')
-    setSelectedThumbnail(null)
-    setThumbnailSaved(false)
-    setStreaming({ step: '', message: '준비 중...', scenes: null, images: [], title: '', jobId: null })
-
-    // AbortController for cancellation
-    const controller = new AbortController()
-    abortRef.current = controller
-
-    try {
-      const token = localStorage.getItem('access_token')
-      const response = await fetch(`${API_BASE}/api/v1/generation/stream`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          category_id: selectedCategory,
-          prompt: prompt.trim(),
-          art_style: artStyle,
-          genre,
-          image_quality: imageQuality,
-        }),
-        signal: controller.signal,
-      })
-
-      if (!response.ok) {
-        throw new Error(`서버 오류: ${response.status}`)
-      }
-
-      const reader = response.body?.getReader()
-      if (!reader) throw new Error('스트림을 읽을 수 없습니다.')
-
-      const decoder = new TextDecoder()
-      let buffer = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        buffer += decoder.decode(value, { stream: true })
-
-        // SSE 파싱: "data: {...}\n\n"
-        const lines = buffer.split('\n\n')
-        buffer = lines.pop() || ''
-
-        for (const line of lines) {
-          const dataLine = line.trim()
-          if (!dataLine.startsWith('data: ')) continue
-          const jsonStr = dataLine.slice(6)
-
-          try {
-            const event = JSON.parse(jsonStr)
-
-            switch (event.type) {
-              case 'step':
-                setStreaming((prev) => ({ ...prev, step: event.step, message: event.message }))
-                break
-
-              case 'script':
-                setStreaming((prev) => ({
-                  ...prev,
-                  scenes: event.scenes,
-                  title: event.title,
-                  jobId: event.job_id,
-                }))
-                break
-
-              case 'image':
-                setStreaming((prev) => ({
-                  ...prev,
-                  images: [...prev.images, { scene_order: event.scene_order, image_url: event.image_url }],
-                }))
-                break
-
-              case 'done':
-                // 스트리밍 완료 → result로 전환
-                setResult({
-                  job_id: event.job_id,
-                  title: event.title,
-                  category_id: event.category_id,
-                  selected_template_image: event.selected_template_image,
-                  scenes: event.scenes,
-                  images: event.images,
-                })
-                setStreaming({ step: '', message: '', scenes: null, images: [], title: '', jobId: null })
-                break
-
-              case 'error':
-                setError(event.message)
-                break
-            }
-          } catch {
-            // JSON 파싱 실패 무시
-          }
-        }
-      }
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        console.error('Stream error:', err)
-        setError(err.message || '서버 오류가 발생했습니다.')
-      }
-    } finally {
-      setLoading(false)
-      abortRef.current = null
-    }
+  // 텍스트 편집 시작
+  const handleStartEdit = () => {
+    if (!result) return
+    setEditTitle(result.title)
+    setEditScenes(result.scenes.map(s => ({
+      scene_order: s.scene_order,
+      dialogue: s.dialogue,
+      subtitle_text: s.subtitle_text,
+    })))
+    setIsEditing(true)
   }
 
-  // 2단계: 자막 합성 → 영상 생성
-  const handleRenderVideo = async () => {
+  // 텍스트 편집 저장
+  const handleSaveEdit = async () => {
     if (!result) return
-
-    setVideoLoading(true)
-    setVideoError('')
-    setVideoUrl(null)
-    setVideoStep('video')
-
+    setTextSaving(true)
     try {
-      // SVD 기반 영상 생성 (각 이미지를 움직이는 영상으로 변환 후 합치기)
-      const videoRes = await generationApi.renderVideoSvd({
-        job_id: result.job_id,
-        images: result.images.map((img) => ({
-          scene_order: img.scene_order,
-          image_url: img.image_url,
-        })),
-        scenes: result.scenes.map((s) => ({
+      const res = await generationApi.updateText(result.job_id, {
+        title: editTitle !== result.title ? editTitle : undefined,
+        scenes: editScenes.map(s => ({
           scene_order: s.scene_order,
           dialogue: s.dialogue,
+          subtitle_text: s.subtitle_text,
         })),
-        motion_intensity: motionIntensity,
       })
-
-      if (videoRes.data.success) {
-        setVideoUrl(resolveApiUrl(videoRes.data.data.video_url))
-        setVideoStep('done')
-      } else {
-        setVideoError(videoRes.data.message || '영상 생성에 실패했습니다.')
+      if (res.data.success) {
+        // result 업데이트
+        setResult({
+          ...result,
+          title: res.data.data.title,
+          scenes: res.data.data.scenes.map(s => ({
+            ...s,
+            subtitle_text: s.subtitle_text || '',
+          })),
+        })
+        setIsEditing(false)
       }
-    } catch (err: any) {
-      console.error('Video render error:', err)
-      const detail = err.response?.data?.detail
-      const message = typeof detail === 'string' ? detail : err.message || '영상 생성 중 오류가 발생했습니다.'
-      setVideoError(message)
+    } catch (err) {
+      console.error('Text update error:', err)
     } finally {
-      setVideoLoading(false)
+      setTextSaving(false)
     }
   }
 
-  // 썸네일 선택 저장
-  const handleSelectThumbnail = async (imageUrl: string) => {
-    if (!result) return
-    setSelectedThumbnail(imageUrl)
-    setThumbnailSaving(true)
-    try {
-      const res = await generationApi.selectThumbnail({
-        job_id: result.job_id,
-        thumbnail_url: imageUrl,
-      })
-      if (res.data.success) {
-        setThumbnailSaved(true)
-      }
-    } catch (err) {
-      console.error('Thumbnail save error:', err)
-    } finally {
-      setThumbnailSaving(false)
-    }
+  // 편집 scene 업데이트 헬퍼
+  const updateEditScene = (sceneOrder: number, field: 'dialogue' | 'subtitle_text', value: string) => {
+    setEditScenes(prev => prev.map(s =>
+      s.scene_order === sceneOrder ? { ...s, [field]: value } : s
+    ))
   }
 
   const videoStepLabel = () => {
@@ -548,10 +393,54 @@ export default function VisualCreationPage() {
         {result ? (
           <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6 space-y-5 animate-enter-scale">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-[#2d2926]">{result.title}</h3>
-              <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
-                {categories.find(c => c.id === result.category_id)?.label}
-              </span>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="text-lg font-bold text-[#2d2926] bg-[#f9f6f0] border border-primary/30 rounded-lg px-3 py-1 outline-none focus:ring-2 focus:ring-primary/20 flex-1 mr-3"
+                  maxLength={255}
+                />
+              ) : (
+                <h3 className="text-lg font-bold text-[#2d2926]">{result.title}</h3>
+              )}
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
+                  {categories.find(c => c.id === result.category_id)?.label}
+                </span>
+                {!videoLoading && (
+                  isEditing ? (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={handleSaveEdit}
+                        disabled={textSaving}
+                        className="flex items-center gap-1 text-xs font-medium text-white bg-primary hover:bg-[#b05d3f] px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          {textSaving ? 'progress_activity' : 'check'}
+                        </span>
+                        {textSaving ? '저장 중...' : '저장'}
+                      </button>
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        disabled={textSaving}
+                        className="flex items-center gap-1 text-xs font-medium text-warm-muted hover:text-[#2d2926] px-2 py-1.5 rounded-lg transition-all"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleStartEdit}
+                      className="flex items-center gap-1 text-xs font-medium text-primary hover:text-[#b05d3f] px-2 py-1 rounded-lg transition-all hover:bg-primary/5"
+                      title="제목과 대사를 수정합니다"
+                    >
+                      <span className="material-symbols-outlined text-sm">edit</span>
+                      수정
+                    </button>
+                  )
+                )}
+              </div>
             </div>
 
             {/* 썸네일 선택 안내 */}
@@ -602,11 +491,33 @@ export default function VisualCreationPage() {
                         <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-bold">
                           {scene.scene_order}컷
                         </span>
-                        <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editScenes.find(s => s.scene_order === scene.scene_order)?.subtitle_text || ''}
+                            onChange={(e) => updateEditScene(scene.scene_order, 'subtitle_text', e.target.value)}
+                            className="text-xs text-warm-muted bg-[#f9f6f0] border border-primary/20 rounded px-2 py-0.5 outline-none focus:ring-1 focus:ring-primary/20 flex-1"
+                            placeholder="장면 설명"
+                            maxLength={500}
+                          />
+                        ) : (
+                          <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
+                        )}
                       </div>
-                      <p className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-[#e5ddd3]">
-                        "{scene.dialogue}"
-                      </p>
+                      {isEditing ? (
+                        <textarea
+                          value={editScenes.find(s => s.scene_order === scene.scene_order)?.dialogue || ''}
+                          onChange={(e) => updateEditScene(scene.scene_order, 'dialogue', e.target.value)}
+                          className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-primary/30 outline-none focus:ring-2 focus:ring-primary/20 w-full resize-none"
+                          rows={3}
+                          maxLength={500}
+                          placeholder="대사를 입력하세요"
+                        />
+                      ) : (
+                        <p className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-[#e5ddd3]">
+                          "{scene.dialogue}"
+                        </p>
+                      )}
                     </div>
                   </div>
                 )
