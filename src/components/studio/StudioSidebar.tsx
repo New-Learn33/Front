@@ -42,7 +42,7 @@ export default function StudioSidebar() {
   const storagePercent = Math.min(100, Math.round((storageUsed / STORAGE_LIMIT) * 100))
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#0b1324] text-white flex flex-col z-50 border-r border-white/10">
+    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#0b1324] text-white flex flex-col z-50 border-r border-white/10" style={{ transform: 'translateZ(0)', willChange: 'transform' }}>
       {/* Logo */}
       <div className="px-6 h-16 flex items-center gap-3 border-b border-white/10">
         <Link to="/" className="flex items-center gap-3">
@@ -59,10 +59,10 @@ export default function StudioSidebar() {
             to={item.to}
             end={item.end}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors border ${
                 isActive
-                  ? 'bg-primary/12 text-primary border border-primary/20'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
+                  ? 'bg-primary/12 text-primary border-primary/20'
+                  : 'text-white/60 hover:text-white hover:bg-white/5 border-transparent'
               }`
             }
           >

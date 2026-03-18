@@ -43,6 +43,17 @@ export default function AssetLibraryPage() {
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // 선택 모드
+  const [selectMode, setSelectMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+
+  // 태그 편집
+  const [editingAsset, setEditingAsset] = useState<Asset | null>(null)
+  const [tagInput, setTagInput] = useState('')
+  const [editTags, setEditTags] = useState<string[]>([])
+  const [savingTags, setSavingTags] = useState(false)
+
   const fetchAssets = async () => {
     try {
       const params = activeCategory ? { category_id: activeCategory } : undefined
@@ -64,23 +75,36 @@ export default function AssetLibraryPage() {
 
   const totalSize = assets.reduce((sum, a) => sum + (a.file_size || 0), 0)
 
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 })
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const files = e.target.files
+    if (!files || files.length === 0) return
 
     setUploading(true)
-    try {
-      const res = await assetsApi.upload(file, activeCategory || 1)
-      if (res.data.success) {
-        setAssets(prev => [res.data.data, ...prev])
+    const total = files.length
+    setUploadProgress({ current: 0, total })
+    let failed = 0
+
+    for (let i = 0; i < total; i++) {
+      setUploadProgress({ current: i + 1, total })
+      try {
+        const res = await assetsApi.upload(files[i], activeCategory || 1)
+        if (res.data.success) {
+          setAssets(prev => [res.data.data, ...prev])
+        }
+      } catch {
+        failed++
       }
-    } catch (err: any) {
-      const detail = err.response?.data?.detail
-      alert(typeof detail === 'string' ? detail : '업로드에 실패했습니다.')
-    } finally {
-      setUploading(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
     }
+
+    if (failed > 0) {
+      alert(`${total - failed}개 업로드 완료, ${failed}개 실패`)
+    }
+
+    setUploading(false)
+    setUploadProgress({ current: 0, total: 0 })
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const handleDelete = async (assetId: string) => {
@@ -93,6 +117,100 @@ export default function AssetLibraryPage() {
     } catch {
       alert('삭제에 실패했습니다.')
     }
+  }
+
+  // 선택 토글
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  // 전체 선택 / 해제
+  const toggleSelectAll = () => {
+    if (selectedIds.size === assets.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(assets.map(a => a.id)))
+    }
+  }
+
+  // 선택 모드 종료
+  const exitSelectMode = () => {
+    setSelectMode(false)
+    setSelectedIds(new Set())
+  }
+
+  // 태그 편집 열기
+  const openTagEditor = (asset: Asset) => {
+    if (selectMode) return
+    setEditingAsset(asset)
+    const existing = new Set([...(asset.style_keywords || []), ...(asset.custom_tags || [])])
+    setEditTags([...existing])
+    setTagInput('')
+  }
+
+  // 태그 추가
+  const addTag = () => {
+    const tag = tagInput.trim()
+    if (!tag || editTags.includes(tag)) return
+    setEditTags(prev => [...prev, tag])
+    setTagInput('')
+  }
+
+  // 태그 삭제
+  const removeTag = (tag: string) => {
+    setEditTags(prev => prev.filter(t => t !== tag))
+  }
+
+  // 태그 저장
+  const saveTags = async () => {
+    if (!editingAsset) return
+    setSavingTags(true)
+    try {
+      const res = await assetsApi.updateTags(editingAsset.id, editTags)
+      if (res.data.success) {
+        setAssets(prev => prev.map(a =>
+          a.id === editingAsset.id ? { ...a, custom_tags: editTags } : a
+        ))
+        setEditingAsset(null)
+      }
+    } catch {
+      alert('태그 저장에 실패했습니다.')
+    } finally {
+      setSavingTags(false)
+    }
+  }
+
+  // 일괄 삭제
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return
+    if (!confirm(`선택한 ${selectedIds.size}개의 에셋을 삭제하시겠습니까?`)) return
+
+    setBulkDeleting(true)
+    const ids = Array.from(selectedIds)
+    const failed: string[] = []
+
+    for (const id of ids) {
+      try {
+        await assetsApi.delete(id)
+      } catch {
+        failed.push(id)
+      }
+    }
+
+    setAssets(prev => prev.filter(a => failed.includes(a.id) || !selectedIds.has(a.id)))
+    setSelectedIds(new Set())
+    setBulkDeleting(false)
+
+    if (failed.length > 0) {
+      alert(`${ids.length - failed.length}개 삭제 완료, ${failed.length}개 실패`)
+    }
+
+    exitSelectMode()
   }
 
   const timeAgo = (dateStr?: string) => {
@@ -110,11 +228,51 @@ export default function AssetLibraryPage() {
             총 {assets.length}개의 에셋 · {formatSize(totalSize)} 사용 중
           </p>
         </div>
-        <div>
+        <div className="flex items-center gap-2">
+          {/* 선택 모드 토글 */}
+          {!selectMode ? (
+            <button
+              onClick={() => setSelectMode(true)}
+              disabled={assets.length === 0}
+              className="bg-white border border-[#e5ddd3] text-warm-muted hover:text-[#2d2926] hover:bg-[#f9f6f0] disabled:opacity-40 text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all"
+            >
+              <span className="material-symbols-outlined text-lg">checklist</span>
+              선택
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleSelectAll}
+                className="bg-white border border-[#e5ddd3] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+              >
+                {selectedIds.size === assets.length ? '전체 해제' : '전체 선택'}
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={selectedIds.size === 0 || bulkDeleting}
+                className="bg-red-500 hover:bg-red-600 disabled:opacity-40 text-white text-sm font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all"
+              >
+                {bulkDeleting ? (
+                  <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                ) : (
+                  <span className="material-symbols-outlined text-sm">delete</span>
+                )}
+                {selectedIds.size > 0 ? `${selectedIds.size}개 삭제` : '삭제'}
+              </button>
+              <button
+                onClick={exitSelectMode}
+                className="text-warm-muted hover:text-[#2d2926] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+              >
+                취소
+              </button>
+            </div>
+          )}
+
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*,video/*,audio/*,.ttf,.otf,.woff,.woff2"
+            multiple
             className="hidden"
             onChange={handleUpload}
           />
@@ -126,7 +284,7 @@ export default function AssetLibraryPage() {
             {uploading ? (
               <>
                 <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
-                업로드 중...
+                {uploadProgress.total > 1 ? `업로드 중 (${uploadProgress.current}/${uploadProgress.total})` : '업로드 중...'}
               </>
             ) : (
               <>
@@ -189,8 +347,28 @@ export default function AssetLibraryPage() {
           {assets.map((a) => (
             <div
               key={a.id}
-              className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden cursor-pointer group card-hover relative"
+              onClick={() => selectMode ? toggleSelect(a.id) : openTagEditor(a)}
+              className={`bg-white rounded-2xl border overflow-hidden group card-hover relative transition-all cursor-pointer ${
+                selectMode && selectedIds.has(a.id)
+                  ? 'border-primary ring-2 ring-primary/20'
+                  : 'border-[#e5ddd3]'
+              } ${selectMode ? 'cursor-pointer' : ''}`}
             >
+              {/* 선택 체크박스 */}
+              {selectMode && (
+                <div className="absolute top-2 left-2 z-10">
+                  <div className={`size-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                    selectedIds.has(a.id)
+                      ? 'bg-primary border-primary text-white'
+                      : 'bg-white/90 border-[#e5ddd3]'
+                  }`}>
+                    {selectedIds.has(a.id) && (
+                      <span className="material-symbols-outlined text-sm">check</span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="aspect-square bg-[#f9f6f0] flex items-center justify-center relative overflow-hidden">
                 {a.image_url ? (
                   <img src={resolveApiUrl(a.image_url)} alt={a.name} className="w-full h-full object-cover" />
@@ -198,25 +376,40 @@ export default function AssetLibraryPage() {
                   <span className="material-symbols-outlined text-4xl text-primary/30">{guessIcon(a.name)}</span>
                 )}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all" />
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(a.id) }}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 size-7 rounded-full bg-white/90 flex items-center justify-center text-red-500 hover:bg-red-50 transition-all shadow"
-                >
-                  <span className="material-symbols-outlined text-sm">delete</span>
-                </button>
+                {!selectMode && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDelete(a.id) }}
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 size-7 rounded-full bg-white/90 flex items-center justify-center text-red-500 hover:bg-red-50 transition-all shadow"
+                  >
+                    <span className="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                )}
               </div>
               <div className="p-3">
                 <p className="text-xs font-semibold text-[#2d2926] truncate">{a.character_name || a.name}</p>
                 <p className="text-[10px] text-warm-muted mt-1">
                   {formatSize(a.file_size)} · {timeAgo(a.created_at)}
                 </p>
-                {a.style_keywords && a.style_keywords.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-1.5">
-                    {a.style_keywords.slice(0, 2).map((kw) => (
-                      <span key={kw} className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">{kw}</span>
-                    ))}
-                  </div>
-                )}
+                {(() => {
+                  const allTags = [
+                    ...(a.style_keywords || []).map(t => ({ tag: t, type: 'style' as const })),
+                    ...(a.custom_tags || [])
+                      .filter(t => !(a.style_keywords || []).includes(t))
+                      .map(t => ({ tag: t, type: 'custom' as const })),
+                  ]
+                  return allTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {allTags.slice(0, 3).map(({ tag, type }) => (
+                        <span key={tag} className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                          type === 'custom' ? 'bg-amber-100 text-amber-700' : 'bg-primary/10 text-primary'
+                        }`}>{tag}</span>
+                      ))}
+                      {allTags.length > 3 && (
+                        <span className="text-[9px] text-warm-muted">+{allTags.length - 3}</span>
+                      )}
+                    </div>
+                  )
+                })()}
               </div>
             </div>
           ))}
@@ -226,6 +419,21 @@ export default function AssetLibraryPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#e5ddd3] text-xs text-warm-muted">
+                {selectMode && (
+                  <th className="px-4 py-3 w-10">
+                    <button onClick={toggleSelectAll}>
+                      <div className={`size-5 rounded border-2 flex items-center justify-center transition-all ${
+                        selectedIds.size === assets.length
+                          ? 'bg-primary border-primary text-white'
+                          : 'border-[#e5ddd3]'
+                      }`}>
+                        {selectedIds.size === assets.length && (
+                          <span className="material-symbols-outlined text-xs">check</span>
+                        )}
+                      </div>
+                    </button>
+                  </th>
+                )}
                 <th className="text-left px-6 py-3 font-medium">이름</th>
                 <th className="text-left px-6 py-3 font-medium">유형</th>
                 <th className="text-left px-6 py-3 font-medium">크기</th>
@@ -235,7 +443,26 @@ export default function AssetLibraryPage() {
             </thead>
             <tbody>
               {assets.map((a) => (
-                <tr key={a.id} className="border-b border-[#e5ddd3] last:border-0 hover:bg-[#f9f6f0] transition-colors">
+                <tr
+                  key={a.id}
+                  onClick={() => selectMode ? toggleSelect(a.id) : openTagEditor(a)}
+                  className={`border-b border-[#e5ddd3] last:border-0 hover:bg-[#f9f6f0] transition-colors cursor-pointer ${
+                    selectMode ? '' : ''
+                  } ${selectMode && selectedIds.has(a.id) ? 'bg-primary/5' : ''}`}
+                >
+                  {selectMode && (
+                    <td className="px-4 py-3">
+                      <div className={`size-5 rounded border-2 flex items-center justify-center transition-all ${
+                        selectedIds.has(a.id)
+                          ? 'bg-primary border-primary text-white'
+                          : 'border-[#e5ddd3]'
+                      }`}>
+                        {selectedIds.has(a.id) && (
+                          <span className="material-symbols-outlined text-xs">check</span>
+                        )}
+                      </div>
+                    </td>
+                  )}
                   <td className="px-6 py-3">
                     <div className="flex items-center gap-3">
                       <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
@@ -252,17 +479,110 @@ export default function AssetLibraryPage() {
                   <td className="px-6 py-3 text-sm text-warm-muted">{formatSize(a.file_size)}</td>
                   <td className="px-6 py-3 text-sm text-warm-muted">{timeAgo(a.created_at)}</td>
                   <td className="px-6 py-3 text-right">
-                    <button
-                      onClick={() => handleDelete(a.id)}
-                      className="text-warm-muted hover:text-red-500 transition-colors"
-                    >
-                      <span className="material-symbols-outlined text-lg">delete</span>
-                    </button>
+                    {!selectMode && (
+                      <button
+                        onClick={() => handleDelete(a.id)}
+                        className="text-warm-muted hover:text-red-500 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-lg">delete</span>
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+      {/* 태그 편집 모달 */}
+      {editingAsset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setEditingAsset(null)}>
+          <div
+            className="bg-white rounded-2xl border border-[#e5ddd3] w-full max-w-md p-6 space-y-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-[#2d2926]">태그 편집</h3>
+              <button onClick={() => setEditingAsset(null)} className="text-warm-muted hover:text-[#2d2926]">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* 에셋 정보 */}
+            <div className="flex items-center gap-3">
+              <div className="size-12 rounded-lg bg-[#f9f6f0] overflow-hidden border border-[#e5ddd3]">
+                {editingAsset.image_url ? (
+                  <img src={resolveApiUrl(editingAsset.image_url)} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="material-symbols-outlined text-primary/30">{guessIcon(editingAsset.name)}</span>
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-[#2d2926]">{editingAsset.character_name || editingAsset.name}</p>
+                <p className="text-xs text-warm-muted">{formatSize(editingAsset.file_size)}</p>
+              </div>
+            </div>
+
+            {/* 현재 태그 */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-[#2d2926]">커스텀 태그</label>
+              {editTags.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {editTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full"
+                    >
+                      {tag}
+                      <button onClick={() => removeTag(tag)} className="hover:text-red-500 transition-colors">
+                        <span className="material-symbols-outlined text-xs">close</span>
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-warm-muted">태그가 없습니다</p>
+              )}
+            </div>
+
+            {/* 태그 입력 */}
+            <div className="flex items-center gap-2">
+              <input
+                className="flex-1 bg-[#f9f6f0] rounded-lg px-3 py-2 text-sm border border-[#e5ddd3] outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="태그 입력 후 Enter"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+              />
+              <button
+                onClick={addTag}
+                disabled={!tagInput.trim()}
+                className="bg-[#f9f6f0] border border-[#e5ddd3] text-sm font-medium px-3 py-2 rounded-lg hover:bg-primary/10 disabled:opacity-40 transition-all"
+              >
+                추가
+              </button>
+            </div>
+
+            {/* 저장/취소 */}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setEditingAsset(null)}
+                className="text-sm text-warm-muted hover:text-[#2d2926] px-4 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+              >
+                취소
+              </button>
+              <button
+                onClick={saveTags}
+                disabled={savingTags}
+                className="bg-primary hover:bg-[#58717c] disabled:opacity-50 text-white text-sm font-bold px-5 py-2 rounded-lg transition-all flex items-center gap-1.5"
+              >
+                {savingTags && <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>}
+                저장
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

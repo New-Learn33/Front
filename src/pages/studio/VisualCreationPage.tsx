@@ -26,6 +26,18 @@ export default function VisualCreationPage() {
     handleGenerate, handleRenderVideo, handleSelectThumbnail,
   } = useGeneration()
 
+  // 생성 중 브라우저 닫기 경고
+  useEffect(() => {
+    const isWorking = loading || videoLoading
+    if (!isWorking) return
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [loading, videoLoading])
+
   // 프리셋 상태
   const [presets, setPresets] = useState<Preset[]>([])
   const [showPresetSave, setShowPresetSave] = useState(false)
@@ -39,7 +51,7 @@ export default function VisualCreationPage() {
     }).catch(() => {})
   }, [])
 
-  // 프리셋 저장
+  // 프리셋 저장 (상세설정 포함)
   const handleSavePreset = async () => {
     if (!presetName.trim() || !prompt.trim()) return
     try {
@@ -47,6 +59,10 @@ export default function VisualCreationPage() {
         name: presetName.trim(),
         prompt: prompt.trim(),
         category_id: selectedCategory,
+        art_style: artStyle,
+        genre,
+        image_quality: imageQuality,
+        motion_intensity: motionIntensity,
       })
       if (res.data.success) {
         setPresets((prev) => [res.data.data, ...prev])
@@ -56,10 +72,14 @@ export default function VisualCreationPage() {
     } catch {}
   }
 
-  // 프리셋 불러오기
+  // 프리셋 불러오기 (상세설정 포함)
   const handleLoadPreset = (preset: Preset) => {
     setPrompt(preset.prompt)
     setSelectedCategory(preset.category_id)
+    if (preset.art_style) setArtStyle(preset.art_style)
+    if (preset.genre) setGenre(preset.genre)
+    if (preset.image_quality) setImageQuality(preset.image_quality)
+    if (preset.motion_intensity) setMotionIntensity(preset.motion_intensity)
     setShowPresets(false)
   }
 
@@ -179,12 +199,25 @@ export default function VisualCreationPage() {
                   >
                     <button
                       onClick={() => handleLoadPreset(preset)}
-                      className="flex-1 text-left"
+                      className="flex-1 text-left min-w-0"
                     >
                       <p className="text-sm font-medium text-[#2d2926]">{preset.name}</p>
                       <p className="text-xs text-warm-muted truncate">{preset.prompt}</p>
+                      {(preset.art_style || preset.genre) && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {preset.art_style && (
+                            <span className="text-[10px] bg-[#f2ece1] text-warm-grey px-1.5 py-0.5 rounded">{preset.art_style}</span>
+                          )}
+                          {preset.genre && preset.genre !== 'auto' && (
+                            <span className="text-[10px] bg-[#f2ece1] text-warm-grey px-1.5 py-0.5 rounded">{preset.genre}</span>
+                          )}
+                          {preset.image_quality && preset.image_quality !== 'medium' && (
+                            <span className="text-[10px] bg-[#f2ece1] text-warm-grey px-1.5 py-0.5 rounded">퀄리티: {preset.image_quality}</span>
+                          )}
+                        </div>
+                      )}
                     </button>
-                    <div className="flex items-center gap-1 ml-2">
+                    <div className="flex items-center gap-1 ml-2 shrink-0">
                       <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                         {categories.find(c => c.id === preset.category_id)?.label}
                       </span>

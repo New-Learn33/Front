@@ -44,6 +44,11 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<UserProject[]>([])
   const [loading, setLoading] = useState(true)
 
+  // 선택 모드
+  const [selectMode, setSelectMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+
   useEffect(() => {
     async function fetch() {
       setLoading(true)
@@ -73,6 +78,70 @@ export default function ProjectsPage() {
     }
   }
 
+  const handleDelete = async (jobId: number) => {
+    if (!confirm('이 프로젝트를 삭제하시겠습니까?')) return
+    try {
+      const res = await userApi.cancelProject(jobId)
+      if (res.data.success) {
+        setProjects(prev => prev.filter(p => p.id !== jobId))
+      }
+    } catch {
+      alert('삭제에 실패했습니다.')
+    }
+  }
+
+  // 선택 토글
+  const toggleSelect = (key: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(filtered.map(p => `${p.type}-${p.id}`)))
+    }
+  }
+
+  const exitSelectMode = () => {
+    setSelectMode(false)
+    setSelectedIds(new Set())
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return
+    if (!confirm(`선택한 ${selectedIds.size}개의 프로젝트를 삭제하시겠습니까?`)) return
+
+    setBulkDeleting(true)
+    const failed: string[] = []
+
+    for (const key of selectedIds) {
+      const id = Number(key.split('-')[1])
+      try {
+        await userApi.cancelProject(id)
+      } catch {
+        failed.push(key)
+      }
+    }
+
+    setProjects(prev => prev.filter(p => {
+      const key = `${p.type}-${p.id}`
+      return failed.includes(key) || !selectedIds.has(key)
+    }))
+    setSelectedIds(new Set())
+    setBulkDeleting(false)
+
+    if (failed.length > 0) {
+      alert(`${selectedIds.size - failed.length}개 삭제 완료, ${failed.length}개 실패`)
+    }
+    exitSelectMode()
+  }
+
   const filtered = projects.filter((p) => {
     return matchFilter(p, activeFilter) && p.title.toLowerCase().includes(search.toLowerCase())
   })
@@ -82,11 +151,52 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="animate-enter">
-        <h1 className="text-2xl font-bold text-[#2d2926]">프로젝트 목록</h1>
-        <p className="text-warm-muted text-sm mt-1">
-          총 {projects.length}개의 작업 · 완료 {completedCount} · 진행중 {inProgressCount}
-        </p>
+      <div className="flex items-center justify-between animate-enter">
+        <div>
+          <h1 className="text-2xl font-bold text-[#2d2926]">프로젝트 목록</h1>
+          <p className="text-warm-muted text-sm mt-1">
+            총 {projects.length}개의 작업 · 완료 {completedCount} · 진행중 {inProgressCount}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {!selectMode ? (
+            <button
+              onClick={() => setSelectMode(true)}
+              disabled={projects.length === 0}
+              className="bg-white border border-[#e5ddd3] text-warm-muted hover:text-[#2d2926] hover:bg-[#f9f6f0] disabled:opacity-40 text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all"
+            >
+              <span className="material-symbols-outlined text-lg">checklist</span>
+              선택
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleSelectAll}
+                className="bg-white border border-[#e5ddd3] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+              >
+                {selectedIds.size === filtered.length ? '전체 해제' : '전체 선택'}
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={selectedIds.size === 0 || bulkDeleting}
+                className="bg-red-500 hover:bg-red-600 disabled:opacity-40 text-white text-sm font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all"
+              >
+                {bulkDeleting ? (
+                  <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                ) : (
+                  <span className="material-symbols-outlined text-sm">delete</span>
+                )}
+                {selectedIds.size > 0 ? `${selectedIds.size}개 삭제` : '삭제'}
+              </button>
+              <button
+                onClick={exitSelectMode}
+                className="text-warm-muted hover:text-[#2d2926] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+              >
+                취소
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Filter & Search */}
@@ -144,17 +254,51 @@ export default function ProjectsPage() {
           {filtered.map((p) => {
             const st = statusLabel(p.status)
             const isCompleted = p.status === 'completed'
-            const Wrapper = isCompleted ? Link : 'div'
-            const wrapperProps = isCompleted
+            const key = `${p.type}-${p.id}`
+            const isSelected = selectedIds.has(key)
+
+            // 선택 모드에서는 Link 대신 div 사용
+            const Wrapper = (!selectMode && isCompleted) ? Link : 'div'
+            const wrapperProps = (!selectMode && isCompleted)
               ? { to: `/video/${p.id}`, state: { video: p } }
               : {}
 
             return (
               <Wrapper
-                key={`${p.type}-${p.id}`}
+                key={key}
                 {...(wrapperProps as any)}
-                className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden group cursor-pointer card-hover block"
+                onClick={() => selectMode && toggleSelect(key)}
+                className={`bg-white rounded-2xl border overflow-hidden group cursor-pointer card-hover block relative transition-all ${
+                  selectMode && isSelected
+                    ? 'border-primary ring-2 ring-primary/20'
+                    : 'border-[#e5ddd3]'
+                }`}
               >
+                {/* 선택 체크박스 */}
+                {selectMode && (
+                  <div className="absolute top-3 left-3 z-10">
+                    <div className={`size-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                      isSelected
+                        ? 'bg-primary border-primary text-white'
+                        : 'bg-white/90 border-[#e5ddd3]'
+                    }`}>
+                      {isSelected && (
+                        <span className="material-symbols-outlined text-sm">check</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 개별 삭제 버튼 (선택 모드 아닐 때, 완료 프로젝트) */}
+                {!selectMode && isCompleted && (
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(p.id) }}
+                    className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 size-7 rounded-full bg-white/90 flex items-center justify-center text-red-500 hover:bg-red-50 transition-all shadow"
+                  >
+                    <span className="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                )}
+
                 <div className="aspect-video bg-[#f9f6f0] flex items-center justify-center relative overflow-hidden">
                   {p.thumbnail_url ? (
                     <img
@@ -167,7 +311,7 @@ export default function ProjectsPage() {
                       {isCompleted ? 'movie' : 'hourglass_top'}
                     </span>
                   )}
-                  {isCompleted && (
+                  {!selectMode && isCompleted && (
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
                       <span className="material-symbols-outlined text-white text-3xl opacity-0 group-hover:opacity-100 transition-all">
                         play_circle
@@ -211,7 +355,7 @@ export default function ProjectsPage() {
                       </span>
                     </div>
                   )}
-                  {!isCompleted && (
+                  {!isCompleted && !selectMode && (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-xs text-amber-600">
                         <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
@@ -224,6 +368,12 @@ export default function ProjectsPage() {
                         <span className="material-symbols-outlined text-sm">cancel</span>
                         취소
                       </button>
+                    </div>
+                  )}
+                  {!isCompleted && selectMode && (
+                    <div className="flex items-center gap-2 text-xs text-amber-600">
+                      <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                      {p.status === 'processing' ? `생성 중 (${p.progress || 0}%)` : '대기 중...'}
                     </div>
                   )}
                 </div>

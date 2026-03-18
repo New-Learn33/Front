@@ -61,7 +61,25 @@ export default function HomePage() {
     }
   }, [activeSort, searchQuery])
 
-  const topVideos = useMemo(() => videos.slice(0, 4), [videos])
+  const [rankPeriod, setRankPeriod] = useState<'daily' | 'weekly' | 'monthly'>('weekly')
+
+  const topVideos = useMemo(() => {
+    const now = new Date()
+    let cutoff: Date
+    if (rankPeriod === 'daily') {
+      cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    } else if (rankPeriod === 'weekly') {
+      cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    } else {
+      cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    }
+
+    return videos
+      .filter(v => v.created_at ? new Date(v.created_at) >= cutoff : true)
+      .sort((a, b) => (b.like_count + (b.view_count || 0)) - (a.like_count + (a.view_count || 0)))
+      .slice(0, 5)
+  }, [videos, rankPeriod])
+
   const [hoveredVideo, setHoveredVideo] = useState<VideoListItem | null>(null)
   const heroVideo = hoveredVideo || topVideos[0]
   const visibleVideos = useMemo(() => videos.slice(0, visibleCount), [videos, visibleCount])
@@ -158,18 +176,26 @@ export default function HomePage() {
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p className="text-xs tracking-[0.12em] text-slate-400">영상</p>
-                    <p className="mt-2 text-xl font-bold">{stats.videos}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p className="text-xs tracking-[0.12em] text-slate-400">좋아요</p>
-                    <p className="mt-2 text-xl font-bold">{stats.likes}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p className="text-xs tracking-[0.12em] text-slate-400">댓글</p>
-                    <p className="mt-2 text-xl font-bold">{stats.comments}</p>
-                  </div>
+                  {(() => {
+                    const v = heroVideo
+                    if (!v) return null
+                    return (
+                      <>
+                        <div className={`rounded-2xl border p-4 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-xs tracking-[0.12em] text-slate-400">조회수</p>
+                          <p className="mt-2 text-xl font-bold">{formatCount(v.view_count)}</p>
+                        </div>
+                        <div className={`rounded-2xl border p-4 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-xs tracking-[0.12em] text-slate-400">좋아요</p>
+                          <p className="mt-2 text-xl font-bold">{formatCount(v.like_count)}</p>
+                        </div>
+                        <div className={`rounded-2xl border p-4 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-xs tracking-[0.12em] text-slate-400">댓글</p>
+                          <p className="mt-2 text-xl font-bold">{formatCount(v.comment_count)}</p>
+                        </div>
+                      </>
+                    )
+                  })()}
                 </div>
               </div>
 
@@ -206,12 +232,32 @@ export default function HomePage() {
           </div>
 
           <div className="rounded-[28px] border border-white/10 bg-[#101a30] p-6 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.45)]">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold tracking-[0.14em] text-primary">인기 순위</p>
-                <h3 className="mt-2 text-2xl font-black tracking-tight text-white">인기 영상</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.14em] text-primary">인기 순위</p>
+                  <h3 className="mt-2 text-2xl font-black tracking-tight text-white">인기 영상</h3>
+                </div>
               </div>
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">실시간 목록</span>
+              <div className="flex items-center gap-1.5 rounded-xl bg-white/5 p-1">
+                {([
+                  { key: 'daily' as const, label: '일간' },
+                  { key: 'weekly' as const, label: '주간' },
+                  { key: 'monthly' as const, label: '월간' },
+                ]).map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setRankPeriod(key)}
+                    className={`flex-1 rounded-lg py-2 text-xs font-bold transition-all ${
+                      rankPeriod === key
+                        ? 'bg-primary text-white shadow'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="mt-5 space-y-3">
               {topVideos.map((video, index) => (
