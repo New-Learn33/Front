@@ -88,7 +88,7 @@ export default function VisualCreationPage() {
       {/* Left Panel */}
       <div className="flex-1 min-w-0 space-y-6">
         <div className="space-y-3 animate-enter">
-          <h1 className="text-2xl font-bold text-[#2d2926]">영상 생성하기</h1>
+          <h1 className="text-2xl font-bold text-[#2d2926]">새 프로젝트 생성</h1>
           <p className="text-warm-muted text-sm">원하는 장면을 설명해 주세요. AI가 6컷 만화를 만들어 드립니다.</p>
         </div>
 
@@ -634,7 +634,7 @@ export default function VisualCreationPage() {
           ) : (
             <>
               <span className="material-symbols-outlined">movie</span>
-              영상 생성하기
+              새 프로젝트 생성
             </>
           )}
         </button>

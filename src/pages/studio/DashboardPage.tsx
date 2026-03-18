@@ -98,7 +98,7 @@ export default function DashboardPage() {
             <span className="material-symbols-outlined text-2xl">auto_awesome</span>
           </div>
           <div>
-            <p className="font-bold">영상 생성하기</p>
+            <p className="font-bold">새 프로젝트 생성</p>
             <p className="text-sm text-white/70">AI로 영상을 생성하세요</p>
           </div>
         </Link>
@@ -141,7 +141,7 @@ export default function DashboardPage() {
             <span className="material-symbols-outlined text-4xl mb-2">movie</span>
             <p className="text-sm">아직 생성한 영상이 없습니다</p>
             <Link to="/studio/create" className="mt-3 text-sm text-primary font-medium hover:underline">
-              영상 생성하기 →
+              새 프로젝트 생성 →
             </Link>
           </div>
         ) : (

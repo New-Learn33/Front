@@ -14,8 +14,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { to: '/studio/create', icon: 'auto_awesome', label: '영상 생성하기' },
-  { to: '/studio/projects', icon: 'folder_open', label: '작업 목록' },
+  { to: '/studio/create', icon: 'auto_awesome', label: '새 프로젝트 생성' },
+  { to: '/studio/projects', icon: 'folder_open', label: '프로젝트 목록' },
   { to: '/studio/assets', icon: 'perm_media', label: '내 자료함' },
   { to: '/studio/mypage', icon: 'person', label: '마이페이지' },
   { to: '/studio/settings', icon: 'settings', label: '환경설정' },
