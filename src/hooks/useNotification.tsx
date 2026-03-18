@@ -84,9 +84,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         if (data.type === 'notification') {
           if (data.event === 'connected') {
             setUnreadCount(data.unread_count ?? 0)
-          } else if (data.event === 'new_notification') {
+          } else if (data.event === 'created' || data.event === 'new_notification') {
             setNotifications(prev => [data.notification, ...prev])
-            setUnreadCount(prev => prev + 1)
+            if (data.unread_count != null) {
+              setUnreadCount(data.unread_count)
+            } else {
+              setUnreadCount(prev => prev + 1)
+            }
           }
         }
 

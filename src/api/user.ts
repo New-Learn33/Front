@@ -71,4 +71,8 @@ export const userApi = {
   // 내 작업 목록 (완료 영상 + 진행중 작업)
   getMyProjects: () =>
     api.get<{ success: boolean; data: { projects: UserProject[] } }>('/api/v1/users/me/projects'),
+
+  // 작업 취소
+  cancelProject: (jobId: number) =>
+    api.delete<{ success: boolean }>(`/api/v1/users/me/projects/${jobId}`),
 }

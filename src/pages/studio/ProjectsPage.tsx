@@ -61,6 +61,18 @@ export default function ProjectsPage() {
     fetch()
   }, [])
 
+  const handleCancel = async (jobId: number) => {
+    if (!confirm('이 작업을 취소하시겠습니까?')) return
+    try {
+      const res = await userApi.cancelProject(jobId)
+      if (res.data.success) {
+        setProjects(prev => prev.filter(p => !(p.type === 'job' && p.id === jobId)))
+      }
+    } catch {
+      alert('작업 취소에 실패했습니다.')
+    }
+  }
+
   const filtered = projects.filter((p) => {
     return matchFilter(p, activeFilter) && p.title.toLowerCase().includes(search.toLowerCase())
   })
@@ -200,9 +212,18 @@ export default function ProjectsPage() {
                     </div>
                   )}
                   {!isCompleted && (
-                    <div className="flex items-center gap-2 text-xs text-amber-600">
-                      <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-                      {p.status === 'processing' ? `생성 중 (${p.progress || 0}%)` : '대기 중...'}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs text-amber-600">
+                        <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                        {p.status === 'processing' ? `생성 중 (${p.progress || 0}%)` : '대기 중...'}
+                      </div>
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCancel(p.id) }}
+                        className="text-xs text-warm-muted hover:text-red-500 transition-colors flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-sm">cancel</span>
+                        취소
+                      </button>
                     </div>
                   )}
                 </div>
