@@ -95,7 +95,8 @@ export default function MyPage() {
           parsed.nickname = nickname.trim()
           localStorage.setItem('user', JSON.stringify(parsed))
         }
-        window.location.reload()
+        // 전체 페이지 리로드를 하면 배포 환경에서 /studio/mypage 404가 날 수 있어
+        // 로컬 상태/스토리지 갱신만으로 화면을 유지한다.
       }
     } catch (err) {
       console.error('닉네임 수정 실패:', err)
@@ -179,7 +180,7 @@ export default function MyPage() {
               ) : (
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-[#2d2926]">
-                    {user?.nickname || '익명의 참가자'}
+                    {nickname || user?.nickname || '익명의 참가자'}
                   </h2>
                   <button
                     onClick={() => { setNickname(user?.nickname || ''); setIsEditingNickname(true) }}
