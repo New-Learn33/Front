@@ -94,7 +94,7 @@ export default function HomePage() {
               </div>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link className="text-sm font-semibold text-primary" to="/">탐색</Link>
+              <Link className="text-sm font-semibold text-primary" to="/">홈</Link>
               <Link className="text-sm font-medium text-slate-400 transition-colors hover:text-primary" to="/studio">스튜디오</Link>
             </nav>
           </div>
@@ -135,11 +135,8 @@ export default function HomePage() {
                   <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-primary">
                     쇼케이스
                   </span>
-                  <h1 className="max-w-[520px] break-keep text-[36px] font-black leading-[1.08] tracking-tight sm:text-[44px] xl:text-[52px]">
-                    영상으로
-                    <br />
-                    바로 둘러보는
-                    <span className="block text-primary">SceneFlow 쇼케이스</span>
+                  <h1 className="max-w-[520px] break-keep text-[30px] font-black leading-[1.12] tracking-tight sm:text-[36px] lg:text-[40px] xl:text-[44px]">
+                    SceneFlow, <span className="text-primary">영상으로 한눈에</span>
                   </h1>
                 </div>
 
@@ -387,12 +384,7 @@ export default function HomePage() {
             <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-xl bg-primary p-1.5 object-contain" />
             <div>
               <p className="font-bold text-[#2d2926] dark:text-white">SceneFlow</p>
-              <p className="text-sm text-slate-400">AI 비디오 쇼케이스</p>
             </div>
-          </div>
-          <div className="flex gap-8 text-sm text-slate-400">
-            <Link className="transition-colors hover:text-primary" to="/terms">이용약관</Link>
-            <Link className="transition-colors hover:text-primary" to="/privacy">개인정보처리방침</Link>
           </div>
           <p className="text-sm text-slate-400">© 2026 SceneFlow. All rights reserved.</p>
         </div>

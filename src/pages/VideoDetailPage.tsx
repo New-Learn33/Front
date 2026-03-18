@@ -224,7 +224,7 @@ export default function VideoDetailPage() {
               </div>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link className="text-sm font-semibold text-primary" to="/">탐색</Link>
+              <Link className="text-sm font-semibold text-primary" to="/">홈</Link>
               <Link className="text-sm font-medium text-slate-400 transition-colors hover:text-primary" to="/studio">스튜디오</Link>
             </nav>
           </div>
@@ -469,10 +469,6 @@ export default function VideoDetailPage() {
           <div className="flex items-center gap-3">
             <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
             <span className="font-bold text-[#2d2926]">SceneFlow</span>
-          </div>
-          <div className="flex gap-8 text-sm text-[#5e5452]">
-            <Link className="hover:text-primary transition-colors" to="/terms">이용약관</Link>
-            <Link className="hover:text-primary transition-colors" to="/privacy">개인정보처리방침</Link>
           </div>
           <p className="text-sm text-warm-muted">© 2026 SceneFlow. All rights reserved.</p>
         </div>
