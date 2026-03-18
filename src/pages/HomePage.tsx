@@ -85,16 +85,6 @@ export default function HomePage() {
   const visibleVideos = useMemo(() => videos.slice(0, visibleCount), [videos, visibleCount])
   const hasMore = visibleCount < videos.length
 
-  const stats = useMemo(() => {
-    const likes = videos.reduce((sum, video) => sum + video.like_count, 0)
-    const comments = videos.reduce((sum, video) => sum + video.comment_count, 0)
-
-    return {
-      videos: videos.length,
-      likes: formatCount(likes),
-      comments: formatCount(comments),
-    }
-  }, [videos])
 
   return (
     <div className="min-h-screen bg-[#f2ece1] text-slate-900 dark:bg-[#09111f] font-display dark:text-slate-100 antialiased">
@@ -183,7 +173,7 @@ export default function HomePage() {
                       <>
                         <div className={`rounded-2xl border p-4 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
                           <p className="text-xs tracking-[0.12em] text-slate-400">조회수</p>
-                          <p className="mt-2 text-xl font-bold">{formatCount(v.view_count)}</p>
+                          <p className="mt-2 text-xl font-bold">{formatCount(v.view_count ?? 0)}</p>
                         </div>
                         <div className={`rounded-2xl border p-4 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
                           <p className="text-xs tracking-[0.12em] text-slate-400">좋아요</p>
