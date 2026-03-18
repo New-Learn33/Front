@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useNotification } from '@/hooks/useNotification'
 
 const routeLabels: Record<string, string> = {
-  '/studio': '대시보드',
+  '/studio': '영상 생성하기',
   '/studio/projects': '작업 목록',
   '/studio/create': '영상 생성하기',
   '/studio/assets': '내 자료함',
@@ -68,7 +68,7 @@ export default function StudioHeader() {
   return (
     <header className="h-16 bg-[#f2ece1] border-b border-[#e5ddd3] dark:border-b-0 flex items-center justify-between px-8">
       <div className="flex items-center gap-2 text-sm">
-        <span className="text-warm-muted">스튜디오</span>
+        <span className="text-warm-muted">작업실</span>
         <span className="text-warm-muted">/</span>
         <span className="font-semibold text-[#2d2926]">{label}</span>
       </div>
