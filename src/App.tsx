@@ -5,7 +5,6 @@ import SignupPage from './pages/SignupPage'
 import LoginPage from './pages/LoginPage'
 import VideoDetailPage from './pages/VideoDetailPage'
 import StudioLayout from './components/studio/StudioLayout'
-import DashboardPage from './pages/studio/DashboardPage'
 import ProjectsPage from './pages/studio/ProjectsPage'
 import VisualCreationPage from './pages/studio/VisualCreationPage'
 import AssetLibraryPage from './pages/studio/AssetLibraryPage'
@@ -48,7 +47,7 @@ function App() {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/studio" element={<RequireAuth><StudioLayout /></RequireAuth>}>
-              <Route index element={<DashboardPage />} />
+              <Route index element={<Navigate to="create" replace />} />
               <Route path="projects" element={<ProjectsPage />} />
               <Route path="create" element={<VisualCreationPage />} />
               <Route path="assets" element={<AssetLibraryPage />} />

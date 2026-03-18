@@ -6,8 +6,14 @@ import type { User } from '@/types/auth'
 
 const STORAGE_LIMIT = 3 * 1024 * 1024 * 1024 // 3GB
 
-const navItems = [
-  { to: '/studio', icon: 'dashboard', label: '대시보드', end: true },
+interface NavItem {
+  to: string
+  icon: string
+  label: string
+  end?: boolean
+}
+
+const navItems: NavItem[] = [
   { to: '/studio/create', icon: 'auto_awesome', label: '영상 생성하기' },
   { to: '/studio/projects', icon: 'folder_open', label: '작업 목록' },
   { to: '/studio/assets', icon: 'perm_media', label: '내 자료함' },
