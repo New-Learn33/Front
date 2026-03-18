@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { assetsApi } from '@/api/assets'
 import type { Asset } from '@/types/asset'
+import { resolveApiUrl } from '@/config/env'
 
 const categories = [
   { id: null, label: '전체' },
@@ -192,7 +193,7 @@ export default function AssetLibraryPage() {
             >
               <div className="aspect-square bg-[#f9f6f0] flex items-center justify-center relative overflow-hidden">
                 {a.image_url ? (
-                  <img src={a.image_url} alt={a.name} className="w-full h-full object-cover" />
+                  <img src={resolveApiUrl(a.image_url)} alt={a.name} className="w-full h-full object-cover" />
                 ) : (
                   <span className="material-symbols-outlined text-4xl text-primary/30">{guessIcon(a.name)}</span>
                 )}
@@ -239,7 +240,7 @@ export default function AssetLibraryPage() {
                     <div className="flex items-center gap-3">
                       <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
                         {a.image_url ? (
-                          <img src={a.image_url} alt="" className="w-full h-full object-cover" />
+                          <img src={resolveApiUrl(a.image_url)} alt="" className="w-full h-full object-cover" />
                         ) : (
                           <span className="material-symbols-outlined text-primary text-sm">{guessIcon(a.name)}</span>
                         )}
