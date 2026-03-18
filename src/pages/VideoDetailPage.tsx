@@ -206,7 +206,7 @@ export default function VideoDetailPage() {
 
   const handleDeleteVideo = async () => {
     try {
-      const res = await api.delete<{ success: boolean }>(`/api/v1/users/me/projects/${numericId}`)
+      const res = await api.delete<{ success: boolean }>(`/api/v1/videos/${numericId}`)
       if (res.data.success) {
         navigate('/', { replace: true })
       }
@@ -526,6 +526,10 @@ export default function VideoDetailPage() {
                     <h4 className="font-bold text-sm text-[#2d2926] truncate group-hover:text-primary transition-colors">{rv.title}</h4>
                     <p className="text-xs text-warm-muted mt-1">{rv.creator_nickname || rv.creator}</p>
                     <div className="flex items-center gap-3 mt-2 text-warm-muted">
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">visibility</span>
+                        <span className="text-xs">{formatCount(rv.view_count ?? 0)}</span>
+                      </span>
                       <span className="flex items-center gap-1">
                         <span className="material-symbols-outlined text-xs">favorite</span>
                         <span className="text-xs">{formatCount(rv.like_count || 0)}</span>
