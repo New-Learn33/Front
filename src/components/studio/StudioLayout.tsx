@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import StudioSidebar from './StudioSidebar'
 import StudioHeader from './StudioHeader'
 import aiVidLogo from '@/assets/AI_vid_logo.png'
