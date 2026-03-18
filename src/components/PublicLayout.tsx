@@ -60,10 +60,6 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
             <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
             <span className="font-bold text-white">SceneFlow</span>
           </div>
-          <div className="flex gap-8 text-sm text-slate-400">
-            <Link className="hover:text-primary transition-colors" to="/terms">이용약관</Link>
-            <Link className="hover:text-primary transition-colors" to="/privacy">개인정보처리방침</Link>
-          </div>
           <p className="text-sm text-slate-400">&copy; 2026 SceneFlow. All rights reserved.</p>
         </div>
       </footer>
