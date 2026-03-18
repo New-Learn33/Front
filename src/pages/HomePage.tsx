@@ -140,17 +140,17 @@ export default function HomePage() {
                   </h1>
                 </div>
 
-                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                   <Link
                     to={isLoggedIn ? '/studio/create' : '/signup'}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-7 py-5 text-base font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto"
                   >
-                    <span className="material-symbols-outlined text-lg">auto_awesome</span>
+                    <span className="material-symbols-outlined text-xl">auto_awesome</span>
                     새 프로젝트 생성
                   </Link>
                   <a
                     href="#showcase"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10 sm:w-auto"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 bg-transparent px-5 py-3.5 text-sm font-bold text-white/85 transition-colors hover:bg-white/5 hover:text-white sm:w-auto"
                   >
                     <span className="material-symbols-outlined text-lg">south</span>
                     쇼케이스 보기
