@@ -7,9 +7,9 @@ export default function StudioLayout() {
   return (
     <div className="min-h-screen bg-[#f2ece1] font-display text-slate-900">
       <StudioSidebar />
-      <div className="ml-64">
+      <div className="ml-64 flex min-h-screen flex-col">
         <StudioHeader />
-        <main className="p-8">
+        <main className="flex-1 p-8">
           <Outlet />
         </main>
         <footer className="border-t border-[#e5ddd3] bg-[#f9f6f0]/30 px-6 py-12 lg:px-20 dark:border-white/10 dark:bg-[#0d1729]">
