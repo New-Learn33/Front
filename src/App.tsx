@@ -47,7 +47,7 @@ function App() {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/studio" element={<RequireAuth><StudioLayout /></RequireAuth>}>
-              <Route index element={<Navigate to="create" replace />} />
+              <Route index element={<Navigate to="projects" replace />} />
               <Route path="projects" element={<ProjectsPage />} />
               <Route path="create" element={<VisualCreationPage />} />
               <Route path="assets" element={<AssetLibraryPage />} />
