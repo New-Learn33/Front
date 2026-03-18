@@ -8,9 +8,9 @@ const STORAGE_LIMIT = 3 * 1024 * 1024 * 1024 // 3GB
 
 const navItems = [
   { to: '/studio', icon: 'dashboard', label: '대시보드', end: true },
-  { to: '/studio/projects', icon: 'folder_open', label: '프로젝트' },
-  { to: '/studio/create', icon: 'auto_awesome', label: '비주얼 생성' },
-  { to: '/studio/assets', icon: 'perm_media', label: '에셋 라이브러리' },
+  { to: '/studio/create', icon: 'auto_awesome', label: '영상 생성하기' },
+  { to: '/studio/projects', icon: 'folder_open', label: '작업 목록' },
+  { to: '/studio/assets', icon: 'perm_media', label: '내 자료함' },
   { to: '/studio/mypage', icon: 'person', label: '마이페이지' },
   { to: '/studio/settings', icon: 'settings', label: '환경설정' },
 ]
@@ -40,7 +40,7 @@ export default function StudioSidebar() {
       {/* Logo */}
       <div className="px-6 h-16 flex items-center gap-3 border-b border-white/10">
         <Link to="/" className="flex items-center gap-3">
-          <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-md bg-primary/90 p-1 object-contain" />
+          <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-full bg-primary/90 p-1 object-contain" />
           <span className="text-base font-bold tracking-tight">SceneFlow</span>
         </Link>
       </div>

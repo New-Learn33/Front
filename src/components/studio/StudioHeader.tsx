@@ -4,9 +4,9 @@ import { useNotification } from '@/hooks/useNotification'
 
 const routeLabels: Record<string, string> = {
   '/studio': '대시보드',
-  '/studio/projects': '프로젝트',
-  '/studio/create': '비주얼 생성',
-  '/studio/assets': '에셋 라이브러리',
+  '/studio/projects': '작업 목록',
+  '/studio/create': '영상 생성하기',
+  '/studio/assets': '내 자료함',
   '/studio/settings': '환경설정',
 }
 
@@ -137,9 +137,6 @@ export default function StudioHeader() {
           )}
         </div>
 
-        <button className="size-9 rounded-lg bg-white border border-[#e5ddd3] flex items-center justify-center text-warm-muted hover:text-primary transition-colors">
-          <span className="material-symbols-outlined text-xl">help</span>
-        </button>
       </div>
     </header>
   )

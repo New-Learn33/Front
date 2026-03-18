@@ -256,7 +256,7 @@ export default function HomePage() {
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/20 bg-white/5 px-6 py-3 text-sm font-bold text-primary shadow-sm transition-colors hover:bg-primary/10"
               >
                 <span className="material-symbols-outlined">add</span>
-                새 영상 만들기
+                영상 생성하기
               </Link>
             )}
           </div>
@@ -383,7 +383,6 @@ export default function HomePage() {
           <div className="flex gap-8 text-sm text-slate-400">
             <Link className="transition-colors hover:text-primary" to="/terms">이용약관</Link>
             <Link className="transition-colors hover:text-primary" to="/privacy">개인정보처리방침</Link>
-            <Link className="transition-colors hover:text-primary" to="/support">고객센터</Link>
           </div>
           <p className="text-sm text-slate-400">© 2026 SceneFlow. All rights reserved.</p>
         </div>
