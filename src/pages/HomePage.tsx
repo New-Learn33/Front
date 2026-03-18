@@ -146,7 +146,7 @@ export default function HomePage() {
                     className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto"
                   >
                     <span className="material-symbols-outlined text-lg">auto_awesome</span>
-                    영상 생성하기
+                    새 프로젝트 생성
                   </Link>
                   <a
                     href="#showcase"
@@ -263,7 +263,7 @@ export default function HomePage() {
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/20 bg-white/5 px-6 py-3 text-sm font-bold text-primary shadow-sm transition-colors hover:bg-primary/10"
               >
                 <span className="material-symbols-outlined">add</span>
-                영상 생성하기
+                새 프로젝트 생성
               </Link>
             )}
           </div>

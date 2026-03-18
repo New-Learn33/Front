@@ -53,7 +53,7 @@ export default function ProjectsPage() {
           setProjects(res.data.data.projects)
         }
       } catch (err) {
-        console.error('작업 목록 조회 실패:', err)
+        console.error('프로젝트 목록 조회 실패:', err)
       } finally {
         setLoading(false)
       }
@@ -83,7 +83,7 @@ export default function ProjectsPage() {
   return (
     <div className="space-y-6">
       <div className="animate-enter">
-        <h1 className="text-2xl font-bold text-[#2d2926]">작업 목록</h1>
+        <h1 className="text-2xl font-bold text-[#2d2926]">프로젝트 목록</h1>
         <p className="text-warm-muted text-sm mt-1">
           총 {projects.length}개의 작업 · 완료 {completedCount} · 진행중 {inProgressCount}
         </p>
