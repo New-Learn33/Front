@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useNotification } from '@/hooks/useNotification'
 
 const routeLabels: Record<string, string> = {
-  '/studio': '새 프로젝트 생성',
+  '/studio': '프로젝트 목록',
   '/studio/projects': '프로젝트 목록',
   '/studio/create': '새 프로젝트 생성',
   '/studio/assets': '내 자료함',
