@@ -2,6 +2,7 @@ import api from './client'
 
 export interface VideoListItem {
   id: number
+  user_id?: number
   title: string
   category_id: number
   thumbnail_url: string

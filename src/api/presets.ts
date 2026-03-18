@@ -5,6 +5,10 @@ export interface Preset {
   name: string
   prompt: string
   category_id: number
+  art_style?: string
+  genre?: string
+  image_quality?: string
+  motion_intensity?: string
   created_at?: string
 }
 
@@ -20,13 +24,23 @@ interface PresetResponse {
   data: Preset
 }
 
+export interface PresetCreateData {
+  name: string
+  prompt: string
+  category_id: number
+  art_style?: string
+  genre?: string
+  image_quality?: string
+  motion_intensity?: string
+}
+
 export const presetsApi = {
   getAll: () => api.get<PresetsResponse>('/api/v1/presets'),
 
-  create: (data: { name: string; prompt: string; category_id: number }) =>
+  create: (data: PresetCreateData) =>
     api.post<PresetResponse>('/api/v1/presets', data),
 
-  update: (id: number, data: { name?: string; prompt?: string; category_id?: number }) =>
+  update: (id: number, data: Partial<PresetCreateData>) =>
     api.patch<PresetResponse>(`/api/v1/presets/${id}`, data),
 
   delete: (id: number) => api.delete(`/api/v1/presets/${id}`),

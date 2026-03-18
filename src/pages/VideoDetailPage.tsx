@@ -39,6 +39,12 @@ export default function VideoDetailPage() {
   const [commentInput, setCommentInput] = useState('')
   const [commentLoading, setCommentLoading] = useState(false)
 
+  // 수정/삭제
+  const [editMode, setEditMode] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
   const numericId = Number(id)
   const stateVideo = (location.state as RouteState | null)?.video
 
@@ -180,6 +186,35 @@ export default function VideoDetailPage() {
     }
   }
 
+  const isOwner = isLoggedIn && video?.user_id != null && user?.id === video.user_id
+
+  const handleEditTitle = async () => {
+    if (!editTitle.trim() || saving) return
+    setSaving(true)
+    try {
+      const res = await api.patch<{ success: boolean }>(`/api/v1/videos/${numericId}`, { title: editTitle.trim() })
+      if (res.data.success) {
+        setVideo(prev => prev ? { ...prev, title: editTitle.trim() } : prev)
+        setEditMode(false)
+      }
+    } catch {
+      alert('수정에 실패했습니다.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDeleteVideo = async () => {
+    try {
+      const res = await api.delete<{ success: boolean }>(`/api/v1/users/me/projects/${numericId}`)
+      if (res.data.success) {
+        navigate('/', { replace: true })
+      }
+    } catch {
+      alert('삭제에 실패했습니다.')
+    }
+  }
+
   if (loading) {
     return (
       <div className="bg-[#f2ece1] font-display text-[#2d2926] antialiased min-h-screen flex items-center justify-center">
@@ -293,7 +328,52 @@ export default function VideoDetailPage() {
 
             {/* Video Info */}
             <div className="space-y-6">
-              <h1 className="text-3xl md:text-4xl font-black text-[#2d2926] tracking-tight">{video.title}</h1>
+              {editMode ? (
+                <div className="flex items-center gap-3">
+                  <input
+                    className="flex-1 text-2xl md:text-3xl font-black text-[#2d2926] tracking-tight bg-white border border-[#e5ddd3] rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleEditTitle()}
+                    autoFocus
+                  />
+                  <button
+                    onClick={handleEditTitle}
+                    disabled={saving || !editTitle.trim()}
+                    className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-[#58717c] disabled:opacity-40 transition-all"
+                  >
+                    {saving ? '저장 중...' : '저장'}
+                  </button>
+                  <button
+                    onClick={() => setEditMode(false)}
+                    className="px-4 py-2 text-warm-muted text-sm font-medium rounded-xl hover:bg-[#f9f6f0] transition-all"
+                  >
+                    취소
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl md:text-4xl font-black text-[#2d2926] tracking-tight">{video.title}</h1>
+                  {isOwner && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => { setEditTitle(video.title); setEditMode(true) }}
+                        className="size-9 rounded-lg flex items-center justify-center text-warm-muted hover:text-primary hover:bg-primary/10 transition-all"
+                        title="제목 수정"
+                      >
+                        <span className="material-symbols-outlined text-lg">edit</span>
+                      </button>
+                      <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        className="size-9 rounded-lg flex items-center justify-center text-warm-muted hover:text-red-500 hover:bg-red-50 transition-all"
+                        title="삭제"
+                      >
+                        <span className="material-symbols-outlined text-lg">delete</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -462,6 +542,37 @@ export default function VideoDetailPage() {
           </div>
         </div>
       </main>
+
+      {/* 삭제 확인 모달 */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="bg-white rounded-2xl border border-[#e5ddd3] w-full max-w-sm p-6 space-y-4 shadow-xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-full bg-red-50 flex items-center justify-center">
+                <span className="material-symbols-outlined text-red-500">warning</span>
+              </div>
+              <h3 className="text-base font-bold text-[#2d2926]">영상 삭제</h3>
+            </div>
+            <p className="text-sm text-[#5e5452]">
+              이 영상을 삭제하시겠습니까? 삭제된 영상은 복구할 수 없습니다.
+            </p>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 text-sm font-medium text-warm-muted hover:text-[#2d2926] rounded-lg hover:bg-[#f9f6f0] transition-all"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDeleteVideo}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-lg transition-all"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="mt-20 border-t border-[#e5ddd3] bg-[#f9f6f0] px-6 lg:px-20 py-12">
