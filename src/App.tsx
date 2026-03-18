@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import HomePage from './pages/HomePage'
 import SignupPage from './pages/SignupPage'
@@ -18,8 +18,19 @@ import ThemeToggle from './components/ThemeToggle'
 import { ThemeProvider } from './hooks/useTheme'
 import { GenerationProvider } from './hooks/useGeneration'
 import { NotificationProvider } from './hooks/useNotification'
+import { useAuth } from './hooks/useAuth'
 
 import { GOOGLE_CLIENT_ID } from './config/env'
+
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn, isLoading } = useAuth()
+  const location = useLocation()
+
+  if (isLoading) return null
+  if (!isLoggedIn) return <Navigate to="/login" replace state={{ from: location.pathname }} />
+
+  return <>{children}</>
+}
 
 function App() {
   return (
@@ -36,7 +47,7 @@ function App() {
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/support" element={<SupportPage />} />
-            <Route path="/studio" element={<StudioLayout />}>
+            <Route path="/studio" element={<RequireAuth><StudioLayout /></RequireAuth>}>
               <Route index element={<DashboardPage />} />
               <Route path="projects" element={<ProjectsPage />} />
               <Route path="create" element={<VisualCreationPage />} />

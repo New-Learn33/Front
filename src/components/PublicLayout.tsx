@@ -25,7 +25,7 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link className={`text-sm transition-colors ${activeNav === 'home' ? 'font-semibold text-primary' : 'font-medium text-slate-400 hover:text-primary'}`} to="/">홈</Link>
-              <Link className="text-sm font-medium text-slate-400 transition-colors hover:text-primary" to="/studio">스튜디오</Link>
+              <Link className="text-sm font-medium text-slate-400 transition-colors hover:text-primary" to={isLoggedIn ? "/studio" : "/login"}>스튜디오</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
