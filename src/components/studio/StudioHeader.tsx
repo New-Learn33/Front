@@ -15,6 +15,7 @@ const notifIcon: Record<string, string> = {
   comment: 'chat_bubble',
   video_completed: 'check_circle',
   video_failed: 'error',
+  image_completed: 'brush',
 }
 
 const notifColor: Record<string, string> = {
@@ -22,6 +23,7 @@ const notifColor: Record<string, string> = {
   comment: 'text-blue-400',
   video_completed: 'text-green-500',
   video_failed: 'text-red-500',
+  image_completed: 'text-emerald-500',
 }
 
 export default function StudioHeader() {
