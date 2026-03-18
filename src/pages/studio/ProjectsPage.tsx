@@ -1,35 +1,80 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { userApi, type UserProject } from '../../api/user'
+import { resolveApiUrl } from '../../config/env'
 
-const projects = [
-  { id: 1, title: '브랜드 홍보 영상', style: '시네마틱', date: '2024.12.15', status: '완료', duration: '0:30', icon: 'movie' },
-  { id: 2, title: '제품 소개 릴스', style: '애니메이션', date: '2024.12.14', status: '완료', duration: '0:15', icon: 'animation' },
-  { id: 3, title: '자연 다큐멘터리', style: '수채화', date: '2024.12.13', status: '진행중', duration: '0:45', icon: 'landscape' },
-  { id: 4, title: '테크 프로모션', style: '사이버펑크', date: '2024.12.12', status: '완료', duration: '0:20', icon: 'computer' },
-  { id: 5, title: '음식 브이로그', style: '빈티지', date: '2024.12.11', status: '완료', duration: '0:25', icon: 'restaurant' },
-  { id: 6, title: '여행 하이라이트', style: '시네마틱', date: '2024.12.10', status: '진행중', duration: '1:00', icon: 'flight' },
-  { id: 7, title: '패션 룩북', style: '3D', date: '2024.12.09', status: '완료', duration: '0:35', icon: 'checkroom' },
-  { id: 8, title: '뮤직 비디오', style: '사이버펑크', date: '2024.12.08', status: '완료', duration: '0:40', icon: 'music_note' },
-]
+const categoryLabels: Record<number, string> = {
+  1: '애니메이션',
+  2: '히어로',
+  3: '게임',
+  4: '판타지',
+}
 
-const filters = ['전체', '완료', '진행중']
+const filters = ['전체', '완료', '진행중'] as const
+type Filter = (typeof filters)[number]
+
+function statusLabel(status: string): { text: string; className: string } {
+  switch (status) {
+    case 'completed':
+      return { text: '완료', className: 'bg-green-50 text-green-600' }
+    case 'processing':
+      return { text: '생성 중', className: 'bg-amber-50 text-amber-600' }
+    case 'pending':
+      return { text: '대기 중', className: 'bg-blue-50 text-blue-600' }
+    default:
+      return { text: status, className: 'bg-gray-50 text-gray-600' }
+  }
+}
+
+function formatDate(iso: string | null) {
+  if (!iso) return '-'
+  const d = new Date(iso)
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
+}
+
+function matchFilter(project: UserProject, filter: Filter): boolean {
+  if (filter === '전체') return true
+  if (filter === '완료') return project.status === 'completed'
+  return project.status === 'pending' || project.status === 'processing'
+}
 
 export default function ProjectsPage() {
-  const [activeFilter, setActiveFilter] = useState('전체')
+  const [activeFilter, setActiveFilter] = useState<Filter>('전체')
   const [search, setSearch] = useState('')
+  const [projects, setProjects] = useState<UserProject[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetch() {
+      setLoading(true)
+      try {
+        const res = await userApi.getMyProjects()
+        if (res.data.success) {
+          setProjects(res.data.data.projects)
+        }
+      } catch (err) {
+        console.error('작업 목록 조회 실패:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetch()
+  }, [])
 
   const filtered = projects.filter((p) => {
-    const matchFilter = activeFilter === '전체' || p.status === activeFilter
-    const matchSearch = p.title.toLowerCase().includes(search.toLowerCase())
-    return matchFilter && matchSearch
+    return matchFilter(p, activeFilter) && p.title.toLowerCase().includes(search.toLowerCase())
   })
+
+  const completedCount = projects.filter((p) => p.status === 'completed').length
+  const inProgressCount = projects.filter((p) => p.status !== 'completed').length
 
   return (
     <div className="space-y-6">
       <div className="animate-enter">
-        <div>
-          <h1 className="text-2xl font-bold text-[#2d2926]">작업 목록</h1>
-          <p className="text-warm-muted text-sm mt-1">총 {projects.length}개의 작업</p>
-        </div>
+        <h1 className="text-2xl font-bold text-[#2d2926]">작업 목록</h1>
+        <p className="text-warm-muted text-sm mt-1">
+          총 {projects.length}개의 작업 · 완료 {completedCount} · 진행중 {inProgressCount}
+        </p>
       </div>
 
       {/* Filter & Search */}
@@ -46,6 +91,8 @@ export default function ProjectsPage() {
               }`}
             >
               {f}
+              {f === '완료' && <span className="ml-1 text-xs opacity-70">({completedCount})</span>}
+              {f === '진행중' && <span className="ml-1 text-xs opacity-70">({inProgressCount})</span>}
             </button>
           ))}
         </div>
@@ -63,39 +110,107 @@ export default function ProjectsPage() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 stagger-children">
-        {filtered.map((p) => (
-          <div
-            key={p.id}
-            className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden group cursor-pointer card-hover"
-          >
-            <div className="aspect-video bg-[#f9f6f0] flex items-center justify-center relative">
-              <span className="material-symbols-outlined text-5xl text-primary/30">{p.icon}</span>
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
-                <span className="material-symbols-outlined text-white text-3xl opacity-0 group-hover:opacity-100 transition-all">
-                  play_circle
-                </span>
-              </div>
-              <span className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-medium px-2 py-0.5 rounded">
-                {p.duration}
-              </span>
-            </div>
-            <div className="p-4 space-y-2">
-              <h3 className="text-sm font-bold text-[#2d2926]">{p.title}</h3>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-warm-muted">{p.style} · {p.date}</span>
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                  p.status === '완료'
-                    ? 'bg-green-50 text-green-600'
-                    : 'bg-amber-50 text-amber-600'
-                }`}>
-                  {p.status}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <span className="material-symbols-outlined text-2xl text-primary animate-spin">progress_activity</span>
+          <span className="ml-2 text-sm text-warm-muted">불러오는 중...</span>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-warm-muted">
+          <span className="material-symbols-outlined text-5xl mb-3">folder_open</span>
+          <p className="text-sm">
+            {projects.length === 0 ? '아직 작업이 없습니다' : '검색 결과가 없습니다'}
+          </p>
+          {projects.length === 0 && (
+            <Link to="/studio/create" className="mt-4 text-sm text-primary font-medium hover:underline">
+              첫 영상 만들기
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 stagger-children">
+          {filtered.map((p) => {
+            const st = statusLabel(p.status)
+            const isCompleted = p.status === 'completed'
+            const Wrapper = isCompleted ? Link : 'div'
+            const wrapperProps = isCompleted
+              ? { to: `/video/${p.id}`, state: { video: p } }
+              : {}
+
+            return (
+              <Wrapper
+                key={`${p.type}-${p.id}`}
+                {...(wrapperProps as any)}
+                className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden group cursor-pointer card-hover block"
+              >
+                <div className="aspect-video bg-[#f9f6f0] flex items-center justify-center relative overflow-hidden">
+                  {p.thumbnail_url ? (
+                    <img
+                      src={resolveApiUrl(p.thumbnail_url)}
+                      alt={p.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <span className="material-symbols-outlined text-5xl text-primary/30">
+                      {isCompleted ? 'movie' : 'hourglass_top'}
+                    </span>
+                  )}
+                  {isCompleted && (
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
+                      <span className="material-symbols-outlined text-white text-3xl opacity-0 group-hover:opacity-100 transition-all">
+                        play_circle
+                      </span>
+                    </div>
+                  )}
+                  {!isCompleted && p.progress !== undefined && p.progress > 0 && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
+                      <div
+                        className="h-full bg-primary transition-all"
+                        style={{ width: `${p.progress}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 space-y-2">
+                  <h3 className="text-sm font-bold text-[#2d2926] truncate group-hover:text-primary transition-colors">
+                    {p.title}
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-warm-muted">
+                      {categoryLabels[p.category_id] || '비디오'} · {formatDate(p.created_at)}
+                    </span>
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${st.className}`}>
+                      {st.text}
+                    </span>
+                  </div>
+                  {isCompleted && (
+                    <div className="flex items-center gap-3 text-xs text-warm-muted">
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">visibility</span>
+                        {p.view_count.toLocaleString()}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">favorite</span>
+                        {p.like_count.toLocaleString()}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">chat_bubble</span>
+                        {p.comment_count}
+                      </span>
+                    </div>
+                  )}
+                  {!isCompleted && (
+                    <div className="flex items-center gap-2 text-xs text-amber-600">
+                      <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                      {p.status === 'processing' ? `생성 중 (${p.progress || 0}%)` : '대기 중...'}
+                    </div>
+                  )}
+                </div>
+              </Wrapper>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

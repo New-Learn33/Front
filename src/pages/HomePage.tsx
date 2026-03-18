@@ -62,7 +62,8 @@ export default function HomePage() {
   }, [activeSort, searchQuery])
 
   const topVideos = useMemo(() => videos.slice(0, 4), [videos])
-  const heroVideo = topVideos[0]
+  const [hoveredVideo, setHoveredVideo] = useState<VideoListItem | null>(null)
+  const heroVideo = hoveredVideo || topVideos[0]
   const visibleVideos = useMemo(() => videos.slice(0, visibleCount), [videos, visibleCount])
   const hasMore = visibleCount < videos.length
 
@@ -177,15 +178,16 @@ export default function HomePage() {
 
               <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0f1c38]">
                 {heroVideo ? (
-                  <div className="relative h-full min-h-[360px] p-5">
+                  <Link to={`/video/${heroVideo.id}`} state={{ video: heroVideo }} className="relative block h-full min-h-[360px] p-5">
                     <div
-                      className="absolute inset-0 bg-cover bg-center opacity-80"
+                      key={heroVideo.id}
+                      className="absolute inset-0 bg-cover bg-center opacity-80 animate-fade-in transition-all duration-500"
                       style={{ backgroundImage: `url("${resolveApiUrl(heroVideo.thumbnail_url)}")` }}
                     />
                     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,37,0.12)_0%,rgba(8,18,37,0.88)_100%)]" />
                     <div className="relative flex h-full flex-col justify-end space-y-3">
                       <span className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary backdrop-blur-md">
-                        대표 영상
+                        {hoveredVideo ? '미리보기' : '대표 영상'}
                       </span>
                       <div>
                         <h2 className="text-2xl font-black tracking-tight">{heroVideo.title}</h2>
@@ -196,7 +198,7 @@ export default function HomePage() {
                         <span>댓글 {formatCount(heroVideo.comment_count)}</span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ) : (
                   <div className="flex min-h-[360px] items-center justify-center text-sm text-white/55">
                     {loading ? '불러오는 중...' : '표시할 영상이 없습니다'}
@@ -220,9 +222,17 @@ export default function HomePage() {
                   key={video.id}
                   to={`/video/${video.id}`}
                   state={{ video }}
-                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 transition-all hover:border-primary/20 hover:bg-white/[0.05]"
+                  onMouseEnter={() => setHoveredVideo(video)}
+                  onMouseLeave={() => setHoveredVideo(null)}
+                  className={`flex items-center gap-3 rounded-2xl border px-3 py-3 transition-all duration-200 ${
+                    hoveredVideo?.id === video.id
+                      ? 'border-primary/40 bg-primary/10 scale-[1.02] shadow-lg shadow-primary/10'
+                      : 'border-white/10 bg-white/[0.03] hover:border-primary/20 hover:bg-white/[0.05]'
+                  }`}
                 >
-                  <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-sm font-black text-primary">
+                  <div className={`flex size-10 flex-shrink-0 items-center justify-center rounded-2xl text-sm font-black transition-colors ${
+                    hoveredVideo?.id === video.id ? 'bg-primary text-white' : 'bg-primary/12 text-primary'
+                  }`}>
                     {index + 1}
                   </div>
                   <div className="min-w-0 flex-1">

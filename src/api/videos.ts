@@ -28,4 +28,7 @@ export const videosApi = {
     api.get<{ success: boolean; data: { videos: VideoListItem[] } }>('/api/v1/videos/search', {
       params: { title },
     }),
+
+  getById: (id: number) =>
+    api.get<{ success: boolean; data: { videos: VideoListItem } }>(`/api/v1/videos/${id}`),
 }

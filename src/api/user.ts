@@ -28,6 +28,21 @@ export interface UserComment {
   created_at?: string
 }
 
+export interface UserProject {
+  id: number
+  type: 'video' | 'job'
+  title: string
+  category_id: number
+  thumbnail_url: string
+  video_url: string
+  status: 'completed' | 'pending' | 'processing'
+  progress?: number
+  like_count: number
+  comment_count: number
+  view_count: number
+  created_at: string | null
+}
+
 export const userApi = {
   // 내 프로필 조회
   getProfile: () =>
@@ -52,4 +67,8 @@ export const userApi = {
   // 댓글 삭제
   deleteComment: (commentId: number) =>
     api.delete<{ success: boolean }>(`/api/v1/comments/${commentId}`),
+
+  // 내 작업 목록 (완료 영상 + 진행중 작업)
+  getMyProjects: () =>
+    api.get<{ success: boolean; data: { projects: UserProject[] } }>('/api/v1/users/me/projects'),
 }

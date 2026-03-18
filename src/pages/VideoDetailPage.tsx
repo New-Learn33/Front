@@ -53,6 +53,7 @@ export default function VideoDetailPage() {
     async function fetchDetail() {
       setLoading(true)
 
+      // 즉시 표시용 (state로 넘어온 경우)
       if (stateVideo && stateVideo.id === numericId && !cancelled) {
         setVideo(stateVideo)
         setLikeCount(stateVideo.like_count || 0)
@@ -60,19 +61,23 @@ export default function VideoDetailPage() {
       }
 
       try {
-        const res = await videosApi.getAll('latest')
-        if (!res.data.success || cancelled) return
+        // 개별 비디오 상세 + 관련 비디오 목록 병렬 조회
+        const [detailRes, listRes] = await Promise.all([
+          videosApi.getById(numericId),
+          videosApi.getAll('latest'),
+        ])
 
-        const list = res.data.data.videos
-        const current = list.find((v) => v.id === numericId) ?? null
-        const related = list.filter((v) => v.id !== numericId).slice(0, 4)
+        if (cancelled) return
 
-        const finalVideo = current ?? (stateVideo && stateVideo.id === numericId ? stateVideo : null)
-        setVideo(finalVideo)
-        setRelatedVideos(related)
-        if (finalVideo) {
-          setLikeCount(finalVideo.like_count || 0)
-          setLiked(finalVideo.liked || false)
+        if (detailRes.data.success) {
+          const current = detailRes.data.data.videos
+          setVideo(current)
+          setLikeCount(current.like_count || 0)
+          setLiked(current.liked || false)
+        }
+
+        if (listRes.data.success) {
+          setRelatedVideos(listRes.data.data.videos.filter((v) => v.id !== numericId).slice(0, 4))
         }
       } catch (err) {
         console.error('비디오 상세 조회 실패:', err)
@@ -306,6 +311,10 @@ export default function VideoDetailPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-warm-muted border border-[#e5ddd3] text-sm font-medium">
+                    <span className="material-symbols-outlined text-lg">visibility</span>
+                    {formatCount(video.view_count || 0)}
+                  </div>
                   <button
                     onClick={handleLike}
                     disabled={!isLoggedIn || likeLoading}
