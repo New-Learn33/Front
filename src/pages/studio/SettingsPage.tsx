@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTheme } from '../../hooks/useTheme'
+import { settingsApi, type UserSettings } from '../../api/settings'
 
 export default function SettingsPage() {
   const { isDark, toggleTheme } = useTheme()
@@ -7,6 +8,53 @@ export default function SettingsPage() {
   const [autoSave, setAutoSave] = useState(true)
   const [quality, setQuality] = useState('high')
   const [language, setLanguage] = useState('ko')
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  // 설정 불러오기
+  useEffect(() => {
+    settingsApi.get()
+      .then((res) => {
+        const s = res.data.data.settings
+        setNotifications(s.notifications_enabled)
+        setAutoSave(s.auto_save)
+        setQuality(s.default_quality)
+        setLanguage(s.language)
+      })
+      .catch(() => {
+        // 실패 시 기본값 유지
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  // 설정 저장
+  const handleSave = async () => {
+    setSaving(true)
+    setMessage(null)
+    try {
+      await settingsApi.update({
+        notifications_enabled: notifications,
+        auto_save: autoSave,
+        default_quality: quality,
+        language: language,
+      })
+      setMessage({ type: 'success', text: '설정이 저장되었습니다.' })
+    } catch {
+      setMessage({ type: 'error', text: '설정 저장에 실패했습니다.' })
+    } finally {
+      setSaving(false)
+      setTimeout(() => setMessage(null), 3000)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="max-w-3xl flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-3xl space-y-8 stagger-children">
@@ -94,9 +142,18 @@ export default function SettingsPage() {
       </div>
 
       {/* Save */}
-      <div className="flex justify-end">
-        <button className="bg-primary hover:bg-[#58717c] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press">
-          변경사항 저장
+      <div className="flex items-center justify-end gap-4">
+        {message && (
+          <p className={`text-sm ${message.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+            {message.text}
+          </p>
+        )}
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-primary hover:bg-[#58717c] text-white font-bold px-8 py-3 rounded-xl transition-all btn-press disabled:opacity-50"
+        >
+          {saving ? '저장 중...' : '변경사항 저장'}
         </button>
       </div>
     </div>
