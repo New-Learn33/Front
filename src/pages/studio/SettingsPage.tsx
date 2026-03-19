@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTheme } from '../../hooks/useTheme'
-import { settingsApi, type UserSettings } from '../../api/settings'
+import { settingsApi } from '../../api/settings'
 
 export default function SettingsPage() {
   const { isDark, toggleTheme } = useTheme()
