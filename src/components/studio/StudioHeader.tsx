@@ -66,7 +66,7 @@ export default function StudioHeader() {
   }
 
   return (
-    <header className="h-16 bg-[#f2ece1] border-b border-[#e5ddd3] dark:border-b-0 flex items-center justify-between px-8">
+    <header className="h-16 bg-[#f8fbff] border-b border-[#dde7f1] dark:border-b-0 flex items-center justify-between px-8">
       <div className="flex items-center gap-2 text-sm">
         <span className="text-warm-muted">작업실</span>
         <span className="text-warm-muted">/</span>
@@ -77,7 +77,7 @@ export default function StudioHeader() {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setOpen(!open)}
-            className="size-9 rounded-lg bg-white border border-[#e5ddd3] flex items-center justify-center text-warm-muted hover:text-primary transition-colors relative"
+            className="size-9 rounded-lg bg-white border border-[#dde7f1] flex items-center justify-center text-warm-muted hover:text-primary transition-colors relative"
           >
             <span className="material-symbols-outlined text-xl">notifications</span>
             {unreadCount > 0 && (
@@ -89,8 +89,8 @@ export default function StudioHeader() {
 
           {/* 드롭다운 */}
           {open && (
-            <div className="absolute right-0 top-11 w-80 bg-white rounded-xl shadow-xl border border-[#e5ddd3] z-50 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5ddd3]">
+            <div className="absolute right-0 top-11 w-80 bg-white rounded-xl shadow-xl border border-[#dde7f1] z-50 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#dde7f1]">
                 <h3 className="font-bold text-sm text-[#2d2926]">알림</h3>
                 {unreadCount > 0 && (
                   <button
@@ -112,7 +112,7 @@ export default function StudioHeader() {
                     <button
                       key={notif.id}
                       onClick={() => handleNotifClick(notif)}
-                      className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-[#f9f6f0] transition-colors border-b border-[#f0ebe2] last:border-0 ${
+                      className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-[#f5f9fd] transition-colors border-b border-[#e9f0f7] last:border-0 ${
                         !notif.is_read ? 'bg-[#faf7f1]' : ''
                       }`}
                     >

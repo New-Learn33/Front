@@ -87,12 +87,12 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen bg-[#f2ece1] text-slate-900 dark:bg-[#09111f] font-display dark:text-slate-100 antialiased">
-      <div className="absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_top_left,_rgba(201,152,102,0.16),_transparent_40%),radial-gradient(circle_at_top_right,_rgba(52,87,246,0.06),_transparent_35%),linear-gradient(180deg,_#f8f3ea_0%,_#f2ece1_58%,_#f2ece1_100%)] dark:hidden" />
-      <div className="absolute inset-x-0 top-0 -z-10 hidden h-[420px] bg-[radial-gradient(circle_at_top_left,_rgba(52,87,246,0.20),_transparent_38%),radial-gradient(circle_at_top_right,_rgba(125,211,252,0.08),_transparent_30%),linear-gradient(180deg,_#0d1730_0%,_#09111f_58%,_#09111f_100%)] dark:block" />
+    <div className="min-h-screen bg-[#F8FBFF] text-slate-900 dark:bg-[#2f4352] font-display dark:text-slate-100 antialiased">
+      <div className="absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_top_left,_rgba(148,163,184,0.12),_transparent_42%),radial-gradient(circle_at_top_right,_rgba(148,163,184,0.06),_transparent_36%),linear-gradient(180deg,_#FFFFFF_0%,_#F8FBFF_58%,_#F8FBFF_100%)] dark:hidden" />
+      <div className="absolute inset-x-0 top-0 -z-10 hidden h-[420px] bg-[radial-gradient(circle_at_top_left,_rgba(189,210,226,0.14),_transparent_38%),radial-gradient(circle_at_top_right,_rgba(189,210,226,0.07),_transparent_30%),linear-gradient(180deg,_#283a48_0%,_#2f4352_58%,_#2f4352_100%)] dark:block" />
 
-      <header className="sticky top-0 z-50 border-b border-[#e5ddd3] bg-[#f2ece1]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#09111f]/80">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-20">
+      <header className="sticky top-0 z-50 border-b border-[#dde7f1] bg-[#F8FBFF]/85 backdrop-blur-xl dark:border-white/10 dark:bg-[#2f4352]/80">
+        <div className="mx-auto flex h-20 max-w-screen-2xl items-center justify-between px-6 lg:px-12 xl:px-16">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
               <img src={aiVidLogo} alt="SceneFlow 로고" className="size-9 rounded-xl bg-primary p-1.5 object-contain shadow-lg shadow-primary/20" />
@@ -134,9 +134,9 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-16 pt-10 lg:px-20">
-        <section className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-          <div className="overflow-hidden rounded-[32px] border border-[#243454] dark:border-white/10 bg-[#081225] px-7 py-8 text-white shadow-[0_30px_80px_-30px_rgba(15,23,42,0.55)] sm:px-9 sm:py-10">
+      <main className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-6 pb-16 pt-10 lg:px-12 xl:px-16">
+        <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
+          <div className="overflow-hidden rounded-[32px] border border-[#243454] dark:border-white/10 bg-[#081225] px-7 py-10 text-white shadow-[0_30px_80px_-30px_rgba(15,23,42,0.55)] sm:px-9 sm:py-12 lg:min-h-[460px]">
             <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
               <div className="space-y-6">
                 <div className="space-y-3">
@@ -144,28 +144,30 @@ export default function HomePage() {
                     쇼케이스
                   </span>
                   <h1 className="max-w-[520px] break-keep text-[30px] font-black leading-[1.12] tracking-tight sm:text-[36px] lg:text-[40px] xl:text-[44px]">
-                    SceneFlow, <span className="text-primary">영상으로 한눈에</span>
+                    <span className="block">SceneFlow,</span>
+                    <span className="block text-primary">아이디어부터 완성까지</span>
+                    <span className="block text-primary">영상을 한 번의 클릭으로</span>
                   </h1>
                 </div>
 
-                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center xl:gap-5">
                   <Link
                     to={isLoggedIn ? '/studio/create' : '/signup'}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-7 py-5 text-base font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-7 py-5 text-base font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto 2xl:px-10 2xl:py-6 2xl:text-lg"
                   >
                     <span className="material-symbols-outlined text-xl">auto_awesome</span>
                     새 프로젝트 생성
                   </Link>
                   <a
                     href="#showcase"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 bg-transparent px-5 py-3.5 text-sm font-bold text-white/85 transition-colors hover:bg-white/5 hover:text-white sm:w-auto"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 bg-transparent px-5 py-3.5 text-sm font-bold text-white/85 transition-colors hover:bg-white/5 hover:text-white sm:w-auto xl:px-4 xl:py-3 2xl:px-6 2xl:py-4"
                   >
                     <span className="material-symbols-outlined text-lg">south</span>
                     쇼케이스 보기
                   </a>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:mt-12">
                   {(() => {
                     const v = heroVideo
                     if (!v) return null
@@ -189,9 +191,9 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0f1c38]">
+              <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#101a30]">
                 {heroVideo ? (
-                  <Link to={`/video/${heroVideo.id}`} state={{ video: heroVideo }} className="relative block h-full min-h-[360px] p-5">
+                  <Link to={`/video/${heroVideo.id}`} state={{ video: heroVideo }} className="relative block h-full min-h-[400px] p-5">
                     <div
                       key={heroVideo.id}
                       className="absolute inset-0 bg-cover bg-center opacity-80 animate-fade-in transition-all duration-500"
@@ -221,7 +223,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-white/10 bg-[#101a30] p-6 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.45)]">
+          <div className="rounded-[28px] border border-white/10 bg-[#101a30] p-7 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.45)] lg:min-h-[460px]">
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -290,8 +292,8 @@ export default function HomePage() {
         <section id="showcase" className="space-y-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h2 className="text-3xl font-black tracking-tight text-white">쇼케이스</h2>
-              <p className="mt-2 text-sm text-slate-400">실제 업로드된 영상만 보여줍니다.</p>
+              <h2 className="text-3xl font-black tracking-tight text-[#2d2926] dark:text-white">쇼케이스</h2>
+              <p className="mt-2 text-sm text-[#73675e] dark:text-slate-400">실제 업로드된 영상만 보여줍니다.</p>
             </div>
             {isLoggedIn && (
               <Link
@@ -414,8 +416,8 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="border-t border-[#e5ddd3] bg-[#f9f6f0]/30 px-6 py-12 lg:px-20 dark:border-white/10 dark:bg-[#0d1729]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
+      <footer className="border-t border-[#dde7f1] bg-[#f5f9fd]/70 px-6 py-12 lg:px-12 xl:px-16 dark:border-white/10 dark:bg-[#0d1729]">
+        <div className="mx-auto flex max-w-screen-2xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-xl bg-primary p-1.5 object-contain" />
             <div>

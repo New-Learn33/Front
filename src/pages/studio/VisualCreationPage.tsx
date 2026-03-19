@@ -113,10 +113,10 @@ export default function VisualCreationPage() {
         </div>
 
         {/* Prompt Input */}
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-3 animate-enter-scale" style={{ animationDelay: '80ms' }}>
+        <div className="bg-white rounded-2xl border border-[#dde7f1] p-5 space-y-3 animate-enter-scale" style={{ animationDelay: '80ms' }}>
           <label className="text-sm font-semibold text-[#2d2926]">프롬프트</label>
           <textarea
-            className="w-full h-32 bg-[#f9f6f0] rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 border border-[#e5ddd3] resize-none placeholder:text-warm-muted/50"
+            className="w-full h-32 bg-[#f5f9fd] rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 border border-[#dde7f1] resize-none placeholder:text-warm-muted/50"
             placeholder="시험 전날 밤샘하다가 갑자기 각성한 캐릭터..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -162,9 +162,9 @@ export default function VisualCreationPage() {
 
           {/* 프리셋 저장 폼 */}
           {showPresetSave && (
-            <div className="flex items-center gap-2 bg-[#f9f6f0] rounded-lg p-3 border border-[#e5ddd3]">
+            <div className="flex items-center gap-2 bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1]">
               <input
-                className="flex-1 bg-white rounded-lg px-3 py-2 text-sm border border-[#e5ddd3] outline-none focus:ring-2 focus:ring-primary/20"
+                className="flex-1 bg-white rounded-lg px-3 py-2 text-sm border border-[#dde7f1] outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="프리셋 이름 (예: 시험 각성 캐릭터)"
                 value={presetName}
                 onChange={(e) => setPresetName(e.target.value)}
@@ -188,14 +188,14 @@ export default function VisualCreationPage() {
 
           {/* 프리셋 목록 */}
           {showPresets && (
-            <div className="bg-[#f9f6f0] rounded-xl border border-[#e5ddd3] p-3 space-y-2 max-h-48 overflow-y-auto">
+            <div className="bg-[#f5f9fd] rounded-xl border border-[#dde7f1] p-3 space-y-2 max-h-48 overflow-y-auto">
               {presets.length === 0 ? (
                 <p className="text-xs text-warm-muted text-center py-3">저장된 프리셋이 없습니다</p>
               ) : (
                 presets.map((preset) => (
                   <div
                     key={preset.id}
-                    className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#e5ddd3] hover:border-primary/30 transition-colors group"
+                    className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-[#dde7f1] hover:border-primary/30 transition-colors group"
                   >
                     <button
                       onClick={() => handleLoadPreset(preset)}
@@ -206,13 +206,13 @@ export default function VisualCreationPage() {
                       {(preset.art_style || preset.genre) && (
                         <div className="flex flex-wrap gap-1 mt-1">
                           {preset.art_style && (
-                            <span className="text-[10px] bg-[#f2ece1] text-warm-grey px-1.5 py-0.5 rounded">{preset.art_style}</span>
+                            <span className="text-[10px] bg-[#f8fbff] text-warm-grey px-1.5 py-0.5 rounded">{preset.art_style}</span>
                           )}
                           {preset.genre && preset.genre !== 'auto' && (
-                            <span className="text-[10px] bg-[#f2ece1] text-warm-grey px-1.5 py-0.5 rounded">{preset.genre}</span>
+                            <span className="text-[10px] bg-[#f8fbff] text-warm-grey px-1.5 py-0.5 rounded">{preset.genre}</span>
                           )}
                           {preset.image_quality && preset.image_quality !== 'medium' && (
-                            <span className="text-[10px] bg-[#f2ece1] text-warm-grey px-1.5 py-0.5 rounded">퀄리티: {preset.image_quality}</span>
+                            <span className="text-[10px] bg-[#f8fbff] text-warm-grey px-1.5 py-0.5 rounded">퀄리티: {preset.image_quality}</span>
                           )}
                         </div>
                       )}
@@ -247,7 +247,7 @@ export default function VisualCreationPage() {
                 className={`p-4 rounded-2xl border-2 text-left transition-all btn-press ${
                   selectedCategory === c.id
                     ? 'border-primary bg-primary/5'
-                    : 'border-[#e5ddd3] bg-white hover:border-primary/30 card-hover'
+                    : 'border-[#dde7f1] bg-white hover:border-primary/30 card-hover'
                 }`}
               >
                 <div className={`size-10 rounded-xl flex items-center justify-center mb-3 ${
@@ -278,7 +278,7 @@ export default function VisualCreationPage() {
 
         {/* 스트리밍 중간 결과 (실시간으로 이미지가 나타남) */}
         {isStreaming && (
-          <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6 space-y-5 animate-enter-scale">
+          <div className="bg-white rounded-2xl border border-[#dde7f1] p-6 space-y-5 animate-enter-scale">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-[#2d2926]">
                 {streaming.title || '생성 중...'}
@@ -297,7 +297,7 @@ export default function VisualCreationPage() {
                   return (
                     <div key={scene.scene_order} className="space-y-3">
                       {/* Image or Placeholder */}
-                      <div className="aspect-square rounded-xl overflow-hidden bg-[#f9f6f0] border border-[#e5ddd3] relative">
+                      <div className="aspect-square rounded-xl overflow-hidden bg-[#f5f9fd] border border-[#dde7f1] relative">
                         {img ? (
                           <img
                             src={img.image_url}
@@ -313,12 +313,12 @@ export default function VisualCreationPage() {
                               </>
                             ) : streaming.images.length >= idx ? (
                               <>
-                                <span className="material-symbols-outlined text-4xl text-[#e5ddd3]">hourglass_top</span>
+                                <span className="material-symbols-outlined text-4xl text-[#dde7f1]">hourglass_top</span>
                                 <span className="text-xs text-warm-muted">대기 중</span>
                               </>
                             ) : (
                               <>
-                                <span className="material-symbols-outlined text-4xl text-[#e5ddd3]">image</span>
+                                <span className="material-symbols-outlined text-4xl text-[#dde7f1]">image</span>
                                 <span className="text-xs text-warm-muted">대기 중</span>
                               </>
                             )}
@@ -335,7 +335,7 @@ export default function VisualCreationPage() {
                           </span>
                           <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
                         </div>
-                        <p className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-[#e5ddd3]">
+                        <p className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1]">
                           "{scene.dialogue}"
                         </p>
                       </div>
@@ -349,7 +349,7 @@ export default function VisualCreationPage() {
 
         {/* 완성된 결과 */}
         {result ? (
-          <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6 space-y-5 animate-enter-scale">
+          <div className="bg-white rounded-2xl border border-[#dde7f1] p-6 space-y-5 animate-enter-scale">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-[#2d2926]">{result.title}</h3>
               <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
@@ -360,7 +360,7 @@ export default function VisualCreationPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {result.scenes.map((scene, idx) => (
                 <div key={scene.scene_order} className="space-y-3">
-                  <div className="aspect-square rounded-xl overflow-hidden bg-[#f9f6f0] border border-[#e5ddd3]">
+                  <div className="aspect-square rounded-xl overflow-hidden bg-[#f5f9fd] border border-[#dde7f1]">
                     {result.images[idx] && (
                       <img
                         src={result.images[idx].image_url}
@@ -376,7 +376,7 @@ export default function VisualCreationPage() {
                       </span>
                       <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
                     </div>
-                    <p className="text-sm font-medium text-[#2d2926] bg-[#f9f6f0] rounded-lg p-3 border border-[#e5ddd3]">
+                    <p className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1]">
                       "{scene.dialogue}"
                     </p>
                   </div>
@@ -386,7 +386,7 @@ export default function VisualCreationPage() {
 
             {/* 영상 플레이어 */}
             {videoUrl && (
-              <div className="mt-4 rounded-xl overflow-hidden border border-[#e5ddd3] bg-black">
+              <div className="mt-4 rounded-xl overflow-hidden border border-[#dde7f1] bg-black">
                 <video
                   src={videoUrl}
                   controls
@@ -397,8 +397,8 @@ export default function VisualCreationPage() {
             )}
           </div>
         ) : !isStreaming && (
-          <div className="bg-white rounded-2xl border border-[#e5ddd3] p-8 flex flex-col items-center justify-center min-h-[240px] animate-enter-scale" style={{ animationDelay: '300ms' }}>
-            <div className="size-16 rounded-2xl bg-[#f9f6f0] flex items-center justify-center mb-4">
+          <div className="bg-white rounded-2xl border border-[#dde7f1] p-8 flex flex-col items-center justify-center min-h-[240px] animate-enter-scale" style={{ animationDelay: '300ms' }}>
+            <div className="size-16 rounded-2xl bg-[#f5f9fd] flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-3xl text-primary/40">smart_display</span>
             </div>
             <p className="text-sm font-semibold text-[#2d2926]">미리보기</p>
@@ -409,7 +409,7 @@ export default function VisualCreationPage() {
 
       {/* Right Panel */}
       <div className="w-80 shrink-0 space-y-5 animate-enter sticky top-8 self-start max-h-[calc(100vh-6rem)] overflow-y-auto" style={{ animationDelay: '200ms' }}>
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-4">
+        <div className="bg-white rounded-2xl border border-[#dde7f1] p-5 space-y-4">
           <h3 className="text-base font-bold text-[#2d2926]">생성 정보</h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
@@ -434,7 +434,7 @@ export default function VisualCreationPage() {
         </div>
 
         {/* 상세설정 */}
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-4">
+        <div className="bg-white rounded-2xl border border-[#dde7f1] p-5 space-y-4">
           <h3 className="text-base font-bold text-[#2d2926]">상세설정</h3>
 
           {/* 아트 스타일 */}
@@ -456,7 +456,7 @@ export default function VisualCreationPage() {
                   className={`flex flex-col items-center gap-1 py-2 rounded-lg text-xs font-medium transition-all ${
                     artStyle === s.value
                       ? 'bg-primary text-white'
-                      : 'bg-[#f9f6f0] text-[#5e5452] hover:bg-primary/10'
+                      : 'bg-[#f5f9fd] text-[#5e5452] hover:bg-primary/10'
                   }`}
                 >
                   <span className="material-symbols-outlined text-base">{s.icon}</span>
@@ -485,7 +485,7 @@ export default function VisualCreationPage() {
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     genre === g.value
                       ? 'bg-primary text-white'
-                      : 'bg-[#f9f6f0] text-[#5e5452] hover:bg-primary/10'
+                      : 'bg-[#f5f9fd] text-[#5e5452] hover:bg-primary/10'
                   }`}
                 >
                   {g.label}
@@ -510,7 +510,7 @@ export default function VisualCreationPage() {
                   className={`py-2 rounded-lg text-xs font-medium transition-all ${
                     imageQuality === q.value
                       ? 'bg-primary text-white'
-                      : 'bg-[#f9f6f0] text-[#5e5452] hover:bg-primary/10'
+                      : 'bg-[#f5f9fd] text-[#5e5452] hover:bg-primary/10'
                   }`}
                 >
                   {q.label}
@@ -535,7 +535,7 @@ export default function VisualCreationPage() {
                   className={`py-2 rounded-lg text-xs font-medium transition-all ${
                     motionIntensity === m.value
                       ? 'bg-primary text-white'
-                      : 'bg-[#f9f6f0] text-[#5e5452] hover:bg-primary/10'
+                      : 'bg-[#f5f9fd] text-[#5e5452] hover:bg-primary/10'
                   }`}
                 >
                   {m.label}
@@ -547,7 +547,7 @@ export default function VisualCreationPage() {
 
         {/* 썸네일 선택 */}
         {result && (
-          <div className="bg-white rounded-2xl border border-[#e5ddd3] p-5 space-y-3">
+          <div className="bg-white rounded-2xl border border-[#dde7f1] p-5 space-y-3">
             <h3 className="text-base font-bold text-[#2d2926]">썸네일 선택</h3>
             <div className="grid grid-cols-3 gap-2">
               {result.images.map((img) => (
@@ -558,7 +558,7 @@ export default function VisualCreationPage() {
                   className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                     selectedThumbnail === img.image_url
                       ? 'border-primary ring-2 ring-primary/20'
-                      : 'border-[#e5ddd3] hover:border-primary/40'
+                      : 'border-[#dde7f1] hover:border-primary/40'
                   }`}
                 >
                   <img src={img.image_url} alt={`씬 ${img.scene_order}`} className="w-full h-full object-cover" />
@@ -618,7 +618,7 @@ export default function VisualCreationPage() {
                   <span className={`material-symbols-outlined text-sm ${
                     streaming.images.length >= n ? 'text-green-500'
                       : streaming.step === `image_${n}` ? 'text-primary animate-spin'
-                      : 'text-[#e5ddd3]'
+                      : 'text-[#dde7f1]'
                   }`}>
                     {streaming.images.length >= n ? 'check_circle'
                       : streaming.step === `image_${n}` ? 'progress_activity'
@@ -628,7 +628,7 @@ export default function VisualCreationPage() {
                 </div>
               ))}
             </div>
-            <div className="w-full bg-[#e5ddd3] rounded-full h-1.5">
+            <div className="w-full bg-[#dde7f1] rounded-full h-1.5">
               <div
                 className="bg-primary h-1.5 rounded-full transition-all duration-500"
                 style={{
@@ -651,7 +651,7 @@ export default function VisualCreationPage() {
           className={`w-full font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 btn-press ${
             result && !videoLoading
               ? 'bg-[#2d2926] hover:bg-[#1a1714] text-white shadow-lg shadow-[#2d2926]/20'
-              : 'bg-[#e5ddd3] text-[#8a7d72] cursor-not-allowed'
+              : 'bg-[#dde7f1] text-[#8a7d72] cursor-not-allowed'
           }`}
         >
           {videoLoading ? (
@@ -673,7 +673,7 @@ export default function VisualCreationPage() {
         </button>
 
         {videoLoading && (
-          <div className="bg-[#f9f6f0] rounded-xl p-4 space-y-3">
+          <div className="bg-[#f5f9fd] rounded-xl p-4 space-y-3">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-sm text-primary animate-spin">progress_activity</span>
               <span className="text-xs text-[#2d2926] font-medium">AI 영상 변환 중</span>
@@ -681,7 +681,7 @@ export default function VisualCreationPage() {
             <p className="text-xs text-warm-muted">
               백그라운드에서 영상을 생성 중입니다. 다른 페이지로 이동해도 작업이 계속됩니다.
             </p>
-            <div className="w-full bg-[#e5ddd3] rounded-full h-1.5">
+            <div className="w-full bg-[#dde7f1] rounded-full h-1.5">
               <div className="bg-primary h-1.5 rounded-full transition-all duration-500" style={{ width: `${Math.max(videoProgress, 10)}%` }} />
             </div>
             <p className="text-[10px] text-warm-muted text-right">{videoProgress}%</p>

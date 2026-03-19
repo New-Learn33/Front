@@ -26,7 +26,7 @@ export default function SupportPage() {
         <div className="space-y-4 mb-16">
           <h2 className="text-lg font-bold text-[#2d2926] mb-4">자주 묻는 질문</h2>
           {faqs.map((faq) => (
-            <details key={faq.q} className="bg-white rounded-xl border border-[#e5ddd3] group">
+            <details key={faq.q} className="bg-white rounded-xl border border-[#dde7f1] group">
               <summary className="p-5 font-medium text-[#2d2926] cursor-pointer flex items-center justify-between text-sm hover:bg-[#faf5ef] rounded-xl transition-colors">
                 {faq.q}
                 <span className="material-symbols-outlined text-[#8a7d72] group-open:rotate-180 transition-transform">expand_more</span>
@@ -37,7 +37,7 @@ export default function SupportPage() {
         </div>
 
         {/* Contact */}
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-8">
+        <div className="bg-white rounded-2xl border border-[#dde7f1] p-8">
           <h2 className="text-lg font-bold text-[#2d2926] mb-6">직접 문의하기</h2>
           <div className="grid sm:grid-cols-3 gap-6">
             {contacts.map((c) => (

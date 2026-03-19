@@ -140,7 +140,7 @@ export default function MyPage() {
       </div>
 
       {/* Profile Card */}
-      <div className="bg-white rounded-2xl border border-[#e5ddd3] p-6">
+      <div className="bg-white rounded-2xl border border-[#dde7f1] p-6">
         <div className="flex items-center gap-6">
           {user?.profile_image_url ? (
             <img src={user.profile_image_url} alt="프로필" className="size-20 rounded-full object-cover" />
@@ -157,7 +157,7 @@ export default function MyPage() {
                   <input
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
-                    className="h-9 px-3 rounded-lg border border-[#e5ddd3] bg-[#f9f6f0] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    className="h-9 px-3 rounded-lg border border-[#dde7f1] bg-[#f5f9fd] text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                     placeholder="닉네임 입력"
                     maxLength={20}
                     autoFocus
@@ -203,7 +203,7 @@ export default function MyPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#e5ddd3]">
+      <div className="flex items-center gap-2 border-b border-[#dde7f1]">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -247,7 +247,7 @@ export default function MyPage() {
                   key={video.id}
                   to={`/video/${video.id}`}
                   state={{ video }}
-                  className="group bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden hover:shadow-lg transition-all"
+                  className="group bg-white rounded-2xl border border-[#dde7f1] overflow-hidden hover:shadow-lg transition-all"
                 >
                   <div className="aspect-video bg-[#f0ebe3] flex items-center justify-center relative overflow-hidden">
                     {video.thumbnail_url ? (
@@ -301,7 +301,7 @@ export default function MyPage() {
                   key={video.id}
                   to={`/video/${video.id}`}
                   state={{ video }}
-                  className="group bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden hover:shadow-lg transition-all"
+                  className="group bg-white rounded-2xl border border-[#dde7f1] overflow-hidden hover:shadow-lg transition-all"
                 >
                   <div className="aspect-video bg-[#f0ebe3] flex items-center justify-center relative overflow-hidden">
                     {video.thumbnail_url ? (
@@ -346,7 +346,7 @@ export default function MyPage() {
             </div>
           ) : (
             comments.map((comment) => (
-              <div key={comment.id} className="bg-white rounded-2xl border border-[#e5ddd3] p-5">
+              <div key={comment.id} className="bg-white rounded-2xl border border-[#dde7f1] p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <Link
