@@ -26,7 +26,7 @@
   }
 
   .dark body {
-    background-color: #1f1b19;
+    background-color: #2f4352;
     color: #f1f5f9;
   }
 
@@ -51,7 +51,7 @@
   }
 
   .dark .glass {
-    background: rgba(44, 40, 38, 0.4);
+    background: rgba(47, 67, 82, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
@@ -180,29 +180,29 @@
 }
 
 /* ===== Global dark mode overrides for existing warm-light classes ===== */
-.dark .bg-\[\#f2ece1\] {
-  background-color: #1f1b19 !important;
+.dark .bg-\[\#f8fbff\] {
+  background-color: #2f4352 !important;
 }
 
-.dark .bg-\[\#f9f6f0\],
-.dark .bg-\[\#f9f6f0\]\/30,
-.dark .bg-\[\#f9f6f0\]\/40,
-.dark .bg-\[\#f9f6f0\]\/50,
-.dark .bg-\[\#f9f6f0\]\/60 {
-  background-color: #25201d !important;
+.dark .bg-\[\#f5f9fd\],
+.dark .bg-\[\#f5f9fd\]\/30,
+.dark .bg-\[\#f5f9fd\]\/40,
+.dark .bg-\[\#f5f9fd\]\/50,
+.dark .bg-\[\#f5f9fd\]\/60 {
+  background-color: #283a48 !important;
 }
 
 .dark .bg-white,
 .dark .bg-white\/40,
 .dark .bg-white\/50,
 .dark .bg-white\/60 {
-  background-color: #2b2523 !important;
+  background-color: #233341 !important;
 }
 
-.dark .border-\[\#e5ddd3\],
-.dark .border-\[\#e5ddd3\]\/50,
+.dark .border-\[\#dde7f1\],
+.dark .border-\[\#dde7f1\]\/50,
 .dark .border-\[\#eee6d8\] {
-  border-color: rgba(52, 87, 246, 0.28) !important;
+  border-color: rgba(185, 212, 230, 0.34) !important;
 }
 
 .dark .text-\[\#1a1a1a\],
@@ -213,7 +213,7 @@
 .dark .text-\[\#5e5452\],
 .dark .text-\[\#8c8479\],
 .dark .text-warm-muted {
-  color: #a8a29e !important;
+  color: #c8d9e5 !important;
 }
 
 .dark .text-slate-900 {
@@ -224,11 +224,11 @@
 .dark .text-slate-600,
 .dark .text-slate-500,
 .dark .text-slate-400 {
-  color: #a8a29e !important;
+  color: #c8d9e5 !important;
 }
 
-.dark .hover\:bg-\[\#f9f6f0\]:hover {
-  background-color: #332d2a !important;
+.dark .hover\:bg-\[\#f5f9fd\]:hover {
+  background-color: #1c2a35 !important;
 }
 
 /* Keep ranking badge text legible on bright badge backgrounds in dark mode */

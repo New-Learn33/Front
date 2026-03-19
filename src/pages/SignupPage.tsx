@@ -74,9 +74,9 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="bg-[#f2ece1] min-h-screen flex flex-col font-display text-slate-900">
+    <div className="bg-[#f8fbff] min-h-screen flex flex-col font-display text-slate-900">
       {/* Top Navigation Bar */}
-      <header className="flex items-center justify-between px-6 py-6 lg:px-20 border-b border-[#e5ddd3]/50">
+      <header className="flex items-center justify-between px-6 py-6 lg:px-20 border-b border-[#dde7f1]/50">
         <Link to="/" className="flex items-center gap-3">
           <img src={aiVidLogo} alt="SceneFlow 로고" className="size-11 rounded-lg bg-primary p-1.5 object-contain" />
           <h2 className="text-xl font-bold tracking-tight">SceneFlow</h2>
@@ -103,7 +103,7 @@ export default function SignupPage() {
             <div className="space-y-2">
               <label className="text-sm font-semibold block px-1">이름</label>
               <input
-                className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
+                className="w-full h-14 px-5 rounded-xl border border-[#dde7f1] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                 placeholder="성함을 입력하세요"
                 type="text"
                 value={name}
@@ -115,7 +115,7 @@ export default function SignupPage() {
             <div className="space-y-2">
               <label className="text-sm font-semibold block px-1">이메일</label>
               <input
-                className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
+                className="w-full h-14 px-5 rounded-xl border border-[#dde7f1] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                 placeholder="example@email.com"
                 type="email"
                 value={email}
@@ -128,7 +128,7 @@ export default function SignupPage() {
               <label className="text-sm font-semibold block px-1">비밀번호</label>
               <div className="relative">
                 <input
-                  className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
+                  className="w-full h-14 px-5 rounded-xl border border-[#dde7f1] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                   placeholder="비밀번호를 입력하세요"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -151,7 +151,7 @@ export default function SignupPage() {
               <label className="text-sm font-semibold block px-1">비밀번호 확인</label>
               <div className="relative">
                 <input
-                  className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
+                  className="w-full h-14 px-5 rounded-xl border border-[#dde7f1] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                   placeholder="비밀번호를 다시 입력하세요"
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
@@ -172,7 +172,7 @@ export default function SignupPage() {
             {/* Terms */}
             <div className="flex items-center gap-3 py-2">
               <input
-                className="w-5 h-5 rounded border-[#e5ddd3] text-primary focus:ring-primary bg-white cursor-pointer"
+                className="w-5 h-5 rounded border-[#dde7f1] text-primary focus:ring-primary bg-white cursor-pointer"
                 id="terms"
                 type="checkbox"
               />
@@ -195,17 +195,17 @@ export default function SignupPage() {
           {/* Divider */}
           <div className="relative py-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#e5ddd3]" />
+              <div className="w-full border-t border-[#dde7f1]" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[#f2ece1] px-4 text-warm-muted">또는 간편 로그인</span>
+              <span className="bg-[#f8fbff] px-4 text-warm-muted">또는 간편 로그인</span>
             </div>
           </div>
 
           {/* Google Login */}
           <div className="w-full flex justify-center">
             {isLoading ? (
-              <div className="w-full flex items-center justify-center h-11 rounded-xl border border-[#e5ddd3] bg-white/40">
+              <div className="w-full flex items-center justify-center h-11 rounded-xl border border-[#dde7f1] bg-white/40">
                 <span className="text-sm text-warm-muted">로그인 중...</span>
               </div>
             ) : (
@@ -229,7 +229,7 @@ export default function SignupPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 px-6 lg:px-20 text-center border-t border-[#e5ddd3]/50">
+      <footer className="py-8 px-6 lg:px-20 text-center border-t border-[#dde7f1]/50">
         <p className="text-xs text-warm-muted/60">
           © 2026 SceneFlow. All rights reserved.
         </p>

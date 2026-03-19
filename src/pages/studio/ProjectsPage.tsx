@@ -163,7 +163,7 @@ export default function ProjectsPage() {
             <button
               onClick={() => setSelectMode(true)}
               disabled={projects.length === 0}
-              className="bg-white border border-[#e5ddd3] text-warm-muted hover:text-[#2d2926] hover:bg-[#f9f6f0] disabled:opacity-40 text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all"
+              className="bg-white border border-[#dde7f1] text-warm-muted hover:text-[#2d2926] hover:bg-[#f5f9fd] disabled:opacity-40 text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all"
             >
               <span className="material-symbols-outlined text-lg">checklist</span>
               선택
@@ -172,7 +172,7 @@ export default function ProjectsPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleSelectAll}
-                className="bg-white border border-[#e5ddd3] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+                className="bg-white border border-[#dde7f1] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f5f9fd] transition-all"
               >
                 {selectedIds.size === filtered.length ? '전체 해제' : '전체 선택'}
               </button>
@@ -190,7 +190,7 @@ export default function ProjectsPage() {
               </button>
               <button
                 onClick={exitSelectMode}
-                className="text-warm-muted hover:text-[#2d2926] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+                className="text-warm-muted hover:text-[#2d2926] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f5f9fd] transition-all"
               >
                 취소
               </button>
@@ -209,7 +209,7 @@ export default function ProjectsPage() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeFilter === f
                   ? 'bg-primary text-white'
-                  : 'bg-white border border-[#e5ddd3] text-warm-muted hover:bg-[#f9f6f0]'
+                  : 'bg-white border border-[#dde7f1] text-warm-muted hover:bg-[#f5f9fd]'
               }`}
             >
               {f}
@@ -222,7 +222,7 @@ export default function ProjectsPage() {
           <div className="relative">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-muted text-lg">search</span>
             <input
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#e5ddd3] bg-white text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#dde7f1] bg-white text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               placeholder="작업 검색..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -271,7 +271,7 @@ export default function ProjectsPage() {
                 className={`bg-white rounded-2xl border overflow-hidden group cursor-pointer card-hover block relative transition-all ${
                   selectMode && isSelected
                     ? 'border-primary ring-2 ring-primary/20'
-                    : 'border-[#e5ddd3]'
+                    : 'border-[#dde7f1]'
                 }`}
               >
                 {/* 선택 체크박스 */}
@@ -280,7 +280,7 @@ export default function ProjectsPage() {
                     <div className={`size-6 rounded-full border-2 flex items-center justify-center transition-all ${
                       isSelected
                         ? 'bg-primary border-primary text-white'
-                        : 'bg-white/90 border-[#e5ddd3]'
+                        : 'bg-white/90 border-[#dde7f1]'
                     }`}>
                       {isSelected && (
                         <span className="material-symbols-outlined text-sm">check</span>
@@ -299,7 +299,7 @@ export default function ProjectsPage() {
                   </button>
                 )}
 
-                <div className="aspect-video bg-[#f9f6f0] flex items-center justify-center relative overflow-hidden">
+                <div className="aspect-video bg-[#f5f9fd] flex items-center justify-center relative overflow-hidden">
                   {p.thumbnail_url ? (
                     <img
                       src={resolveApiUrl(p.thumbnail_url)}

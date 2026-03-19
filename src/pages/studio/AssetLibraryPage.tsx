@@ -234,7 +234,7 @@ export default function AssetLibraryPage() {
             <button
               onClick={() => setSelectMode(true)}
               disabled={assets.length === 0}
-              className="bg-white border border-[#e5ddd3] text-warm-muted hover:text-[#2d2926] hover:bg-[#f9f6f0] disabled:opacity-40 text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all"
+              className="bg-white border border-[#dde7f1] text-warm-muted hover:text-[#2d2926] hover:bg-[#f5f9fd] disabled:opacity-40 text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all"
             >
               <span className="material-symbols-outlined text-lg">checklist</span>
               선택
@@ -243,7 +243,7 @@ export default function AssetLibraryPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleSelectAll}
-                className="bg-white border border-[#e5ddd3] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+                className="bg-white border border-[#dde7f1] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f5f9fd] transition-all"
               >
                 {selectedIds.size === assets.length ? '전체 해제' : '전체 선택'}
               </button>
@@ -261,7 +261,7 @@ export default function AssetLibraryPage() {
               </button>
               <button
                 onClick={exitSelectMode}
-                className="text-warm-muted hover:text-[#2d2926] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+                className="text-warm-muted hover:text-[#2d2926] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f5f9fd] transition-all"
               >
                 취소
               </button>
@@ -306,14 +306,14 @@ export default function AssetLibraryPage() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeCategory === c.id
                   ? 'bg-primary text-white'
-                  : 'bg-white border border-[#e5ddd3] text-warm-muted hover:bg-[#f9f6f0]'
+                  : 'bg-white border border-[#dde7f1] text-warm-muted hover:bg-[#f5f9fd]'
               }`}
             >
               {c.label}
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-1 bg-white border border-[#e5ddd3] rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-white border border-[#dde7f1] rounded-lg p-1">
           <button
             onClick={() => setViewMode('grid')}
             className={`p-1.5 rounded transition-all ${viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-warm-muted'}`}
@@ -335,8 +335,8 @@ export default function AssetLibraryPage() {
           <span className="material-symbols-outlined text-3xl text-primary animate-spin">progress_activity</span>
         </div>
       ) : assets.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] p-12 flex flex-col items-center justify-center">
-          <div className="size-16 rounded-2xl bg-[#f9f6f0] flex items-center justify-center mb-4">
+        <div className="bg-white rounded-2xl border border-[#dde7f1] p-12 flex flex-col items-center justify-center">
+          <div className="size-16 rounded-2xl bg-[#f5f9fd] flex items-center justify-center mb-4">
             <span className="material-symbols-outlined text-3xl text-primary/40">perm_media</span>
           </div>
           <p className="text-sm font-semibold text-[#2d2926]">자료가 없습니다</p>
@@ -351,7 +351,7 @@ export default function AssetLibraryPage() {
               className={`bg-white rounded-2xl border overflow-hidden group card-hover relative transition-all cursor-pointer ${
                 selectMode && selectedIds.has(a.id)
                   ? 'border-primary ring-2 ring-primary/20'
-                  : 'border-[#e5ddd3]'
+                  : 'border-[#dde7f1]'
               } ${selectMode ? 'cursor-pointer' : ''}`}
             >
               {/* 선택 체크박스 */}
@@ -360,7 +360,7 @@ export default function AssetLibraryPage() {
                   <div className={`size-6 rounded-full border-2 flex items-center justify-center transition-all ${
                     selectedIds.has(a.id)
                       ? 'bg-primary border-primary text-white'
-                      : 'bg-white/90 border-[#e5ddd3]'
+                      : 'bg-white/90 border-[#dde7f1]'
                   }`}>
                     {selectedIds.has(a.id) && (
                       <span className="material-symbols-outlined text-sm">check</span>
@@ -369,7 +369,7 @@ export default function AssetLibraryPage() {
                 </div>
               )}
 
-              <div className="aspect-square bg-[#f9f6f0] flex items-center justify-center relative overflow-hidden">
+              <div className="aspect-square bg-[#f5f9fd] flex items-center justify-center relative overflow-hidden">
                 {a.image_url ? (
                   <img src={resolveApiUrl(a.image_url)} alt={a.name} className="w-full h-full object-cover" />
                 ) : (
@@ -415,17 +415,17 @@ export default function AssetLibraryPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden animate-enter-scale" style={{ animationDelay: '150ms' }}>
+        <div className="bg-white rounded-2xl border border-[#dde7f1] overflow-hidden animate-enter-scale" style={{ animationDelay: '150ms' }}>
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#e5ddd3] text-xs text-warm-muted">
+              <tr className="border-b border-[#dde7f1] text-xs text-warm-muted">
                 {selectMode && (
                   <th className="px-4 py-3 w-10">
                     <button onClick={toggleSelectAll}>
                       <div className={`size-5 rounded border-2 flex items-center justify-center transition-all ${
                         selectedIds.size === assets.length
                           ? 'bg-primary border-primary text-white'
-                          : 'border-[#e5ddd3]'
+                          : 'border-[#dde7f1]'
                       }`}>
                         {selectedIds.size === assets.length && (
                           <span className="material-symbols-outlined text-xs">check</span>
@@ -446,7 +446,7 @@ export default function AssetLibraryPage() {
                 <tr
                   key={a.id}
                   onClick={() => selectMode ? toggleSelect(a.id) : openTagEditor(a)}
-                  className={`border-b border-[#e5ddd3] last:border-0 hover:bg-[#f9f6f0] transition-colors cursor-pointer ${
+                  className={`border-b border-[#dde7f1] last:border-0 hover:bg-[#f5f9fd] transition-colors cursor-pointer ${
                     selectMode ? '' : ''
                   } ${selectMode && selectedIds.has(a.id) ? 'bg-primary/5' : ''}`}
                 >
@@ -455,7 +455,7 @@ export default function AssetLibraryPage() {
                       <div className={`size-5 rounded border-2 flex items-center justify-center transition-all ${
                         selectedIds.has(a.id)
                           ? 'bg-primary border-primary text-white'
-                          : 'border-[#e5ddd3]'
+                          : 'border-[#dde7f1]'
                       }`}>
                         {selectedIds.has(a.id) && (
                           <span className="material-symbols-outlined text-xs">check</span>
@@ -498,7 +498,7 @@ export default function AssetLibraryPage() {
       {editingAsset && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setEditingAsset(null)}>
           <div
-            className="bg-white rounded-2xl border border-[#e5ddd3] w-full max-w-md p-6 space-y-4 shadow-xl"
+            className="bg-white rounded-2xl border border-[#dde7f1] w-full max-w-md p-6 space-y-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -510,7 +510,7 @@ export default function AssetLibraryPage() {
 
             {/* 에셋 정보 */}
             <div className="flex items-center gap-3">
-              <div className="size-12 rounded-lg bg-[#f9f6f0] overflow-hidden border border-[#e5ddd3]">
+              <div className="size-12 rounded-lg bg-[#f5f9fd] overflow-hidden border border-[#dde7f1]">
                 {editingAsset.image_url ? (
                   <img src={resolveApiUrl(editingAsset.image_url)} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -550,7 +550,7 @@ export default function AssetLibraryPage() {
             {/* 태그 입력 */}
             <div className="flex items-center gap-2">
               <input
-                className="flex-1 bg-[#f9f6f0] rounded-lg px-3 py-2 text-sm border border-[#e5ddd3] outline-none focus:ring-2 focus:ring-primary/20"
+                className="flex-1 bg-[#f5f9fd] rounded-lg px-3 py-2 text-sm border border-[#dde7f1] outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="태그 입력 후 Enter"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
@@ -559,7 +559,7 @@ export default function AssetLibraryPage() {
               <button
                 onClick={addTag}
                 disabled={!tagInput.trim()}
-                className="bg-[#f9f6f0] border border-[#e5ddd3] text-sm font-medium px-3 py-2 rounded-lg hover:bg-primary/10 disabled:opacity-40 transition-all"
+                className="bg-[#f5f9fd] border border-[#dde7f1] text-sm font-medium px-3 py-2 rounded-lg hover:bg-primary/10 disabled:opacity-40 transition-all"
               >
                 추가
               </button>
@@ -569,7 +569,7 @@ export default function AssetLibraryPage() {
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setEditingAsset(null)}
-                className="text-sm text-warm-muted hover:text-[#2d2926] px-4 py-2 rounded-lg hover:bg-[#f9f6f0] transition-all"
+                className="text-sm text-warm-muted hover:text-[#2d2926] px-4 py-2 rounded-lg hover:bg-[#f5f9fd] transition-all"
               >
                 취소
               </button>

@@ -217,7 +217,7 @@ export default function VideoDetailPage() {
 
   if (loading) {
     return (
-      <div className="bg-[#f2ece1] font-display text-[#2d2926] antialiased min-h-screen flex items-center justify-center">
+      <div className="bg-[#f8fbff] font-display text-[#2d2926] antialiased min-h-screen flex items-center justify-center">
         <span className="material-symbols-outlined text-3xl text-primary animate-spin">progress_activity</span>
       </div>
     )
@@ -225,7 +225,7 @@ export default function VideoDetailPage() {
 
   if (!video) {
     return (
-      <div className="bg-[#f2ece1] font-display text-[#2d2926] antialiased min-h-screen flex flex-col items-center justify-center">
+      <div className="bg-[#f8fbff] font-display text-[#2d2926] antialiased min-h-screen flex flex-col items-center justify-center">
         <span className="material-symbols-outlined text-6xl text-[#c4b9ab] mb-4">videocam_off</span>
         <h2 className="text-2xl font-bold mb-2">비디오를 찾을 수 없습니다</h2>
         <p className="text-warm-muted mb-8">존재하지 않는 비디오이거나 삭제된 비디오입니다.</p>
@@ -243,12 +243,12 @@ export default function VideoDetailPage() {
   const videoSrc = video.video_url ? resolveApiUrl(video.video_url) : null
 
   return (
-    <div className="relative min-h-screen bg-[#f2ece1] text-slate-900 dark:bg-[#09111f] font-display dark:text-slate-100 antialiased flex flex-col">
-      <div className="absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_top_left,_rgba(201,152,102,0.16),_transparent_40%),radial-gradient(circle_at_top_right,_rgba(52,87,246,0.06),_transparent_35%),linear-gradient(180deg,_#f8f3ea_0%,_#f2ece1_58%,_#f2ece1_100%)] dark:hidden" />
+    <div className="relative min-h-screen bg-[#f8fbff] text-slate-900 dark:bg-[#09111f] font-display dark:text-slate-100 antialiased flex flex-col">
+      <div className="absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_top_left,_rgba(148,163,184,0.12),_transparent_40%),radial-gradient(circle_at_top_right,_rgba(148,163,184,0.06),_transparent_35%),linear-gradient(180deg,_#ffffff_0%,_#f8fbff_58%,_#f8fbff_100%)] dark:hidden" />
       <div className="absolute inset-x-0 top-0 -z-10 hidden h-[420px] bg-[radial-gradient(circle_at_top_left,_rgba(52,87,246,0.20),_transparent_38%),radial-gradient(circle_at_top_right,_rgba(125,211,252,0.08),_transparent_30%),linear-gradient(180deg,_#0d1730_0%,_#09111f_58%,_#09111f_100%)] dark:block" />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-[#e5ddd3] bg-[#f2ece1]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#09111f]/80">
+      <header className="sticky top-0 z-50 border-b border-[#dde7f1] bg-[#f8fbff]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#09111f]/80">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-20">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
@@ -331,7 +331,7 @@ export default function VideoDetailPage() {
               {editMode ? (
                 <div className="flex items-center gap-3">
                   <input
-                    className="flex-1 text-2xl md:text-3xl font-black text-[#2d2926] tracking-tight bg-white border border-[#e5ddd3] rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    className="flex-1 text-2xl md:text-3xl font-black text-[#2d2926] tracking-tight bg-white border border-[#dde7f1] rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleEditTitle()}
@@ -346,7 +346,7 @@ export default function VideoDetailPage() {
                   </button>
                   <button
                     onClick={() => setEditMode(false)}
-                    className="px-4 py-2 text-warm-muted text-sm font-medium rounded-xl hover:bg-[#f9f6f0] transition-all"
+                    className="px-4 py-2 text-warm-muted text-sm font-medium rounded-xl hover:bg-[#f5f9fd] transition-all"
                   >
                     취소
                   </button>
@@ -377,7 +377,7 @@ export default function VideoDetailPage() {
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="size-12 rounded-full overflow-hidden ring-2 ring-primary/20 bg-[#e5ddd3] flex items-center justify-center">
+                  <div className="size-12 rounded-full overflow-hidden ring-2 ring-primary/20 bg-[#dde7f1] flex items-center justify-center">
                     {video.creator_avatar_url ? (
                       <img src={resolveApiUrl(video.creator_avatar_url)} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -391,7 +391,7 @@ export default function VideoDetailPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-warm-muted border border-[#e5ddd3] text-sm font-medium">
+                  <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-warm-muted border border-[#dde7f1] text-sm font-medium">
                     <span className="material-symbols-outlined text-lg">visibility</span>
                     {formatCount(video.view_count || 0)}
                   </div>
@@ -401,13 +401,13 @@ export default function VideoDetailPage() {
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                       liked
                         ? 'bg-red-50 text-red-500 border border-red-200'
-                        : 'bg-white text-warm-muted border border-[#e5ddd3] hover:border-primary hover:text-primary'
+                        : 'bg-white text-warm-muted border border-[#dde7f1] hover:border-primary hover:text-primary'
                     } ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <span className="material-symbols-outlined text-lg">{liked ? 'favorite' : 'favorite_border'}</span>
                     {formatCount(likeCount)}
                   </button>
-                  <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-warm-muted border border-[#e5ddd3] text-sm font-medium">
+                  <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-warm-muted border border-[#dde7f1] text-sm font-medium">
                     <span className="material-symbols-outlined text-lg">chat_bubble_outline</span>
                     {comments.length}
                   </div>
@@ -436,7 +436,7 @@ export default function VideoDetailPage() {
                   </div>
                   <div className="flex-1 flex gap-2">
                     <input
-                      className="flex-1 px-4 py-3 bg-white border border-[#e5ddd3] rounded-xl text-sm text-[#2d2926] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
+                      className="flex-1 px-4 py-3 bg-white border border-[#dde7f1] rounded-xl text-sm text-[#2d2926] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                       placeholder="댓글을 입력하세요..."
                       value={commentInput}
                       onChange={(e) => setCommentInput(e.target.value)}
@@ -457,7 +457,7 @@ export default function VideoDetailPage() {
                   </div>
                 </div>
               ) : (
-                <div className="bg-white border border-[#e5ddd3] rounded-xl p-4 text-center">
+                <div className="bg-white border border-[#dde7f1] rounded-xl p-4 text-center">
                   <p className="text-sm text-warm-muted">
                     댓글을 작성하려면{' '}
                     <Link to="/login" className="text-primary font-bold hover:underline">로그인</Link>
@@ -474,7 +474,7 @@ export default function VideoDetailPage() {
                   </div>
                 ) : (
                   comments.map((comment) => (
-                    <div key={comment.comment_id} className="flex gap-3 bg-white border border-[#e5ddd3] rounded-xl p-4 group">
+                    <div key={comment.comment_id} className="flex gap-3 bg-white border border-[#dde7f1] rounded-xl p-4 group">
                       <div className="size-10 rounded-full overflow-hidden flex-shrink-0 bg-primary/10 flex items-center justify-center">
                         <span className="material-symbols-outlined text-primary text-lg">person</span>
                       </div>
@@ -514,7 +514,7 @@ export default function VideoDetailPage() {
                   key={rv.id}
                   to={`/video/${rv.id}`}
                   state={{ video: rv }}
-                  className="flex gap-3 group bg-white hover:bg-[#f9f6f0] border border-[#e5ddd3] hover:border-primary/30 rounded-xl p-3 transition-all hover:shadow-md"
+                  className="flex gap-3 group bg-white hover:bg-[#f5f9fd] border border-[#dde7f1] hover:border-primary/30 rounded-xl p-3 transition-all hover:shadow-md"
                 >
                   <div className="relative w-36 flex-shrink-0 aspect-video rounded-lg overflow-hidden">
                     <div
@@ -550,7 +550,7 @@ export default function VideoDetailPage() {
       {/* 삭제 확인 모달 */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowDeleteConfirm(false)}>
-          <div className="bg-white rounded-2xl border border-[#e5ddd3] w-full max-w-sm p-6 space-y-4 shadow-xl" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl border border-[#dde7f1] w-full max-w-sm p-6 space-y-4 shadow-xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center gap-3">
               <div className="size-10 rounded-full bg-red-50 flex items-center justify-center">
                 <span className="material-symbols-outlined text-red-500">warning</span>
@@ -563,7 +563,7 @@ export default function VideoDetailPage() {
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-sm font-medium text-warm-muted hover:text-[#2d2926] rounded-lg hover:bg-[#f9f6f0] transition-all"
+                className="px-4 py-2 text-sm font-medium text-warm-muted hover:text-[#2d2926] rounded-lg hover:bg-[#f5f9fd] transition-all"
               >
                 취소
               </button>
@@ -579,7 +579,7 @@ export default function VideoDetailPage() {
       )}
 
       {/* Footer */}
-      <footer className="mt-20 border-t border-[#e5ddd3] bg-[#f9f6f0] px-6 lg:px-20 py-12">
+      <footer className="mt-20 border-t border-[#dde7f1] bg-[#f5f9fd] px-6 lg:px-20 py-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
             <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />

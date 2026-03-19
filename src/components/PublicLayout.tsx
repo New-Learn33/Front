@@ -11,9 +11,9 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
   const { isLoggedIn, user, logout } = useAuth()
 
   return (
-    <div className="min-h-screen bg-[#f2ece1] text-slate-900 dark:bg-[#09111f] font-display dark:text-slate-100 antialiased flex flex-col">
+    <div className="min-h-screen bg-[#f8fbff] text-slate-900 dark:bg-[#09111f] font-display dark:text-slate-100 antialiased flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-[#e5ddd3] bg-[#f2ece1]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#09111f]/80">
+      <header className="sticky top-0 z-50 border-b border-[#dde7f1] bg-[#f8fbff]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#09111f]/80">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-20">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
