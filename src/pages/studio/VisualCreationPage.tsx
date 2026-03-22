@@ -16,8 +16,13 @@ export default function VisualCreationPage() {
     videoLoading, videoStep, videoUrl, videoError, videoProgress,
     selectedThumbnail,
     thumbnailSaving, thumbnailSaved,
+    handleUpdateSceneText, textSaving,
     handleGenerate, handleRenderVideo, handleSelectThumbnail,
   } = useGeneration()
+
+  // 인라인 편집 상태
+  const [editingScene, setEditingScene] = useState<{ sceneOrder: number; field: 'dialogue' | 'subtitle_text' } | null>(null)
+  const [editValue, setEditValue] = useState('')
 
   // 생성 중 브라우저 닫기 경고
   useEffect(() => {
@@ -396,19 +401,94 @@ export default function VisualCreationPage() {
                     )}
                   </div>
                   <div className="mt-3 space-y-1">
+                    {/* 줄거리 (클릭하면 편집) */}
                     <div className="flex items-start gap-2 min-h-[2.5rem]">
                       <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-bold shrink-0">
                         {scene.scene_order}컷
                       </span>
-                      <span className="text-xs text-warm-muted line-clamp-2">{scene.subtitle_text}</span>
+                      {editingScene?.sceneOrder === scene.scene_order && editingScene.field === 'subtitle_text' ? (
+                        <div className="flex-1 flex gap-1">
+                          <input
+                            className="flex-1 text-xs border border-primary rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary"
+                            value={editValue}
+                            onChange={e => setEditValue(e.target.value)}
+                            onKeyDown={async e => {
+                              if (e.key === 'Enter') {
+                                await handleUpdateSceneText(scene.scene_order, 'subtitle_text', editValue)
+                                setEditingScene(null)
+                              } else if (e.key === 'Escape') {
+                                setEditingScene(null)
+                              }
+                            }}
+                            autoFocus
+                            maxLength={500}
+                          />
+                          <button
+                            className="text-xs text-primary font-bold shrink-0"
+                            onClick={async () => {
+                              await handleUpdateSceneText(scene.scene_order, 'subtitle_text', editValue)
+                              setEditingScene(null)
+                            }}
+                          >✓</button>
+                        </div>
+                      ) : (
+                        <span
+                          className="text-xs text-warm-muted line-clamp-2 cursor-pointer hover:text-primary transition-colors"
+                          title="클릭하여 줄거리 수정"
+                          onClick={() => {
+                            setEditingScene({ sceneOrder: scene.scene_order, field: 'subtitle_text' })
+                            setEditValue(scene.subtitle_text)
+                          }}
+                        >{scene.subtitle_text}</span>
+                      )}
                     </div>
-                    <p className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1] line-clamp-2">
-                      "{scene.dialogue}"
-                    </p>
+                    {/* 대사 (클릭하면 편집) */}
+                    {editingScene?.sceneOrder === scene.scene_order && editingScene.field === 'dialogue' ? (
+                      <div className="flex gap-1">
+                        <input
+                          className="flex-1 text-sm border border-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
+                          value={editValue}
+                          onChange={e => setEditValue(e.target.value)}
+                          onKeyDown={async e => {
+                            if (e.key === 'Enter') {
+                              await handleUpdateSceneText(scene.scene_order, 'dialogue', editValue)
+                              setEditingScene(null)
+                            } else if (e.key === 'Escape') {
+                              setEditingScene(null)
+                            }
+                          }}
+                          autoFocus
+                          maxLength={500}
+                        />
+                        <button
+                          className="text-sm text-primary font-bold shrink-0"
+                          onClick={async () => {
+                            await handleUpdateSceneText(scene.scene_order, 'dialogue', editValue)
+                            setEditingScene(null)
+                          }}
+                        >✓</button>
+                      </div>
+                    ) : (
+                      <p
+                        className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1] line-clamp-2 cursor-pointer hover:border-primary transition-colors"
+                        title="클릭하여 대사 수정"
+                        onClick={() => {
+                          setEditingScene({ sceneOrder: scene.scene_order, field: 'dialogue' })
+                          setEditValue(scene.dialogue)
+                        }}
+                      >
+                        "{scene.dialogue}"
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* 수정 안내 */}
+            <p className="text-xs text-warm-muted text-center">
+              💡 줄거리나 대사를 클릭하면 직접 수정할 수 있습니다
+            </p>
 
             {/* 영상 플레이어 */}
             {videoUrl && (

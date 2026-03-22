@@ -49,6 +49,10 @@ interface GenerationContextType {
   thumbnailSaving: boolean
   thumbnailSaved: boolean
 
+  // 텍스트 수정
+  handleUpdateSceneText: (sceneOrder: number, field: 'dialogue' | 'subtitle_text', value: string) => Promise<void>
+  textSaving: boolean
+
   // 액션
   handleGenerate: () => Promise<void>
   handleRenderVideo: () => Promise<void>
@@ -118,6 +122,9 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
   const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(null)
   const [thumbnailSaving, setThumbnailSaving] = useState(false)
   const [thumbnailSaved, setThumbnailSaved] = useState(false)
+
+  // 텍스트 수정
+  const [textSaving, setTextSaving] = useState(false)
 
   const abortRef = useRef<AbortController | null>(null)
 
@@ -323,6 +330,30 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
     }
   }, [result])
 
+  // ── 대사/줄거리 수정 ──
+  const handleUpdateSceneText = useCallback(async (sceneOrder: number, field: 'dialogue' | 'subtitle_text', value: string) => {
+    if (!result) return
+    setTextSaving(true)
+    try {
+      const res = await generationApi.updateText(result.job_id, {
+        scenes: [{ scene_order: sceneOrder, [field]: value }],
+      })
+      if (res.data.success) {
+        // result 안의 해당 scene 업데이트
+        setResult({
+          ...result,
+          scenes: result.scenes.map(s =>
+            s.scene_order === sceneOrder ? { ...s, [field]: value } : s
+          ),
+        })
+      }
+    } catch (err) {
+      console.error('Text update error:', err)
+    } finally {
+      setTextSaving(false)
+    }
+  }, [result])
+
   // ── 중단 ──
   const handleAbort = useCallback(() => {
     abortRef.current?.abort()
@@ -364,6 +395,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
         videoLoading, videoStep, videoUrl, videoError, videoProgress,
         selectedThumbnail, setSelectedThumbnail,
         thumbnailSaving, thumbnailSaved,
+        handleUpdateSceneText, textSaving,
         handleGenerate, handleRenderVideo, handleSelectThumbnail,
         handleAbort, resetAll,
       }}
