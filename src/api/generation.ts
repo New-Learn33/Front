@@ -76,4 +76,12 @@ export const generationApi = {
         scenes: { scene_order: number; dialogue: string; subtitle_text: string }[]
       }
     }>(`/api/v1/generation/jobs/${jobId}/text`, data),
+
+  // 일일 생성 횟수 조회
+  getDailyLimit: () =>
+    api.get<{
+      success: boolean
+      message: string
+      data: { daily_limit: number; used_today: number; remaining: number }
+    }>('/api/v1/generation/daily-limit'),
 }

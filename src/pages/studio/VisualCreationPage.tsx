@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { presetsApi, type Preset } from '@/api/presets'
+import { generationApi } from '@/api/generation'
 import { useGeneration } from '@/hooks/useGeneration'
 
 export default function VisualCreationPage() {
@@ -35,6 +36,26 @@ export default function VisualCreationPage() {
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [loading, videoLoading])
+
+  // 일일 생성 횟수
+  const [dailyRemaining, setDailyRemaining] = useState<number | null>(null)
+  const [dailyLimit, setDailyLimit] = useState<number>(5)
+
+  const fetchDailyLimit = () => {
+    generationApi.getDailyLimit().then(res => {
+      if (res.data.success) {
+        setDailyRemaining(res.data.data.remaining)
+        setDailyLimit(res.data.data.daily_limit)
+      }
+    }).catch(() => {})
+  }
+
+  useEffect(() => { fetchDailyLimit() }, [])
+
+  // 생성 완료 시 남은 횟수 갱신
+  useEffect(() => {
+    if (result) fetchDailyLimit()
+  }, [result])
 
   // 프리셋 상태
   const [presets, setPresets] = useState<Preset[]>([])
@@ -686,16 +707,33 @@ export default function VisualCreationPage() {
           </div>
         )}
 
+        {/* 남은 생성 횟수 */}
+        {dailyRemaining !== null && (
+          <div className={`flex items-center justify-between rounded-xl px-4 py-2.5 text-sm ${
+            dailyRemaining === 0
+              ? 'bg-red-50 border border-red-200 text-red-600'
+              : 'bg-primary/5 border border-primary/10 text-primary'
+          }`}>
+            <span className="font-medium">오늘 남은 생성 횟수</span>
+            <span className="font-bold">{dailyRemaining} / {dailyLimit}회</span>
+          </div>
+        )}
+
         {/* 6컷 생성 버튼 */}
         <button
           onClick={handleGenerate}
-          disabled={loading || videoLoading || !prompt.trim()}
+          disabled={loading || videoLoading || !prompt.trim() || dailyRemaining === 0}
           className="w-full bg-primary hover:bg-[#58717c] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 btn-press"
         >
           {loading ? (
             <>
               <span className="material-symbols-outlined animate-spin">progress_activity</span>
               생성 중...
+            </>
+          ) : dailyRemaining === 0 ? (
+            <>
+              <span className="material-symbols-outlined">block</span>
+              오늘 생성 횟수를 모두 사용했습니다
             </>
           ) : (
             <>
