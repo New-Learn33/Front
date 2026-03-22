@@ -438,9 +438,9 @@ export default function VisualCreationPage() {
         <div className="bg-white rounded-2xl border border-[#dde7f1] p-5 space-y-4">
           <h3 className="text-base font-bold text-[#2d2926]">생성 정보</h3>
           <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-warm-muted">태그</span>
-              <span className="font-medium text-[#2d2926]">
+            <div className="flex justify-between gap-4">
+              <span className="text-warm-muted shrink-0">태그</span>
+              <span className="font-medium text-[#2d2926] text-right break-all">
                 {selectedTags.join(', ') || '없음'}
               </span>
             </div>
