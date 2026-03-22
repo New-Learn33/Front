@@ -251,7 +251,7 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-            <div className="mt-5 space-y-3">
+            <div className="mt-5 min-h-[340px] space-y-3">
               {topVideos.map((video, index) => (
                 <Link
                   key={video.id}
