@@ -216,6 +216,7 @@ export default function VisualCreationPage() {
               <li>저작권이 강한 캐릭터는 언급할 수 없습니다</li>
               <li>폭력적이거나 선정적인 내용은 생성할 수 없습니다</li>
               <li>실존 인물의 이름이나 초상을 사용할 수 없습니다</li>
+              <li>생성 후 스토리의 줄거리나 대사를 클릭하면 수정이 가능합니다</li>
             </ul>
           </div>
 
