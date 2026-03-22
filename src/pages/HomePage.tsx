@@ -136,7 +136,7 @@ export default function HomePage() {
 
       <main className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-6 pb-16 pt-10 lg:px-12 xl:px-16">
         <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-          <div className="overflow-hidden rounded-[32px] border border-[#243454] dark:border-white/10 bg-[#081225] px-7 py-10 text-white shadow-[0_30px_80px_-30px_rgba(15,23,42,0.55)] sm:px-9 sm:py-12">
+          <div className="overflow-hidden rounded-[32px] border border-[#243454] dark:border-white/10 bg-[#081225] px-7 py-7 text-white shadow-[0_30px_80px_-30px_rgba(15,23,42,0.55)] sm:px-9 sm:py-8">
             <div className="grid gap-6 xl:grid-cols-[1fr_300px] items-stretch">
               <div className="flex flex-col justify-between">
                 <div className="space-y-3">
