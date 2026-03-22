@@ -127,6 +127,8 @@ export default function VisualCreationPage() {
         <div className="space-y-3 animate-enter">
           <h1 className="text-2xl font-bold text-[#2d2926]">새 프로젝트 생성</h1>
           <p className="text-warm-muted text-sm">원하는 장면을 설명해 주세요. AI가 6컷 만화를 만들어 드립니다.</p>
+          <p className="text-warm-muted text-xs">태그를 입력하고 내 자료함에 영상관련 에셋을 추가 시 의도한대로 영상이 만들어질 수 있습니다.</p>
+          <p className="text-warm-muted text-xs">이미지 퀄리티나 움직임 강도가 높을 시 렌더링 시간이 길어질 수 있습니다.</p>
         </div>
 
         {/* Tag Input */}
@@ -185,7 +187,7 @@ export default function VisualCreationPage() {
               <span className="text-xs font-semibold text-amber-700">콘텐츠 생성 가이드</span>
             </div>
             <ul className="text-[11px] text-amber-600 space-y-0.5 pl-5 list-disc">
-              <li>특정 캐릭터(마블, 디즈니, 원피스 등) 및 브랜드 이름은 직접 언급할 수 없습니다</li>
+              <li>저작권이 강한 캐릭터는 언급할 수 없습니다</li>
               <li>폭력적이거나 선정적인 내용은 생성할 수 없습니다</li>
               <li>실존 인물의 이름이나 초상을 사용할 수 없습니다</li>
             </ul>

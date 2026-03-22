@@ -244,6 +244,7 @@ export default function AssetLibraryPage() {
           <p className="text-warm-muted text-sm mt-1">
             총 {assets.length}개의 에셋 · {formatSize(totalSize)} 사용 중
           </p>
+          <p className="text-warm-muted text-xs mt-1">에셋을 다중으로 업로드 시 태그를 한번에 붙일 수 있습니다.</p>
         </div>
         <div className="flex items-center gap-2">
           {/* 선택 모드 토글 */}
