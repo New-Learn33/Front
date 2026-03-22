@@ -2,13 +2,13 @@ import api from './client'
 import type { Asset, AssetListResponse } from '@/types/asset'
 
 export const assetsApi = {
-  list: (params?: { category_id?: number; tag?: string }) =>
+  list: (params?: { tag?: string }) =>
     api.get<AssetListResponse>('/api/v1/assets', { params }),
 
-  upload: (file: File, categoryId: number, name?: string) => {
+  upload: (file: File, tags: string[] = [], name?: string) => {
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('category_id', String(categoryId))
+    tags.forEach((tag) => formData.append('tags', tag))
     if (name) formData.append('name', name)
     return api.post<{ success: boolean; message: string; data: Asset }>(
       '/api/v1/assets/upload',

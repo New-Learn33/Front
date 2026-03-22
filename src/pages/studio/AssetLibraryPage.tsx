@@ -3,14 +3,6 @@ import { assetsApi } from '@/api/assets'
 import type { Asset } from '@/types/asset'
 import { resolveApiUrl } from '@/config/env'
 
-const categories = [
-  { id: null, label: '전체' },
-  { id: 1, label: '애니메이션' },
-  { id: 2, label: '히어로' },
-  { id: 3, label: '게임' },
-  { id: 4, label: '판타지' },
-]
-
 function formatSize(bytes?: number): string {
   if (!bytes) return '0 B'
   if (bytes < 1024) return `${bytes} B`
@@ -36,7 +28,9 @@ function guessType(name: string): string {
 }
 
 export default function AssetLibraryPage() {
-  const [activeCategory, setActiveCategory] = useState<number | null>(null)
+  const [activeTag, setActiveTag] = useState<string>('')
+  const [filterTagInput, setFilterTagInput] = useState('')
+  const [uploadTagsInput, setUploadTagsInput] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [assets, setAssets] = useState<Asset[]>([])
   const [loading, setLoading] = useState(true)
@@ -54,9 +48,19 @@ export default function AssetLibraryPage() {
   const [editTags, setEditTags] = useState<string[]>([])
   const [savingTags, setSavingTags] = useState(false)
 
+  const parseTags = (raw: string): string[] =>
+    Array.from(
+      new Set(
+        raw
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      ),
+    )
+
   const fetchAssets = async () => {
     try {
-      const params = activeCategory ? { category_id: activeCategory } : undefined
+      const params = activeTag.trim() ? { tag: activeTag.trim() } : undefined
       const res = await assetsApi.list(params)
       if (res.data.success) {
         setAssets(res.data.data)
@@ -71,7 +75,7 @@ export default function AssetLibraryPage() {
   useEffect(() => {
     setLoading(true)
     fetchAssets()
-  }, [activeCategory])
+  }, [activeTag])
 
   const totalSize = assets.reduce((sum, a) => sum + (a.file_size || 0), 0)
 
@@ -83,13 +87,14 @@ export default function AssetLibraryPage() {
 
     setUploading(true)
     const total = files.length
+    const uploadTags = parseTags(uploadTagsInput)
     setUploadProgress({ current: 0, total })
     let failed = 0
 
     for (let i = 0; i < total; i++) {
       setUploadProgress({ current: i + 1, total })
       try {
-        const res = await assetsApi.upload(files[i], activeCategory || 1)
+        const res = await assetsApi.upload(files[i], uploadTags)
         if (res.data.success) {
           setAssets(prev => [res.data.data, ...prev])
         }
@@ -219,6 +224,15 @@ export default function AssetLibraryPage() {
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
   }
 
+  const applyTagFilter = () => {
+    setActiveTag(filterTagInput.trim())
+  }
+
+  const clearTagFilter = () => {
+    setFilterTagInput('')
+    setActiveTag('')
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between animate-enter">
@@ -296,22 +310,56 @@ export default function AssetLibraryPage() {
         </div>
       </div>
 
+      <div className="bg-white rounded-xl border border-[#dde7f1] p-4 animate-enter" style={{ animationDelay: '80ms' }}>
+        <label className="block text-xs font-semibold text-[#2d2926] mb-2">업로드 기본 태그</label>
+        <div className="flex items-center gap-2">
+          <input
+            value={uploadTagsInput}
+            onChange={(e) => setUploadTagsInput(e.target.value)}
+            className="w-full max-w-lg bg-[#f5f9fd] border border-[#dde7f1] rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+            placeholder="쉼표로 구분해서 입력 (예: hero, fantasy, 3d)"
+          />
+          {uploadTagsInput.trim() && (
+            <button
+              onClick={() => setUploadTagsInput('')}
+              className="px-3 py-2 rounded-lg text-sm font-medium bg-white border border-[#dde7f1] text-warm-muted hover:bg-[#f5f9fd] transition-all"
+            >
+              초기화
+            </button>
+          )}
+        </div>
+        <p className="text-[11px] text-warm-muted mt-2">
+          업로드 시 입력한 태그가 모든 선택 파일에 동일하게 적용됩니다.
+        </p>
+      </div>
+
       {/* Filter & View */}
       <div className="flex items-center justify-between animate-enter" style={{ animationDelay: '100ms' }}>
         <div className="flex items-center gap-2">
-          {categories.map((c) => (
-            <button
-              key={c.label}
-              onClick={() => setActiveCategory(c.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeCategory === c.id
-                  ? 'bg-primary text-white'
-                  : 'bg-white border border-[#dde7f1] text-warm-muted hover:bg-[#f5f9fd]'
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
+          <input
+            value={filterTagInput}
+            onChange={(e) => setFilterTagInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && applyTagFilter()}
+            className="w-56 bg-white border border-[#dde7f1] rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+            placeholder="태그 필터 (예: hero, 3d)"
+          />
+          <button
+            onClick={applyTagFilter}
+            className="px-3 py-2 rounded-lg text-sm font-medium bg-primary text-white hover:bg-[#58717c] transition-all"
+          >
+            적용
+          </button>
+          <button
+            onClick={clearTagFilter}
+            className="px-3 py-2 rounded-lg text-sm font-medium bg-white border border-[#dde7f1] text-warm-muted hover:bg-[#f5f9fd] transition-all"
+          >
+            전체
+          </button>
+          {activeTag && (
+            <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full">
+              필터: {activeTag}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1 bg-white border border-[#dde7f1] rounded-lg p-1">
           <button
@@ -494,6 +542,7 @@ export default function AssetLibraryPage() {
           </table>
         </div>
       )}
+
       {/* 태그 편집 모달 */}
       {editingAsset && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setEditingAsset(null)}>
