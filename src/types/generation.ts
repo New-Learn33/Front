@@ -1,5 +1,5 @@
 export interface GenerationRequest {
-  category_id: number
+  tags: string[]
   prompt: string
 }
 
@@ -23,7 +23,7 @@ export interface SelectedTemplateImage {
 export interface GenerationData {
   job_id: number
   title: string
-  category_id: number
+  tags?: string[]
   selected_template_image: SelectedTemplateImage
   scenes: SceneItem[]
   images: ImageItem[]
