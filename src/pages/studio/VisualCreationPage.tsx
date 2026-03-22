@@ -16,7 +16,7 @@ export default function VisualCreationPage() {
     videoLoading, videoStep, videoUrl, videoError, videoProgress,
     selectedThumbnail,
     thumbnailSaving, thumbnailSaved,
-    handleUpdateSceneText, textSaving,
+    handleUpdateSceneText,
     handleGenerate, handleRenderVideo, handleSelectThumbnail,
   } = useGeneration()
 
