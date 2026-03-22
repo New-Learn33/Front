@@ -379,6 +379,10 @@ export default function HomePage() {
 
                   <div className="flex items-center justify-between p-4 text-sm text-slate-400">
                     <span className="inline-flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base">visibility</span>
+                      {formatCount(video.view_count ?? 0)}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-base text-primary">favorite</span>
                       {formatCount(video.like_count)}
                     </span>

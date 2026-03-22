@@ -88,7 +88,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     ws.onopen = () => {
       setConnected(true)
-      console.log('[WS] Connected')
     }
 
     ws.onmessage = (event) => {
@@ -143,7 +142,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     ws.onclose = () => {
       setConnected(false)
-      console.log('[WS] Disconnected, reconnecting in 3s...')
       reconnectTimer.current = setTimeout(connectWs, 3000)
     }
 
