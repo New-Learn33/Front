@@ -321,7 +321,7 @@ export default function VisualCreationPage() {
                 {streaming.scenes.map((scene, idx) => {
                   const img = streaming.images.find((i) => i.scene_order === scene.scene_order)
                   return (
-                    <div key={scene.scene_order} className="space-y-3">
+                    <div key={scene.scene_order} className="flex flex-col">
                       {/* Image or Placeholder */}
                       <div className="aspect-square rounded-xl overflow-hidden bg-[#f5f9fd] border border-[#dde7f1] relative">
                         {img ? (
@@ -352,14 +352,14 @@ export default function VisualCreationPage() {
                         )}
                       </div>
                       {/* Scene Info */}
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                      <div className="mt-3 space-y-1 flex-1">
+                        <div className="flex items-start gap-2">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-bold shrink-0 ${
                             img ? 'bg-green-500 text-white' : 'bg-primary text-white'
                           }`}>
                             {scene.scene_order}컷 {img ? '✓' : ''}
                           </span>
-                          <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
+                          <span className="text-xs text-warm-muted line-clamp-2">{scene.subtitle_text}</span>
                         </div>
                         <p className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1]">
                           "{scene.dialogue}"
@@ -385,7 +385,7 @@ export default function VisualCreationPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {result.scenes.map((scene, idx) => (
-                <div key={scene.scene_order} className="space-y-3">
+                <div key={scene.scene_order} className="flex flex-col">
                   <div className="aspect-square rounded-xl overflow-hidden bg-[#f5f9fd] border border-[#dde7f1]">
                     {result.images[idx] && (
                       <img
@@ -395,12 +395,12 @@ export default function VisualCreationPage() {
                       />
                     )}
                   </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-bold">
+                  <div className="mt-3 space-y-1 flex-1">
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-bold shrink-0">
                         {scene.scene_order}컷
                       </span>
-                      <span className="text-xs text-warm-muted">{scene.subtitle_text}</span>
+                      <span className="text-xs text-warm-muted line-clamp-2">{scene.subtitle_text}</span>
                     </div>
                     <p className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1]">
                       "{scene.dialogue}"

@@ -137,8 +137,8 @@ export default function HomePage() {
       <main className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-6 pb-16 pt-10 lg:px-12 xl:px-16">
         <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
           <div className="overflow-hidden rounded-[32px] border border-[#243454] dark:border-white/10 bg-[#081225] px-7 py-10 text-white shadow-[0_30px_80px_-30px_rgba(15,23,42,0.55)] sm:px-9 sm:py-12 lg:min-h-[460px]">
-            <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-              <div className="space-y-6">
+            <div className="grid gap-6 xl:grid-cols-[1fr_300px] items-stretch">
+              <div className="flex flex-col justify-between">
                 <div className="space-y-3">
                   <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-primary">
                     쇼케이스
@@ -150,40 +150,40 @@ export default function HomePage() {
                   </h1>
                 </div>
 
-                <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center xl:gap-5">
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center xl:gap-5">
                   <Link
                     to={isLoggedIn ? '/studio/create' : '/signup'}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-7 py-5 text-base font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto 2xl:px-10 2xl:py-6 2xl:text-lg"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-base font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto"
                   >
                     <span className="material-symbols-outlined text-xl">auto_awesome</span>
                     새 프로젝트 생성
                   </Link>
                   <a
                     href="#showcase"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 bg-transparent px-5 py-3.5 text-sm font-bold text-white/85 transition-colors hover:bg-white/5 hover:text-white sm:w-auto xl:px-4 xl:py-3 2xl:px-6 2xl:py-4"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 bg-transparent px-5 py-3 text-sm font-bold text-white/85 transition-colors hover:bg-white/5 hover:text-white sm:w-auto"
                   >
                     <span className="material-symbols-outlined text-lg">south</span>
                     쇼케이스 보기
                   </a>
                 </div>
 
-                <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:mt-12">
+                <div className="mt-6 grid gap-3 grid-cols-3">
                   {(() => {
                     const v = heroVideo
                     if (!v) return null
                     return (
                       <>
-                        <div className={`rounded-2xl border p-4 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
-                          <p className="text-xs tracking-[0.12em] text-slate-400">조회수</p>
-                          <p className="mt-2 text-xl font-bold">{formatCount(v.view_count ?? 0)}</p>
+                        <div className={`rounded-2xl border p-3 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-[11px] tracking-[0.12em] text-slate-400">조회수</p>
+                          <p className="mt-1 text-lg font-bold">{formatCount(v.view_count ?? 0)}</p>
                         </div>
-                        <div className={`rounded-2xl border p-4 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
-                          <p className="text-xs tracking-[0.12em] text-slate-400">좋아요</p>
-                          <p className="mt-2 text-xl font-bold">{formatCount(v.like_count)}</p>
+                        <div className={`rounded-2xl border p-3 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-[11px] tracking-[0.12em] text-slate-400">좋아요</p>
+                          <p className="mt-1 text-lg font-bold">{formatCount(v.like_count)}</p>
                         </div>
-                        <div className={`rounded-2xl border p-4 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
-                          <p className="text-xs tracking-[0.12em] text-slate-400">댓글</p>
-                          <p className="mt-2 text-xl font-bold">{formatCount(v.comment_count)}</p>
+                        <div className={`rounded-2xl border p-3 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-[11px] tracking-[0.12em] text-slate-400">댓글</p>
+                          <p className="mt-1 text-lg font-bold">{formatCount(v.comment_count)}</p>
                         </div>
                       </>
                     )
@@ -193,7 +193,7 @@ export default function HomePage() {
 
               <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#101a30]">
                 {heroVideo ? (
-                  <Link to={`/video/${heroVideo.id}`} state={{ video: heroVideo }} className="relative block h-full min-h-[400px] p-5">
+                  <Link to={`/video/${heroVideo.id}`} state={{ video: heroVideo }} className="relative block h-full min-h-[380px] p-5">
                     <div
                       key={heroVideo.id}
                       className="absolute inset-0 bg-cover bg-center opacity-80 animate-fade-in transition-all duration-500"
@@ -205,8 +205,8 @@ export default function HomePage() {
                         {hoveredVideo ? '미리보기' : '대표 영상'}
                       </span>
                       <div>
-                        <h2 className="text-2xl font-black tracking-tight">{heroVideo.title}</h2>
-                        <p className="mt-2 text-sm text-white/68">{categoryLabels[heroVideo.category_id] || '비디오'}</p>
+                        <h2 className="text-xl font-black tracking-tight">{heroVideo.title}</h2>
+                        <p className="mt-1 text-sm text-white/68">{categoryLabels[heroVideo.category_id] || '비디오'}</p>
                       </div>
                       <div className="flex gap-4 text-sm text-slate-300">
                         <span>좋아요 {formatCount(heroVideo.like_count)}</span>
