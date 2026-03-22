@@ -109,6 +109,7 @@ export default function AssetLibraryPage() {
 
     setUploading(false)
     setUploadProgress({ current: 0, total: 0 })
+    setUploadTagsInput('')
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -225,7 +226,9 @@ export default function AssetLibraryPage() {
   }
 
   const applyTagFilter = () => {
-    setActiveTag(filterTagInput.trim())
+    const nextTag = filterTagInput.trim()
+    setActiveTag(nextTag)
+    setFilterTagInput('')
   }
 
   const clearTagFilter = () => {
@@ -311,7 +314,7 @@ export default function AssetLibraryPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-[#dde7f1] p-4 animate-enter" style={{ animationDelay: '80ms' }}>
-        <label className="block text-xs font-semibold text-[#2d2926] mb-2">업로드 기본 태그</label>
+        <label className="block text-xs font-semibold text-[#2d2926] mb-2">업로드 태그</label>
         <div className="flex items-center gap-2">
           <input
             value={uploadTagsInput}

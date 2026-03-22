@@ -17,8 +17,8 @@ interface GenerationContextType {
   // 생성 상태
   prompt: string
   setPrompt: (v: string) => void
-  selectedCategory: number
-  setSelectedCategory: (v: number) => void
+  selectedTags: string[]
+  setSelectedTags: (v: string[]) => void
   loading: boolean
   error: string
   setError: (v: string) => void
@@ -90,9 +90,9 @@ const INITIAL_STREAMING: StreamingState = {
 
 // ── Provider ──
 export function GenerationProvider({ children }: { children: ReactNode }) {
-  // 프롬프트 & 카테고리
+  // 프롬프트 & 태그
   const [prompt, setPrompt] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState(1)
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState<GenerationData | null>(null)
@@ -150,7 +150,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          category_id: selectedCategory,
+          tags: selectedTags,
           prompt: prompt.trim(),
           art_style: artStyle,
           genre,
@@ -200,7 +200,9 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
                 setResult({
                   job_id: event.job_id,
                   title: event.title,
-                  category_id: event.category_id,
+                  tags: Array.isArray(event.tags)
+                    ? event.tags
+                    : (event.category_id ? [String(event.category_id)] : selectedTags),
                   selected_template_image: event.selected_template_image,
                   scenes: event.scenes,
                   images: event.images,
@@ -225,7 +227,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
       setLoading(false)
       abortRef.current = null
     }
-  }, [prompt, selectedCategory, artStyle, genre, imageQuality])
+  }, [prompt, selectedTags, artStyle, genre, imageQuality])
 
   // ── WebSocket 기반 영상 진행률 수신 ──
   useEffect(() => {
@@ -331,7 +333,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
   const resetAll = useCallback(() => {
     handleAbort()
     setPrompt('')
-    setSelectedCategory(1)
+    setSelectedTags([])
     setLoading(false)
     setError('')
     setResult(null)
@@ -351,7 +353,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
     <GenerationContext.Provider
       value={{
         prompt, setPrompt,
-        selectedCategory, setSelectedCategory,
+        selectedTags, setSelectedTags,
         loading, error, setError,
         result, setResult,
         streaming,

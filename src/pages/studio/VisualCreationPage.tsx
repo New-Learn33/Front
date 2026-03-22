@@ -2,17 +2,10 @@ import { useState, useEffect } from 'react'
 import { presetsApi, type Preset } from '@/api/presets'
 import { useGeneration } from '@/hooks/useGeneration'
 
-const categories = [
-  { id: 1, label: '애니메이션', icon: 'animation', desc: '생동감 넘치는 애니 스타일' },
-  { id: 2, label: '히어로', icon: 'shield', desc: '슈퍼히어로 액션 스타일' },
-  { id: 3, label: '게임', icon: 'sports_esports', desc: '게임 시네마틱 스타일' },
-  { id: 4, label: '판타지', icon: 'auto_awesome', desc: '에픽 판타지 스타일' },
-]
-
 export default function VisualCreationPage() {
   const {
     prompt, setPrompt,
-    selectedCategory, setSelectedCategory,
+    selectedTags, setSelectedTags,
     loading, error,
     result,
     streaming,
@@ -43,6 +36,7 @@ export default function VisualCreationPage() {
   const [showPresetSave, setShowPresetSave] = useState(false)
   const [presetName, setPresetName] = useState('')
   const [showPresets, setShowPresets] = useState(false)
+  const [customTag, setCustomTag] = useState('')
 
   // 프리셋 목록 로드
   useEffect(() => {
@@ -58,7 +52,7 @@ export default function VisualCreationPage() {
       const res = await presetsApi.create({
         name: presetName.trim(),
         prompt: prompt.trim(),
-        category_id: selectedCategory,
+        tags: selectedTags,
         art_style: artStyle,
         genre,
         image_quality: imageQuality,
@@ -75,12 +69,35 @@ export default function VisualCreationPage() {
   // 프리셋 불러오기 (상세설정 포함)
   const handleLoadPreset = (preset: Preset) => {
     setPrompt(preset.prompt)
-    setSelectedCategory(preset.category_id)
+    setSelectedTags(preset.tags || [])
     if (preset.art_style) setArtStyle(preset.art_style)
     if (preset.genre) setGenre(preset.genre)
     if (preset.image_quality) setImageQuality(preset.image_quality)
     if (preset.motion_intensity) setMotionIntensity(preset.motion_intensity)
     setShowPresets(false)
+  }
+
+  const addCustomTag = () => {
+    const parsedTags = Array.from(
+      new Set(
+        customTag
+          .split(',')
+          .map((tag) => tag.trim().toLowerCase())
+          .filter(Boolean),
+      ),
+    )
+
+    if (!parsedTags.length) return
+    const merged = [...selectedTags]
+    parsedTags.forEach((tag) => {
+      if (!merged.includes(tag)) merged.push(tag)
+    })
+    setSelectedTags(merged)
+    setCustomTag('')
+  }
+
+  const removeTag = (tag: string) => {
+    setSelectedTags(selectedTags.filter((t) => t !== tag))
   }
 
   // 프리셋 삭제
@@ -112,8 +129,42 @@ export default function VisualCreationPage() {
           <p className="text-warm-muted text-sm">원하는 장면을 설명해 주세요. AI가 6컷 만화를 만들어 드립니다.</p>
         </div>
 
+        {/* Tag Input */}
+        <div className="space-y-3 animate-enter" style={{ animationDelay: '80ms' }}>
+          <h2 className="text-lg font-bold text-[#2d2926]">태그 입력</h2>
+          <div className="flex items-center gap-2">
+            <input
+              value={customTag}
+              onChange={(e) => setCustomTag(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomTag())}
+              placeholder="태그 입력 후 Enter (쉼표로 여러 개 가능)"
+              className="w-full max-w-xs bg-white rounded-lg px-3 py-2 text-sm border border-[#dde7f1] outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            <button
+              onClick={addCustomTag}
+              disabled={!customTag.trim()}
+              className="bg-primary text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-[#58717c] disabled:opacity-40 transition-colors"
+            >
+              추가
+            </button>
+          </div>
+          {selectedTags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {selectedTags.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => removeTag(tag)}
+                  className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full hover:bg-primary/20 transition-colors"
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Prompt Input */}
-        <div className="bg-white rounded-2xl border border-[#dde7f1] p-5 space-y-3 animate-enter-scale" style={{ animationDelay: '80ms' }}>
+        <div className="bg-white rounded-2xl border border-[#dde7f1] p-5 space-y-3 animate-enter-scale" style={{ animationDelay: '160ms' }}>
           <label className="text-sm font-semibold text-[#2d2926]">프롬프트</label>
           <textarea
             className="w-full h-32 bg-[#f5f9fd] rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 border border-[#dde7f1] resize-none placeholder:text-warm-muted/50"
@@ -219,7 +270,7 @@ export default function VisualCreationPage() {
                     </button>
                     <div className="flex items-center gap-1 ml-2 shrink-0">
                       <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                        {categories.find(c => c.id === preset.category_id)?.label}
+                        {(preset.tags || []).join(', ') || '태그 없음'}
                       </span>
                       <button
                         onClick={() => handleDeletePreset(preset.id)}
@@ -233,33 +284,6 @@ export default function VisualCreationPage() {
               )}
             </div>
           )}
-        </div>
-
-        {/* Category Selection */}
-        <div className="space-y-3 animate-enter" style={{ animationDelay: '160ms' }}>
-          <h2 className="text-lg font-bold text-[#2d2926]">카테고리 선택</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {categories.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setSelectedCategory(c.id)}
-                disabled={loading || videoLoading}
-                className={`p-4 rounded-2xl border-2 text-left transition-all btn-press ${
-                  selectedCategory === c.id
-                    ? 'border-primary bg-primary/5'
-                    : 'border-[#dde7f1] bg-white hover:border-primary/30 card-hover'
-                }`}
-              >
-                <div className={`size-10 rounded-xl flex items-center justify-center mb-3 ${
-                  selectedCategory === c.id ? 'bg-primary text-white' : 'bg-primary/10 text-primary'
-                }`}>
-                  <span className="material-symbols-outlined">{c.icon}</span>
-                </div>
-                <p className="text-sm font-bold text-[#2d2926]">{c.label}</p>
-                <p className="text-xs text-warm-muted mt-1">{c.desc}</p>
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Error Messages */}
@@ -353,7 +377,7 @@ export default function VisualCreationPage() {
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-[#2d2926]">{result.title}</h3>
               <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
-                {categories.find(c => c.id === result.category_id)?.label}
+                {(result.tags || []).join(', ') || '태그 없음'}
               </span>
             </div>
 
@@ -413,9 +437,9 @@ export default function VisualCreationPage() {
           <h3 className="text-base font-bold text-[#2d2926]">생성 정보</h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-warm-muted">카테고리</span>
+              <span className="text-warm-muted">태그</span>
               <span className="font-medium text-[#2d2926]">
-                {categories.find(c => c.id === selectedCategory)?.label}
+                {selectedTags.join(', ') || '없음'}
               </span>
             </div>
             <div className="flex justify-between">

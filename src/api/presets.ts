@@ -4,7 +4,7 @@ export interface Preset {
   id: number
   name: string
   prompt: string
-  category_id: number
+  tags?: string[]
   art_style?: string
   genre?: string
   image_quality?: string
@@ -27,7 +27,7 @@ interface PresetResponse {
 export interface PresetCreateData {
   name: string
   prompt: string
-  category_id: number
+  tags: string[]
   art_style?: string
   genre?: string
   image_quality?: string
