@@ -352,8 +352,8 @@ export default function VisualCreationPage() {
                         )}
                       </div>
                       {/* Scene Info */}
-                      <div className="mt-3 space-y-1 flex-1">
-                        <div className="flex items-start gap-2">
+                      <div className="mt-3 space-y-1">
+                        <div className="flex items-start gap-2 min-h-[2.5rem]">
                           <span className={`text-xs px-2 py-0.5 rounded-full font-bold shrink-0 ${
                             img ? 'bg-green-500 text-white' : 'bg-primary text-white'
                           }`}>
@@ -361,7 +361,7 @@ export default function VisualCreationPage() {
                           </span>
                           <span className="text-xs text-warm-muted line-clamp-2">{scene.subtitle_text}</span>
                         </div>
-                        <p className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1]">
+                        <p className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1] line-clamp-2">
                           "{scene.dialogue}"
                         </p>
                       </div>
@@ -395,14 +395,14 @@ export default function VisualCreationPage() {
                       />
                     )}
                   </div>
-                  <div className="mt-3 space-y-1 flex-1">
-                    <div className="flex items-start gap-2">
+                  <div className="mt-3 space-y-1">
+                    <div className="flex items-start gap-2 min-h-[2.5rem]">
                       <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-bold shrink-0">
                         {scene.scene_order}컷
                       </span>
                       <span className="text-xs text-warm-muted line-clamp-2">{scene.subtitle_text}</span>
                     </div>
-                    <p className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1]">
+                    <p className="text-sm font-medium text-[#2d2926] bg-[#f5f9fd] rounded-lg p-3 border border-[#dde7f1] line-clamp-2">
                       "{scene.dialogue}"
                     </p>
                   </div>
