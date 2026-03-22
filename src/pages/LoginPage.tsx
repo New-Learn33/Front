@@ -61,7 +61,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="bg-[#f2ece1] min-h-screen flex flex-col font-display text-slate-900">
+    <div className="bg-[#f8fbff] min-h-screen flex flex-col font-display text-slate-900">
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-[440px] space-y-8">
           {/* Logo */}
@@ -84,7 +84,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label className="text-sm font-semibold block px-1">이메일</label>
               <input
-                className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
+                className="w-full h-14 px-5 rounded-xl border border-[#dde7f1] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                 placeholder="이메일을 입력하세요"
                 type="email"
                 value={email}
@@ -97,7 +97,7 @@ export default function LoginPage() {
               <label className="text-sm font-semibold block px-1">비밀번호</label>
               <div className="relative">
                 <input
-                  className="w-full h-14 px-5 rounded-xl border border-[#e5ddd3] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
+                  className="w-full h-14 px-5 rounded-xl border border-[#dde7f1] bg-white/50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-warm-muted/50"
                   placeholder="비밀번호를 입력하세요"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -119,7 +119,7 @@ export default function LoginPage() {
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
                 <input
-                  className="w-5 h-5 rounded border-[#e5ddd3] text-primary focus:ring-primary bg-white cursor-pointer"
+                  className="w-5 h-5 rounded border-[#dde7f1] text-primary focus:ring-primary bg-white cursor-pointer"
                   id="remember"
                   type="checkbox"
                 />
@@ -144,17 +144,17 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative py-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#e5ddd3]" />
+              <div className="w-full border-t border-[#dde7f1]" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[#f2ece1] px-4 text-warm-muted">또는 간편 로그인</span>
+              <span className="bg-[#f8fbff] px-4 text-warm-muted">또는 간편 로그인</span>
             </div>
           </div>
 
           {/* Social Logins */}
           <div className="w-full flex justify-center">
             {isLoading ? (
-              <div className="w-full flex items-center justify-center h-11 rounded-xl border border-[#e5ddd3] bg-white/40">
+              <div className="w-full flex items-center justify-center h-11 rounded-xl border border-[#dde7f1] bg-white/40">
                 <span className="text-sm text-warm-muted">로그인 중...</span>
               </div>
             ) : (

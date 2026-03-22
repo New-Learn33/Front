@@ -11,24 +11,26 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
   const { isLoggedIn, user, logout } = useAuth()
 
   return (
-    <div className="bg-[#09111f] font-display text-slate-100 antialiased min-h-screen flex flex-col">
+    <div className="min-h-screen bg-[#f8fbff] text-slate-900 dark:bg-[#09111f] font-display dark:text-slate-100 antialiased flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#09111f]/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 lg:px-20 h-20 flex items-center justify-between">
+      <header className="sticky top-0 z-50 border-b border-[#dde7f1] bg-[#f8fbff]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#09111f]/80">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-20">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
-          <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary/90 p-1 object-contain" />
-              <h2 className="text-lg font-bold tracking-tight text-white">SceneFlow</h2>
+              <img src={aiVidLogo} alt="SceneFlow 로고" className="size-9 rounded-xl bg-primary p-1.5 object-contain shadow-lg shadow-primary/20" />
+              <div>
+                <h2 className="text-lg font-bold tracking-tight text-[#2d2926] dark:text-white">SceneFlow</h2>
+                <p className="text-[11px] font-medium tracking-[0.12em] text-slate-500">GENERATIVE VIDEO STUDIO</p>
+              </div>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link className={`text-sm font-medium transition-colors ${activeNav === 'home' ? 'font-semibold text-primary' : 'text-slate-400 hover:text-primary'}`} to="/">홈</Link>
+              <Link className={`text-sm transition-colors ${activeNav === 'home' ? 'font-semibold text-primary' : 'font-medium text-slate-400 hover:text-primary'}`} to="/">홈</Link>
+              <Link className="text-sm font-medium text-slate-400 transition-colors hover:text-primary" to={isLoggedIn ? "/studio" : "/login"}>작업실</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
-              <>
-                <Link to="/studio" className="text-sm font-medium text-slate-400 hover:text-primary transition-colors">스튜디오</Link>
-                <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-1 shadow-sm shadow-black/20">
                   {user?.profile_image_url ? (
                     <img src={user.profile_image_url} alt="프로필" className="size-8 rounded-full object-cover" />
                   ) : (
@@ -36,14 +38,13 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
                       {user?.name?.charAt(0) || '?'}
                     </div>
                   )}
-                  <span className="hidden sm:block text-sm font-medium text-slate-200">{user?.nickname || user?.name}</span>
-                  <button onClick={logout} className="text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors">로그아웃</button>
+                  <span className="hidden sm:block text-sm font-medium text-[#2d2926]">{user?.nickname || user?.name}</span>
+                  <button onClick={logout} className="px-3 text-sm font-medium text-[#8a7d72] transition-colors hover:text-[#2d2926]">로그아웃</button>
                 </div>
-              </>
             ) : (
               <>
-                <Link to="/login" className="hidden sm:block text-sm font-medium text-slate-400">로그인</Link>
-                <Link to="/signup" className="bg-primary hover:bg-[#58717c] text-white text-sm font-bold px-5 py-2 rounded-lg transition-all">시작하기</Link>
+                <Link to="/login" className="hidden text-sm font-medium text-slate-400 sm:block">로그인</Link>
+                <Link to="/signup" className="rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-[#58717c]">시작하기</Link>
               </>
             )}
           </div>
@@ -58,11 +59,6 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
           <div className="flex items-center gap-3">
             <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
             <span className="font-bold text-white">SceneFlow</span>
-          </div>
-          <div className="flex gap-8 text-sm text-slate-400">
-            <Link className="hover:text-primary transition-colors" to="/terms">이용약관</Link>
-            <Link className="hover:text-primary transition-colors" to="/privacy">개인정보처리방침</Link>
-            <Link className="hover:text-primary transition-colors" to="/support">고객센터</Link>
           </div>
           <p className="text-sm text-slate-400">&copy; 2026 SceneFlow. All rights reserved.</p>
         </div>

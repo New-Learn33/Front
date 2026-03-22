@@ -2,6 +2,7 @@ import api from './client'
 
 export interface VideoListItem {
   id: number
+  user_id?: number
   title: string
   category_id: number
   thumbnail_url: string
@@ -28,4 +29,7 @@ export const videosApi = {
     api.get<{ success: boolean; data: { videos: VideoListItem[] } }>('/api/v1/videos/search', {
       params: { title },
     }),
+
+  getById: (id: number) =>
+    api.get<{ success: boolean; data: { videos: VideoListItem } }>(`/api/v1/videos/${id}`),
 }

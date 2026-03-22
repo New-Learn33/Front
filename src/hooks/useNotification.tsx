@@ -64,6 +64,20 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     } catch { /* ignore */ }
   }, [])
 
+  // 브라우저 데스크톱 알림 전송
+  const showBrowserNotification = useCallback((title: string, body: string) => {
+    if (!('Notification' in window)) return
+    if (Notification.permission === 'granted') {
+      new Notification(title, { body, icon: '/favicon.ico' })
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(perm => {
+        if (perm === 'granted') {
+          new Notification(title, { body, icon: '/favicon.ico' })
+        }
+      })
+    }
+  }, [])
+
   const connectWs = useCallback(() => {
     const token = localStorage.getItem('access_token')
     if (!token) return
@@ -84,9 +98,21 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         if (data.type === 'notification') {
           if (data.event === 'connected') {
             setUnreadCount(data.unread_count ?? 0)
-          } else if (data.event === 'new_notification') {
-            setNotifications(prev => [data.notification, ...prev])
-            setUnreadCount(prev => prev + 1)
+          } else if (data.event === 'created' || data.event === 'new_notification') {
+            const notif = data.notification
+            setNotifications(prev => [notif, ...prev])
+            if (data.unread_count != null) {
+              setUnreadCount(data.unread_count)
+            } else {
+              setUnreadCount(prev => prev + 1)
+            }
+            // 브라우저 데스크톱 알림
+            if (notif) {
+              showBrowserNotification(
+                notif.title || '새 알림',
+                notif.message || ''
+              )
+            }
           }
         }
 
@@ -103,6 +129,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             next.set(data.job_id, jobEvent)
             return next
           })
+          // 영상 생성 완료/실패 시 브라우저 알림
+          if (data.status === 'completed') {
+            showBrowserNotification('영상 생성 완료', data.message || '영상이 완성되었습니다!')
+          } else if (data.status === 'failed') {
+            showBrowserNotification('영상 생성 실패', data.message || '영상 생성 중 오류가 발생했습니다.')
+          }
         }
       } catch {
         // JSON 파싱 실패 무시
@@ -120,6 +152,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
 
     wsRef.current = ws
+  }, [])
+
+  // 브라우저 알림 권한 요청
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
   }, [])
 
   // 로그인 상태 변화 감지

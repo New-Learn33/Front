@@ -6,11 +6,17 @@ import type { User } from '@/types/auth'
 
 const STORAGE_LIMIT = 3 * 1024 * 1024 * 1024 // 3GB
 
-const navItems = [
-  { to: '/studio', icon: 'dashboard', label: '대시보드', end: true },
-  { to: '/studio/projects', icon: 'folder_open', label: '프로젝트' },
-  { to: '/studio/create', icon: 'auto_awesome', label: '비주얼 생성' },
-  { to: '/studio/assets', icon: 'perm_media', label: '에셋 라이브러리' },
+interface NavItem {
+  to: string
+  icon: string
+  label: string
+  end?: boolean
+}
+
+const navItems: NavItem[] = [
+  { to: '/studio/projects', icon: 'folder_open', label: '프로젝트 목록' },
+  { to: '/studio/create', icon: 'auto_awesome', label: '새 프로젝트 생성' },
+  { to: '/studio/assets', icon: 'perm_media', label: '내 자료함' },
   { to: '/studio/mypage', icon: 'person', label: '마이페이지' },
   { to: '/studio/settings', icon: 'settings', label: '환경설정' },
 ]
@@ -36,11 +42,11 @@ export default function StudioSidebar() {
   const storagePercent = Math.min(100, Math.round((storageUsed / STORAGE_LIMIT) * 100))
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#0b1324] text-white flex flex-col z-50 border-r border-white/10">
+    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#0b1324] text-white flex flex-col z-50 border-r border-white/10" style={{ transform: 'translateZ(0)', willChange: 'transform' }}>
       {/* Logo */}
       <div className="px-6 h-16 flex items-center gap-3 border-b border-white/10">
         <Link to="/" className="flex items-center gap-3">
-          <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-md bg-primary/90 p-1 object-contain" />
+          <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-full bg-primary/90 p-1 object-contain" />
           <span className="text-base font-bold tracking-tight">SceneFlow</span>
         </Link>
       </div>
@@ -53,10 +59,10 @@ export default function StudioSidebar() {
             to={item.to}
             end={item.end}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors border ${
                 isActive
-                  ? 'bg-primary/12 text-primary border border-primary/20'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
+                  ? 'bg-primary/12 text-primary border-primary/20'
+                  : 'text-white/60 hover:text-white hover:bg-white/5 border-transparent'
               }`
             }
           >
@@ -86,7 +92,7 @@ export default function StudioSidebar() {
           </div>
           <div>
             <p className="text-sm font-medium">{user?.name || '사용자'}</p>
-            <p className="text-[11px] text-white/40">무료 플랜</p>
+            <p className="text-[11px] text-white/40">{user?.email || ''}</p>
           </div>
         </div>
       </div>

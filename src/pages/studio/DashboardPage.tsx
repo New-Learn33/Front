@@ -74,7 +74,7 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
         {stats.map((s) => (
-          <div key={s.label} className="bg-white rounded-2xl p-5 border border-[#e5ddd3] card-hover">
+          <div key={s.label} className="bg-white rounded-2xl p-5 border border-[#dde7f1] card-hover">
             <div className="flex items-center justify-between mb-3">
               <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary">{s.icon}</span>
@@ -98,13 +98,13 @@ export default function DashboardPage() {
             <span className="material-symbols-outlined text-2xl">auto_awesome</span>
           </div>
           <div>
-            <p className="font-bold">새 영상 만들기</p>
+            <p className="font-bold">새 프로젝트 생성</p>
             <p className="text-sm text-white/70">AI로 영상을 생성하세요</p>
           </div>
         </Link>
         <Link
           to="/studio/mypage"
-          className="bg-white border border-[#e5ddd3] rounded-2xl p-6 flex items-center gap-4 card-hover btn-press"
+          className="bg-white border border-[#dde7f1] rounded-2xl p-6 flex items-center gap-4 card-hover btn-press"
         >
           <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-2xl">person</span>
@@ -116,7 +116,7 @@ export default function DashboardPage() {
         </Link>
         <Link
           to="/studio/settings"
-          className="bg-white border border-[#e5ddd3] rounded-2xl p-6 flex items-center gap-4 card-hover btn-press"
+          className="bg-white border border-[#dde7f1] rounded-2xl p-6 flex items-center gap-4 card-hover btn-press"
         >
           <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-2xl">settings</span>
@@ -137,11 +137,11 @@ export default function DashboardPage() {
           </Link>
         </div>
         {myVideos.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#e5ddd3] p-12 flex flex-col items-center text-warm-muted">
+          <div className="bg-white rounded-2xl border border-[#dde7f1] p-12 flex flex-col items-center text-warm-muted">
             <span className="material-symbols-outlined text-4xl mb-2">movie</span>
             <p className="text-sm">아직 생성한 영상이 없습니다</p>
             <Link to="/studio/create" className="mt-3 text-sm text-primary font-medium hover:underline">
-              첫 영상 만들기 →
+              새 프로젝트 생성 →
             </Link>
           </div>
         ) : (
@@ -151,7 +151,7 @@ export default function DashboardPage() {
                 key={video.id}
                 to={`/video/${video.id}`}
                 state={{ video }}
-                className="group bg-white rounded-2xl border border-[#e5ddd3] overflow-hidden hover:shadow-lg transition-all"
+                className="group bg-white rounded-2xl border border-[#dde7f1] overflow-hidden hover:shadow-lg transition-all"
               >
                 <div className="aspect-video bg-[#f0ebe3] flex items-center justify-center relative overflow-hidden">
                   {video.thumbnail_url ? (
