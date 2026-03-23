@@ -179,13 +179,20 @@ export default function VisualCreationPage() {
           {selectedTags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {selectedTags.map(tag => (
-                <button
+                <span
                   key={tag}
-                  onClick={() => removeTag(tag)}
-                  className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full hover:bg-primary/20 transition-colors"
+                  className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full"
                 >
                   #{tag}
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    aria-label={`${tag} 태그 삭제`}
+                    className="hover:text-red-500 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-xs leading-none">close</span>
+                  </button>
+                </span>
               ))}
             </div>
           )}
