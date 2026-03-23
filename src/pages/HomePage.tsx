@@ -77,7 +77,7 @@ export default function HomePage() {
     return videos
       .filter(v => v.created_at ? new Date(v.created_at) >= cutoff : true)
       .sort((a, b) => (b.like_count + (b.view_count || 0)) - (a.like_count + (a.view_count || 0)))
-      .slice(0, 5)
+      .slice(0, 4)
   }, [videos, rankPeriod])
 
   const [hoveredVideo, setHoveredVideo] = useState<VideoListItem | null>(null)
@@ -359,7 +359,7 @@ export default function HomePage() {
                   key={video.id}
                   to={`/video/${video.id}`}
                   state={{ video }}
-                  className="group overflow-hidden rounded-[26px] border border-white/10 bg-[#101a30] shadow-[0_24px_55px_-34px_rgba(0,0,0,0.45)] transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-32px_rgba(37,99,235,0.22)]"
+                  className="group isolate overflow-hidden rounded-[26px] ring-1 ring-white/10 bg-[#101a30] shadow-[0_24px_55px_-34px_rgba(0,0,0,0.45)] transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-32px_rgba(37,99,235,0.22)]"
                 >
                   <div className="relative aspect-[9/16] overflow-hidden">
                     <div
