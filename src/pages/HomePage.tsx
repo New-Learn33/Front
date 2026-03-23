@@ -150,7 +150,7 @@ export default function HomePage() {
                   </h1>
                 </div>
 
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center xl:mt-10 xl:gap-5">
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center xl:mt-8 xl:gap-5">
                   <Link
                     to={isLoggedIn ? '/studio/create' : '/signup'}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-base font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto"
