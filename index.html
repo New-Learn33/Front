@@ -9,8 +9,7 @@
     <script>
       (() => {
         const storedTheme = localStorage.getItem('theme')
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        const shouldUseDark = storedTheme ? storedTheme === 'dark' : prefersDark
+        const shouldUseDark = storedTheme ? storedTheme === 'dark' : false
         document.documentElement.classList.toggle('dark', shouldUseDark)
       })()
     </script>
