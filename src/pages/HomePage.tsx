@@ -143,7 +143,7 @@ export default function HomePage() {
                   <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-primary">
                     쇼케이스
                   </span>
-                  <h1 className="max-w-[520px] break-keep text-[26px] font-black leading-[1.15] tracking-tight sm:text-[32px] lg:text-[36px] xl:text-[42px]">
+                  <h1 className="break-keep text-[26px] font-black leading-[1.15] tracking-tight sm:text-[32px] lg:text-[36px] xl:text-[42px]">
                     <span className="block">SceneFlow,</span>
                     <span className="block text-primary">아이디어부터 완성까지</span>
                     <span className="block text-primary">영상을 한 번의 클릭으로</span>
