@@ -58,6 +58,11 @@ export default function AssetLibraryPage() {
       ),
     )
 
+  const removeUploadTag = (tagToRemove: string) => {
+    const nextTags = parseTags(uploadTagsInput).filter((tag) => tag !== tagToRemove)
+    setUploadTagsInput(nextTags.join(', '))
+  }
+
   const fetchAssets = async () => {
     try {
       const params = activeTag.trim() ? { tag: activeTag.trim() } : undefined
@@ -320,6 +325,12 @@ export default function AssetLibraryPage() {
           <input
             value={uploadTagsInput}
             onChange={(e) => setUploadTagsInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                setUploadTagsInput(parseTags(uploadTagsInput).join(', '))
+              }
+            }}
             className="w-full max-w-lg bg-[#f5f9fd] border border-[#dde7f1] rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             placeholder="쉼표로 구분해서 입력 (예: hero, fantasy, 3d)"
           />
@@ -332,6 +343,26 @@ export default function AssetLibraryPage() {
             </button>
           )}
         </div>
+        {parseTags(uploadTagsInput).length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {parseTags(uploadTagsInput).map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full"
+              >
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => removeUploadTag(tag)}
+                  aria-label={`${tag} 태그 삭제`}
+                  className="hover:text-red-500 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-xs leading-none">close</span>
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
         <p className="text-[11px] text-warm-muted mt-2">
           업로드 시 입력한 태그가 모든 선택 파일에 동일하게 적용됩니다.
         </p>
