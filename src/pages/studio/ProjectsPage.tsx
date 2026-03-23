@@ -78,12 +78,13 @@ export default function ProjectsPage() {
     }
   }
 
-  const handleDelete = async (jobId: number) => {
+  const handleDelete = async (project: UserProject) => {
     if (!confirm('이 프로젝트를 삭제하시겠습니까?')) return
+    const deleteId = project.type === 'video' ? project.job_id ?? project.id : project.id
     try {
-      const res = await userApi.cancelProject(jobId)
+      const res = await userApi.cancelProject(deleteId)
       if (res.data.success) {
-        setProjects(prev => prev.filter(p => p.id !== jobId))
+        setProjects(prev => prev.filter(p => p.id !== project.id))
       }
     } catch {
       alert('삭제에 실패했습니다.')
@@ -121,9 +122,12 @@ export default function ProjectsPage() {
     const failed: string[] = []
 
     for (const key of selectedIds) {
-      const id = Number(key.split('-')[1])
+      const [type, idStr] = key.split('-')
+      const id = Number(idStr)
+      const proj = projects.find(p => p.type === type && p.id === id)
+      const deleteId = proj && proj.type === 'video' ? proj.job_id ?? proj.id : id
       try {
-        await userApi.cancelProject(id)
+        await userApi.cancelProject(deleteId)
       } catch {
         failed.push(key)
       }
@@ -292,7 +296,7 @@ export default function ProjectsPage() {
                 {/* 개별 삭제 버튼 (선택 모드 아닐 때, 완료 프로젝트) */}
                 {!selectMode && isCompleted && (
                   <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(p.id) }}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(p) }}
                     className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 size-7 rounded-full bg-white/90 flex items-center justify-center text-red-500 hover:bg-red-50 transition-all shadow"
                   >
                     <span className="material-symbols-outlined text-sm">delete</span>

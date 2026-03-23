@@ -30,6 +30,7 @@ export interface UserComment {
 
 export interface UserProject {
   id: number
+  job_id?: number
   type: 'video' | 'job'
   title: string
   category_id: number
