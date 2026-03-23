@@ -138,7 +138,7 @@ export default function MyPage() {
             <img src={user.profile_image_url} alt="프로필" className="size-20 rounded-full object-cover" />
           ) : (
             <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="text-primary text-3xl font-bold">{user?.name?.charAt(0) || '?'}</span>
+              <span className="text-primary text-3xl font-bold">{nickname?.charAt(0) || user?.nickname?.charAt(0) || user?.name?.charAt(0) || '?'}</span>
             </div>
           )}
           <div className="flex-1 space-y-2">

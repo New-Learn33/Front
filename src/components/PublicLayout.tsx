@@ -35,7 +35,7 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
                     <img src={user.profile_image_url} alt="프로필" className="size-8 rounded-full object-cover" />
                   ) : (
                     <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
-                      {user?.name?.charAt(0) || '?'}
+                      {user?.nickname?.charAt(0) || user?.name?.charAt(0) || '?'}
                     </div>
                   )}
                   <span className="hidden sm:block text-sm font-medium text-[#2d2926]">{user?.nickname || user?.name}</span>
