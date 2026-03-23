@@ -391,8 +391,16 @@ export default function AssetLibraryPage() {
             전체
           </button>
           {activeTag && (
-            <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full">
-              필터: {activeTag}
+            <span className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full">
+              {activeTag}
+              <button
+                type="button"
+                onClick={clearTagFilter}
+                aria-label={`${activeTag} 필터 삭제`}
+                className="hover:text-red-500 transition-colors"
+              >
+                <span className="material-symbols-outlined text-xs leading-none">close</span>
+              </button>
             </span>
           )}
         </div>
