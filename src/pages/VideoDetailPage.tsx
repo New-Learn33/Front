@@ -249,7 +249,7 @@ export default function VideoDetailPage() {
 
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-[#dde7f1] bg-[#f8fbff]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#09111f]/80">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-20">
+        <div className="mx-auto flex h-16 lg:h-20 max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-12 xl:px-16">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
               <img src={aiVidLogo} alt="SceneFlow 로고" className="size-9 rounded-xl bg-primary p-1.5 object-contain shadow-lg shadow-primary/20" />
@@ -289,7 +289,7 @@ export default function VideoDetailPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-20 py-8">
+      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-4 sm:px-6 lg:px-12 xl:px-16 py-8">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-warm-muted hover:text-primary transition-colors mb-6 group"
@@ -298,9 +298,9 @@ export default function VideoDetailPage() {
           <span className="text-sm font-medium">뒤로가기</span>
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-10">
           {/* Left: Video + Info + Comments */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8">
             {/* Video Player */}
             <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-black">
               {videoSrc ? (

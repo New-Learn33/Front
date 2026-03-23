@@ -71,7 +71,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between py-2">
             <div>
               <p className="text-sm font-medium text-[#2d2926]">다크 모드</p>
-              <p className="text-xs text-warm-muted">어두운 테마로 전환합니다</p>
+              <p className="text-xs text-warm-muted">어두운 테마로 전환합니다.</p>
             </div>
             <button
               onClick={toggleTheme}
@@ -84,7 +84,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between py-2 border-t border-[#dde7f1]">
             <div>
               <p className="text-sm font-medium text-[#2d2926]">알림</p>
-              <p className="text-xs text-warm-muted">앱 내 알림을 받습니다</p>
+              <p className="text-xs text-warm-muted">앱 내 알림을 받습니다.</p>
             </div>
             <button
               onClick={() => setNotifications(!notifications)}
@@ -97,7 +97,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between py-2 border-t border-[#dde7f1]">
             <div>
               <p className="text-sm font-medium text-[#2d2926]">자동 저장</p>
-              <p className="text-xs text-warm-muted">프로젝트를 자동으로 저장합니다</p>
+              <p className="text-xs text-warm-muted">프로젝트를 자동으로 저장합니다.</p>
             </div>
             <button
               onClick={() => setAutoSave(!autoSave)}

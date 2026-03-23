@@ -14,7 +14,7 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
     <div className="min-h-screen bg-[#f8fbff] text-slate-900 dark:bg-[#09111f] font-display dark:text-slate-100 antialiased flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-[#dde7f1] bg-[#f8fbff]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#09111f]/80">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-20">
+        <div className="mx-auto flex h-16 lg:h-20 max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-12 xl:px-16">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-3">
               <img src={aiVidLogo} alt="SceneFlow 로고" className="size-9 rounded-xl bg-primary p-1.5 object-contain shadow-lg shadow-primary/20" />
@@ -54,8 +54,8 @@ export default function PublicLayout({ children, activeNav = '' }: PublicLayoutP
       <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="mt-20 border-t border-white/10 bg-[#0d1729] px-6 lg:px-20 py-12">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+      <footer className="mt-20 border-t border-white/10 bg-[#0d1729] px-6 lg:px-12 xl:px-16 py-12">
+        <div className="max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
             <img src={aiVidLogo} alt="SceneFlow 로고" className="size-8 rounded-lg bg-primary p-1 object-contain" />
             <span className="font-bold text-white">SceneFlow</span>

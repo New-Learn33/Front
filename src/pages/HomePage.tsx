@@ -134,23 +134,23 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-6 pb-16 pt-10 lg:px-12 xl:px-16">
+      <main className="mx-auto flex w-full max-w-screen-2xl flex-col gap-10 px-4 sm:px-6 pb-16 pt-10 lg:px-12 xl:px-16">
         <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
           <div className="overflow-hidden rounded-[32px] border border-[#243454] dark:border-white/10 bg-[#081225] px-7 py-7 text-white shadow-[0_30px_80px_-30px_rgba(15,23,42,0.55)] sm:px-9 sm:py-8">
-            <div className="grid gap-6 xl:grid-cols-[1fr_300px] items-stretch">
-              <div className="flex flex-col justify-between">
+            <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
+              <div className="flex flex-col">
                 <div className="space-y-3">
                   <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-primary">
                     쇼케이스
                   </span>
-                  <h1 className="max-w-[520px] break-keep text-[30px] font-black leading-[1.12] tracking-tight sm:text-[36px] lg:text-[40px] xl:text-[44px]">
+                  <h1 className="max-w-[520px] break-keep text-[26px] font-black leading-[1.15] tracking-tight sm:text-[32px] lg:text-[36px] xl:text-[42px]">
                     <span className="block">SceneFlow,</span>
                     <span className="block text-primary">아이디어부터 완성까지</span>
                     <span className="block text-primary">영상을 한 번의 클릭으로</span>
                   </h1>
                 </div>
 
-                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center xl:gap-5">
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center xl:mt-6 xl:gap-5">
                   <Link
                     to={isLoggedIn ? '/studio/create' : '/signup'}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-base font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto"
@@ -167,7 +167,7 @@ export default function HomePage() {
                   </a>
                 </div>
 
-                <div className="mt-6 grid gap-3 grid-cols-3">
+                <div className="mt-4 grid gap-3 grid-cols-3 xl:mt-6">
                   {(() => {
                     const v = heroVideo
                     if (!v) return null
@@ -193,7 +193,7 @@ export default function HomePage() {
 
               <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#101a30]">
                 {heroVideo ? (
-                  <Link to={`/video/${heroVideo.id}`} state={{ video: heroVideo }} className="relative block h-full min-h-[380px] p-5">
+                  <Link to={`/video/${heroVideo.id}`} state={{ video: heroVideo }} className="relative block h-full min-h-[260px] p-5">
                     <div
                       key={heroVideo.id}
                       className="absolute inset-0 bg-cover bg-center opacity-80 animate-fade-in transition-all duration-500"
@@ -215,7 +215,7 @@ export default function HomePage() {
                     </div>
                   </Link>
                 ) : (
-                  <div className="flex min-h-[360px] items-center justify-center text-sm text-white/55">
+                  <div className="flex h-full min-h-[260px] items-center justify-center text-sm text-white/55">
                     {loading ? '불러오는 중...' : '표시할 영상이 없습니다'}
                   </div>
                 )}
@@ -223,7 +223,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-white/10 bg-[#101a30] p-7 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.45)]">
+          <div className="flex flex-col rounded-[28px] border border-white/10 bg-[#101a30] p-5 lg:p-7 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.45)]">
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -251,7 +251,7 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-            <div className="mt-5 min-h-[340px] space-y-3">
+            <div className="mt-5 flex-1 space-y-3">
               {topVideos.map((video, index) => (
                 <Link
                   key={video.id}

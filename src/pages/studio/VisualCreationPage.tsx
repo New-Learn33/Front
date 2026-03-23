@@ -213,10 +213,10 @@ export default function VisualCreationPage() {
               <span className="text-xs font-semibold text-amber-700">콘텐츠 생성 가이드</span>
             </div>
             <ul className="text-[11px] text-amber-600 space-y-0.5 pl-5 list-disc">
-              <li>저작권이 강한 캐릭터는 언급할 수 없습니다</li>
-              <li>폭력적이거나 선정적인 내용은 생성할 수 없습니다</li>
-              <li>실존 인물의 이름이나 초상을 사용할 수 없습니다</li>
-              <li>생성 후 스토리의 줄거리나 대사를 클릭하면 수정이 가능합니다</li>
+              <li>저작권이 강한 캐릭터는 언급할 수 없습니다.</li>
+              <li>폭력적이거나 선정적인 내용은 생성할 수 없습니다.</li>
+              <li>실존 인물의 이름이나 초상을 사용할 수 없습니다.</li>
+              <li>생성 후 스토리의 줄거리나 대사를 클릭하면 수정이 가능합니다.</li>
             </ul>
           </div>
 
@@ -530,7 +530,7 @@ export default function VisualCreationPage() {
               <span className="material-symbols-outlined text-3xl text-primary/40">smart_display</span>
             </div>
             <p className="text-sm font-semibold text-[#2d2926]">미리보기</p>
-            <p className="text-xs text-warm-muted mt-1">프롬프트를 입력하고 생성 버튼을 누르세요</p>
+            <p className="text-xs text-warm-muted mt-1">프롬프트를 입력하고 생성 버튼을 누르세요.</p>
           </div>
         )}
       </div>
