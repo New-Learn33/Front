@@ -139,18 +139,18 @@ export default function HomePage() {
           <div className="overflow-hidden rounded-[32px] border border-[#243454] dark:border-white/10 bg-[#081225] px-7 py-7 text-white shadow-[0_30px_80px_-30px_rgba(15,23,42,0.55)] sm:px-9 sm:py-8">
             <div className="flex h-full gap-6 flex-col xl:flex-row">
               <div className="flex flex-col flex-1">
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-primary">
                     쇼케이스
                   </span>
-                  <h1 className="break-keep text-[26px] font-black leading-[1.3] tracking-tight sm:text-[32px] lg:text-[36px] xl:text-[42px]">
+                  <h1 className="text-[26px] font-black leading-[1.35] tracking-tight sm:text-[32px] lg:text-[36px] xl:text-[42px]">
                     <span className="block">SceneFlow,</span>
                     <span className="block text-primary">아이디어부터 완성까지</span>
                     <span className="block text-primary">영상을 한 번의 클릭으로</span>
                   </h1>
                 </div>
 
-                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center xl:mt-8 xl:gap-5">
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center xl:mt-10 xl:gap-5">
                   <Link
                     to={isLoggedIn ? '/studio/create' : '/signup'}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-base font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[#58717c] sm:w-auto"
@@ -216,7 +216,7 @@ export default function HomePage() {
                   </Link>
                 ) : (
                   <div className="flex h-full min-h-[260px] items-center justify-center text-sm text-white/55">
-                    {loading ? '불러오는 중...' : '표시할 영상이 없습니다'}
+                    {loading ? '불러오는 중...' : '표시할 영상이 없습니다.'}
                   </div>
                 )}
               </div>
@@ -282,7 +282,7 @@ export default function HomePage() {
               ))}
               {!loading && topVideos.length === 0 && (
                 <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-500">
-                  표시할 영상이 없습니다
+                  표시할 영상이 없습니다.
                 </div>
               )}
             </div>
@@ -359,7 +359,7 @@ export default function HomePage() {
                   key={video.id}
                   to={`/video/${video.id}`}
                   state={{ video }}
-                  className="group overflow-hidden rounded-[26px] border border-white/10 bg-[#101a30] shadow-[0_24px_55px_-34px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-32px_rgba(37,99,235,0.22)]"
+                  className="group overflow-hidden rounded-[26px] border border-white/10 bg-[#101a30] shadow-[0_24px_55px_-34px_rgba(0,0,0,0.45)] transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-32px_rgba(37,99,235,0.22)]"
                 >
                   <div className="relative aspect-[9/16] overflow-hidden">
                     <div

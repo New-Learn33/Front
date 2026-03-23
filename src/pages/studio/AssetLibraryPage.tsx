@@ -430,7 +430,7 @@ export default function AssetLibraryPage() {
           <div className="size-16 rounded-2xl bg-[#f5f9fd] flex items-center justify-center mb-4">
             <span className="material-symbols-outlined text-3xl text-primary/40">perm_media</span>
           </div>
-          <p className="text-sm font-semibold text-[#2d2926]">자료가 없습니다</p>
+          <p className="text-sm font-semibold text-[#2d2926]">자료가 없습니다.</p>
           <p className="text-xs text-warm-muted mt-1">이미지를 업로드하여 캐릭터 프로필을 생성하세요</p>
         </div>
       ) : viewMode === 'grid' ? (

@@ -139,7 +139,7 @@ export default function DashboardPage() {
         {myVideos.length === 0 ? (
           <div className="bg-white rounded-2xl border border-[#dde7f1] p-12 flex flex-col items-center text-warm-muted">
             <span className="material-symbols-outlined text-4xl mb-2">movie</span>
-            <p className="text-sm">아직 생성한 영상이 없습니다</p>
+            <p className="text-sm">아직 생성한 영상이 없습니다.</p>
             <Link to="/studio/create" className="mt-3 text-sm text-primary font-medium hover:underline">
               새 프로젝트 생성 →
             </Link>

@@ -227,7 +227,7 @@ export default function MyPage() {
           ) : videos.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-warm-muted">
               <span className="material-symbols-outlined text-5xl mb-3">movie</span>
-              <p className="text-sm">아직 업로드한 영상이 없습니다</p>
+              <p className="text-sm">아직 업로드한 영상이 없습니다.</p>
               <Link to="/studio/create" className="mt-4 text-sm text-primary font-medium hover:underline">
                 첫 영상 만들기
               </Link>
@@ -284,7 +284,7 @@ export default function MyPage() {
           ) : likedVideos.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-warm-muted">
               <span className="material-symbols-outlined text-5xl mb-3">favorite</span>
-              <p className="text-sm">좋아요한 영상이 없습니다</p>
+              <p className="text-sm">좋아요한 영상이 없습니다.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -334,7 +334,7 @@ export default function MyPage() {
           ) : comments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-warm-muted">
               <span className="material-symbols-outlined text-5xl mb-3">chat_bubble</span>
-              <p className="text-sm">작성한 댓글이 없습니다</p>
+              <p className="text-sm">작성한 댓글이 없습니다.</p>
             </div>
           ) : (
             comments.map((comment) => (

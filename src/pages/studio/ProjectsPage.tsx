@@ -245,7 +245,7 @@ export default function ProjectsPage() {
         <div className="flex flex-col items-center justify-center py-20 text-warm-muted">
           <span className="material-symbols-outlined text-5xl mb-3">folder_open</span>
           <p className="text-sm">
-            {projects.length === 0 ? '아직 작업이 없습니다' : '검색 결과가 없습니다'}
+            {projects.length === 0 ? '아직 작업이 없습니다.' : '검색 결과가 없습니다.'}
           </p>
           {projects.length === 0 && (
             <Link to="/studio/create" className="mt-4 text-sm text-primary font-medium hover:underline">
