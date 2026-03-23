@@ -167,6 +167,28 @@ export default function HomePage() {
                   </a>
                 </div>
 
+                <div className="mt-auto pt-4 grid gap-3 grid-cols-3 xl:pt-6">
+                  {(() => {
+                    const v = heroVideo
+                    if (!v) return null
+                    return (
+                      <>
+                        <div className={`rounded-2xl border p-3 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-[11px] tracking-[0.12em] text-slate-400">조회수</p>
+                          <p className="mt-1 text-lg font-bold">{formatCount(v.view_count ?? 0)}</p>
+                        </div>
+                        <div className={`rounded-2xl border p-3 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-[11px] tracking-[0.12em] text-slate-400">좋아요</p>
+                          <p className="mt-1 text-lg font-bold">{formatCount(v.like_count)}</p>
+                        </div>
+                        <div className={`rounded-2xl border p-3 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-[11px] tracking-[0.12em] text-slate-400">댓글</p>
+                          <p className="mt-1 text-lg font-bold">{formatCount(v.comment_count)}</p>
+                        </div>
+                      </>
+                    )
+                  })()}
+                </div>
               </div>
 
               <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#101a30] xl:w-[300px] xl:shrink-0">
@@ -198,29 +220,6 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
-            </div>
-            {/* 통계 카드 - 전체 너비 */}
-            <div className="mt-4 grid gap-3 grid-cols-3 xl:mt-6">
-              {(() => {
-                const v = heroVideo
-                if (!v) return null
-                return (
-                  <>
-                    <div className={`rounded-2xl border p-3 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
-                      <p className="text-[11px] tracking-[0.12em] text-slate-400">조회수</p>
-                      <p className="mt-1 text-lg font-bold">{formatCount(v.view_count ?? 0)}</p>
-                    </div>
-                    <div className={`rounded-2xl border p-3 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
-                      <p className="text-[11px] tracking-[0.12em] text-slate-400">좋아요</p>
-                      <p className="mt-1 text-lg font-bold">{formatCount(v.like_count)}</p>
-                    </div>
-                    <div className={`rounded-2xl border p-3 transition-all ${hoveredVideo ? 'border-primary/20 bg-primary/5' : 'border-white/10 bg-white/5'}`}>
-                      <p className="text-[11px] tracking-[0.12em] text-slate-400">댓글</p>
-                      <p className="mt-1 text-lg font-bold">{formatCount(v.comment_count)}</p>
-                    </div>
-                  </>
-                )
-              })()}
             </div>
           </div>
 
