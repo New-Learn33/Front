@@ -35,6 +35,18 @@ export function useAuth() {
       })
   }, [])
 
+  const refreshUser = async () => {
+    try {
+      const res = await authApi.me()
+      const userData = res.data.data
+      setUser(userData)
+      setIsLoggedIn(true)
+      localStorage.setItem('user', JSON.stringify(userData))
+    } catch {
+      // ignore
+    }
+  }
+
   const logout = async () => {
     try {
       await authApi.logout()
@@ -49,5 +61,5 @@ export function useAuth() {
     }
   }
 
-  return { user, isLoggedIn, isLoading, logout }
+  return { user, isLoggedIn, isLoading, logout, refreshUser }
 }

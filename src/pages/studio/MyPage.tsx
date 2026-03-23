@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 type Tab = 'videos' | 'likes' | 'comments'
 
 export default function MyPage() {
-  const { user, isLoading: authLoading } = useAuth()
+  const { user, isLoading: authLoading, refreshUser } = useAuth()
   const [activeTab, setActiveTab] = useState<Tab>('videos')
   const [nickname, setNickname] = useState('')
   const [isEditingNickname, setIsEditingNickname] = useState(false)
@@ -88,15 +88,7 @@ export default function MyPage() {
       const res = await userApi.updateProfile({ nickname: nickname.trim() })
       if (res.data.success) {
         setIsEditingNickname(false)
-        // localStorage에 유저 정보 갱신
-        const stored = localStorage.getItem('user')
-        if (stored) {
-          const parsed = JSON.parse(stored)
-          parsed.nickname = nickname.trim()
-          localStorage.setItem('user', JSON.stringify(parsed))
-        }
-        // 전체 페이지 리로드를 하면 배포 환경에서 /studio/mypage 404가 날 수 있어
-        // 로컬 상태/스토리지 갱신만으로 화면을 유지한다.
+        await refreshUser()
       }
     } catch (err) {
       console.error('닉네임 수정 실패:', err)
