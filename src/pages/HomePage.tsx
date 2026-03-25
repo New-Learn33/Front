@@ -77,7 +77,7 @@ export default function HomePage() {
     return videos
       .filter(v => v.created_at ? new Date(v.created_at) >= cutoff : true)
       .sort((a, b) => (b.like_count + (b.view_count || 0)) - (a.like_count + (a.view_count || 0)))
-      .slice(0, 4)
+      .slice(0, 5)
   }, [videos, rankPeriod])
 
   const [hoveredVideo, setHoveredVideo] = useState<VideoListItem | null>(null)
