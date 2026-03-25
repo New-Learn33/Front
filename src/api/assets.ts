@@ -8,7 +8,10 @@ export const assetsApi = {
   upload: (file: File, tags: string[] = [], name?: string) => {
     const formData = new FormData()
     formData.append('file', file)
-    tags.forEach((tag) => formData.append('tags', tag))
+    tags
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+      .forEach((tag) => formData.append('tags', tag))
     if (name) formData.append('name', name)
     return api.post<{ success: boolean; message: string; data: Asset }>(
       '/api/v1/assets/upload',

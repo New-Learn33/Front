@@ -101,7 +101,21 @@ export default function AssetLibraryPage() {
       try {
         const res = await assetsApi.upload(files[i], uploadTags)
         if (res.data.success) {
-          setAssets(prev => [res.data.data, ...prev])
+          const uploadedAsset = res.data.data
+
+          if (uploadTags.length > 0) {
+            try {
+              const tagRes = await assetsApi.updateTags(uploadedAsset.id, uploadTags)
+              if (tagRes.data.success) {
+                setAssets(prev => [tagRes.data.data, ...prev])
+                continue
+              }
+            } catch {
+              // 업로드는 성공했으므로 태그 저장 실패 시 기본 응답으로 표시
+            }
+          }
+
+          setAssets(prev => [uploadedAsset, ...prev])
         }
       } catch {
         failed++
@@ -159,7 +173,7 @@ export default function AssetLibraryPage() {
   const openTagEditor = (asset: Asset) => {
     if (selectMode) return
     setEditingAsset(asset)
-    const existing = new Set([...(asset.style_keywords || []), ...(asset.custom_tags || [])])
+    const existing = new Set(asset.custom_tags || [])
     setEditTags([...existing])
     setTagInput('')
   }
@@ -363,8 +377,8 @@ export default function AssetLibraryPage() {
             ))}
           </div>
         )}
-        <p className="text-[11px] text-warm-muted mt-2">
-          업로드 시 입력한 태그가 모든 선택 파일에 동일하게 적용됩니다.
+        <p className="text-[11px] text-rose-700/80 mt-2">
+          특정 캐릭터명 태그는 인식이 제한될 수 있습니다. 인식이 어려운 경우 동물 이름이나 일반 키워드로 다시 입력해 주세요.
         </p>
       </div>
 
@@ -482,21 +496,16 @@ export default function AssetLibraryPage() {
                   {formatSize(a.file_size)} · {timeAgo(a.created_at)}
                 </p>
                 {(() => {
-                  const allTags = [
-                    ...(a.style_keywords || []).map(t => ({ tag: t, type: 'style' as const })),
-                    ...(a.custom_tags || [])
-                      .filter(t => !(a.style_keywords || []).includes(t))
-                      .map(t => ({ tag: t, type: 'custom' as const })),
-                  ]
-                  return allTags.length > 0 && (
+                  const customTags = a.custom_tags || []
+                  return customTags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
-                      {allTags.slice(0, 3).map(({ tag, type }) => (
-                        <span key={tag} className={`text-[9px] px-1.5 py-0.5 rounded-full ${
-                          type === 'custom' ? 'bg-amber-100 text-amber-700' : 'bg-primary/10 text-primary'
-                        }`}>{tag}</span>
+                      {customTags.slice(0, 3).map((tag) => (
+                        <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                          {tag}
+                        </span>
                       ))}
-                      {allTags.length > 3 && (
-                        <span className="text-[9px] text-warm-muted">+{allTags.length - 3}</span>
+                      {customTags.length > 3 && (
+                        <span className="text-[9px] text-warm-muted">+{customTags.length - 3}</span>
                       )}
                     </div>
                   )
